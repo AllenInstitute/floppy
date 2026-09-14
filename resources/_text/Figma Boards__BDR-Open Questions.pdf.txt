@@ -1,0 +1,203 @@
+# source: resources/Figma Boards/BDR-Open Questions.pdf
+# original kept: no (too large)
+
+Technical/System Design
+Who is making this document and where does it
+live? I think we need this before we build anything.
+The use cases do not seem sufficient. We need
+specs and requirements and diagrams that cover
+all the workstreams.
+abhe rajagopal
+Workstreams 1,3,4
+Workstreams 2,5,6  Documented Answers/Decisions
+The functional unit of the  Data Assets can contain  Default Boundary Policy:
+Continuous registration
+What is the versioning  How to store updates?
+Schema Language
+Kubernetes vs Serverless
+Relational DB vs  BDR is a Data Asset. A  raw or derived data.  Data assets are from a
+vs noise
+strategy?
+Document Store
+Data Asset is defined as  Derived files are  single acquisition for raw
+Analysis can result in
+How should curation  Hows is the database  Should we leverage AWS-  persistently-identified  processed from raw data  data — i.e., "one raw asset
+many highly similar files
+How will iterations or  transforms be applied?  schema defined? SQL,  native serverless products  What is the persistence  single data file or  files.  ≈ one acquisition"
+before formal artifacts are
+alterations to the same  Are they atomic,  python/SQLModel, c#/hot  (documentdb, aurora) or  database for metadata?  organized set of files that
+derived. How do we
+Granularity and Data  Files-only registry or  Boundaries & integration
+What is a Data Asset?
+entry be tracked and  reversible, deltas,  chocolate, go/mongo, etc  admin our own servers  PostgreSQL + JSON  carries metadata and  One Data Asset for files
+balance continous
+Types
+more
+Does BioDataRegistry  communicated?
+patches? How do we re-  (EC2+K8s)?  columns, or mongodb/  provenance, resolves to  produced during a single
+registration vs file noise vs  Jess Thomas  Stark
+Does BioDataRegistry only  replace existing Registry  What are we considering a  build the registry after 1 or  documentdb?  one or more physical  acquisition
+scientists only registering  David  David
+At what data granularity  capture files or other  solutions outright or sit as  data asset? How do Allen  2 years with the edits?  distributions, and
+milestone artifacts ad-hoc  David
+do we want to support  entities also? Are the  a layer on top of them?
+Institute groups currently  abhe rajagopal
+references the subjects  One Data Asset for files
+and how prescriptive do  latter needed to make  define an asset?  Jess Thomas
+Sven Otto  and samples it describes.  produced by an
+we want to be?
+sense of files beyond just  Implications of where
+Jess Thomas
+automated computation
+metadata?  pipelines are registering
+Jess Thomas  Jess Thomas
+strict: acquisitions and  Sven Otto
+data.
+collections
+loose: files
+What does a transition  The BioData Registry will  For owned data,
+look like?  Storage System Support
+support the Registration  maintained and governed
+Individual files?  Sven Otto
+and Search of Data Assets  by the Allen Institute, the
+Directories? Compressed  What kind of file systems  pertaining to raw data  BioData Registry will
+Archives? Databases?  do we want to support?
+stored on any cloud (  facilitate authorized
+GCP, Azure, AWS, VAST,  Allen Institute on prem  data stored on any cloud
+external collaborators  storage ( VAST, Isilon).
+or on prem storage.
+databases, all of the
+above?  Note this is decision is on  For unowned data,
+Example data for
+Registration and Search  maintained and governed
+harmonization?
+only.  by outside entities, the
+BioData Registry will
+What existing data/  provide a file path and
+assets/metadata can we  facilitate an authorization
+look at? This will help us  request to the data owner.
+Stickies  Add text  understand the scope and  If granted, BDR will
+Toolbar
+extent of data/metadata  The BDR is designed as an  facilitate retrieval.
+It’s at the bottom of your  variation. Will also help us  inventory system NOT an
+screen, with stickies,  Press “S” to quickly add a sticky  Work on access and
+look at algorithm/AI  archival reference system.
+stamps, and anything  to the canvas.  authorization will occur in
+requirements.
+you need.  the following priority
+Meaning the BDR will NOT
+be capable of reproducing  order:
+S  raw data from a prior
+publication.  Owned Data:
+1. AWS
+Jess Thomas  GCP
+controls are in the top right  Stamps  BioData Registry WILL
+TBD
+corner.  maintain a revision history
+Leave your mark on the canvas  for each Core Component  Jess Thomas
+with a stamp. Make sure you  table in the BioData
+Spacebar  setup an avatar in your user  Schema.
+settings. This enables you to
+stamp your avatar.  These are for Data Assets
+that are validated and
+stored in the persistence
+E  (  toggle)  layer.
+Work with your  Share  Jess Thomas
+team
+Click the Share button above
+Ontologies and Data
+Models
+Pr  ovenance
+Archiving data”
+“  Search capabilities
+AI Embeddings for Search
+URL to raw/native data
+Chat with others in the file by  What is the definition of sample vs specimen?
+How much provenance  I believe we asserted that  What search capabilities  How do we select which  How do we refer/locate/
+pressing “/” or by accessing  Some ontologies are  does Registry hold? e.g.  archive =/= delete. But  data-driven columns to  access raw data and
+Sawyer Hood
+does Registry need in-
+metadata files
+the top toolbar.  could that information be captured in other ways?
+we use is ~100K entries.
+data that produced a  mean?
+corresponding to every
+Love this idea!!!
+given data asset.
+downstream applications?
+What is our performance  asset in the registry?
+What's the best way to  Is there a “level of access”  Simple ID lookups,  benchmark?
+Lock all  /  One subject or one tissue from one subject,  refer to these massive
+David
+layer to archiving - e.g.  opensearch, natural  What are the access
+Choose to lock all content in the section or  Lock background only  whichever is least granular
+vocabularies that don't fit  archive = deep glacier
+language queries, etc.  What use cases does it  protocols or file formats  ?
+only the background to allow content  One collection event (i.e., blood draw)
+well into python  David
+cover?
+interactions while preventing sections from  One aliquot of a blood draw
+packages?
+HMW have tombstones for
+Where could the files be
+being moved or deleted.  One sample of one tissue passage of cell  Data Storage Governance
+old versions w/ references  cached to for processing?
+culture
+to newer versions to not  abhe rajagopal
+Alina Ott  What does the  break access chains &
+when section selected  redirect to latest records?
+relationship look like  Inference time compute
+between a centralized  Sven Otto
+metadata registry team  How should we handle
+Celebrate wins with others by  What metadata updates  and accelerators/  compute for complex
+high-fiving. Simply press and  to prioritize?
+collaborators maintaining  search, curation, or
+hold the “H” key and wave your  their own Data Storage?  transform steps (e.g.
+cursor around.  We may need new  Who is responsible for  requiring GPU and/or AI).
+concepts or edits to  what aspect of the  abhe rajagopal
+existing ones. What  metadata and the
+(Hold)  H  should we focus on?  underlying data?
+David  Jess Thomas
+Quickly access the emoji wheel
+to add live reactions when
+collaborating with others.
+E  (toggle)
+What permission groups  At what level are  C  RUD API
+Sharing metadata access
+Sensitive metadata
+Compliance
+do we need?
+constraints applied?
+How do we expose  Can every access request/  Acknowledging the  How are we handling the
+2: org, individual
+Institute level, team level,  operations for creating/  decision resolve through  requirement for “sensitive  data use agreement
+3: org, project/space,  modality level...all of these  updating/deleting  group membership? Do  metadata handling”, does  verification loop? Do we
+individual
+will need the just right  metadata? REST (e.g.  we need arbitrary per  -  this extend to the  interface with Malbek?
+4: org, workspace, project,  level of control vs  FastAPI), GraphQL, etc  -
+person, per dataset  redaction of sensitive
+flexibility.
+sharing  ?
+fields under certain
+Aldan Beaubien
+5: +team
+circumstances?
+When a scientist wants to
+(possibly same as  Aldan Beaubien
+Jess Thomas  share a dataset with
+constraints question)
+someone outside their
+Jess Thomas  project, what will the flow
+P
+be? ick a person? A
+team? Request approval
+Auth
+How much is role or
+from a  PM P
+or I?
+resource based auth  Aldan Beaubien
+managed in
+BioDataRegistry vs in
+underlying accelerator
+specific tooling
+Sven Otto

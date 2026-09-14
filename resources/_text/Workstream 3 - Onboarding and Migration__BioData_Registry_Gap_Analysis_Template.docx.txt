@@ -1,0 +1,237 @@
+# source: resources/Workstream 3 - Onboarding and Migration/BioData_Registry_Gap_Analysis_Template.docx
+# original kept: yes
+
+**BioData Registry**
+
+**Schema Gap Analysis --- Dataset Report**
+
+  ------------------------- -----------------------------------------------------------------------------------------
+  **Dataset / System**      \[Source Dataset or System Name --- e.g., \"Immunology Registry\" / \"mIF Cell DIVE\"\]
+  **Source Organization**   \[Allen Institute team or external collaborator\]
+  **Prepared by**           \[Name(s) · Workstream 2, Workstream 3
+  **Reference Schema**      aind-data-schema (latest) · https://aind-data-schema.readthedocs.io/en/latest/
+  **Milestone**             Milestone 0 --- Track C · DDM Gate target: Aug 14, 2026
+  **Status**                \[ Draft \| In Review \| Final \]
+  **Date**                  \[YYYY-MM-DD\]
+  **Version**               v0.1
+  ------------------------- -----------------------------------------------------------------------------------------
+
+1. Purpose & Scope
+==================
+
+This document applies the BioData Registry schema (aind-data-schema) to
+a sample dataset from \[Source System\] and catalogs every schema gap,
+conflict, and unmappable field as required by Milestone 0, Track C. The
+goal is to surface structural and field-level mismatches, enabling the
+Schema & Data Model workstream (WS2) and the Metadata Onboarding &
+Migration workstream (WS3) to plan schema extensions and migration
+strategies.
+
+**Source documents reviewed:**
+
+-   \[Source document 1 --- e.g., Registry Spec, Metadata Ingest Spec\]
+
+-   \[Source document 2\]
+
+-   \[Sample data files --- list filenames / asset IDs\]
+
+-   BioData Registry overview and charter
+
+-   aind-data-schema documentation
+    (https://aind-data-schema.readthedocs.io/en/latest/)
+
+2. Executive Summary of Key Gaps
+================================
+
+Describe in 2--3 sentences the most consequential differences between
+the source system and the target schema. What is the single biggest
+structural mismatch? What is the most impactful gap for onboarding?
+
+  -------------------------- ------------------------------------------------------------------------- ------------ -------------------------------------------------------------------------------------- ----------------------
+  **Key Gaps --- Summary**                                                                                                                                                                                 
+  **\#**                     **Gap / Issue Title**                                                     **Impact**   **Recommended Action**                                                                 **Workstream Owner**
+  **G1**                     **\[Short title --- e.g., \"No first-class Cohort entity\"\]**            **High**     \[E.g., Add persistent Cohort/Study grouping with stable ID (R1)\]                     WS2 / WS3
+  **G2**                     **\[Short title --- e.g., \"Asset-to-subject cardinality mismatch\"\]**   **High**     \[E.g., Decide: decompose multi-subject assets (WS3) or extend schema (WS2) --- R2\]   WS2 + WS3
+  **G3**                     **\[Short title --- e.g., \"No biospecimen sampleType vocabulary\"\]**    **Medium**   \[E.g., Add sampleType enum to SpecimenProcedure (R4)\]                                WS2
+  **G4**                     **\[\...\]**                                                              **Low**      \[\...\]                                                                               \[\...\]
+  -------------------------- ------------------------------------------------------------------------- ------------ -------------------------------------------------------------------------------------- ----------------------
+
+3. Terminology Reconciliation
+=============================
+
+Map source-system terms to their closest BioData Registry (AIND)
+concepts and note any semantic divergence. This shared vocabulary is
+used throughout the rest of the document.
+
+  --------------------------------------- ---------------------------------------- ---------------------------------------------------------------- -----------
+  **Source Term**                         **Closest aind Concept**                 **Caveat / Semantic Divergence**                                 **Notes**
+  \[Source term 1\]                       \[aind equivalent\]                      \[Any semantic difference\]                                      
+  \[Source term 2\]                       \[aind equivalent\]                      \[Any semantic difference\]                                      
+  \[Source term 3 --- e.g., DataAsset\]   metadata.json + data\_description.json   Source models file units; aind models acquisition sessions.      
+  \[Source term 4 --- e.g., Cohort\]      --- (no analog)                          No persistent cohort entity in aind core; only free-text tags.   Drives G1
+  --------------------------------------- ---------------------------------------- ---------------------------------------------------------------- -----------
+
+4. Classification Legend
+========================
+
+All fields in Section 5 are tagged with one of the following
+classifications.
+
+  ----------------------------------------------------------------------- ----------------------------------------------------------------------------- ------------------------------------------------------------------------------- ------------------------------------------------------------------------ --------------------------------------------------------------------
+  **Classification Legend**                                                                                                                                                                                                                                                                                      
+  **🟢 Mapped**                                                            **🟡 Gap**                                                                     **🔴 Conflict**                                                                  **⚪ Unmappable**                                                         **❓ Needs Review**
+  Field maps to an existing schema field, possibly with transformation.   Field has no equivalent in the target schema; schema extension recommended.   Field exists in schema but with incompatible semantics, type, or cardinality.   Field cannot be mapped; belongs to platform/service layer, not schema.   Mapping ambiguous; team decision or schema clarification required.
+  ----------------------------------------------------------------------- ----------------------------------------------------------------------------- ------------------------------------------------------------------------------- ------------------------------------------------------------------------ --------------------------------------------------------------------
+
+5. Field-Level Mapping by Entity
+================================
+
+The tables below map every source field to its target in the aind
+schema. Add one table block per entity. Copy the pattern for additional
+entities.
+
+**5.1 Subject / Participant**
+
+Brief description of how this entity is modeled in the source system and
+any key structural differences from the aind concept.
+
+  -------------------------------------------------------------- -------------------- -------------------------- -------------------- ------------------------------------------------------------------------------------------------------------- --------------------------------------------------------------------------------
+  **Entity: Subject \| Source: \[Source System / Team Name\]**                                                                                                                                                                                      
+  **Source Field**                                               **Source Type**      **Target Field (aind)**    **Classification**   **Notes / Mismatch Detail**                                                                                   **Recommendation**
+  **subject\_id / name**                                         string               subject.subject\_id        **Mapped**           Direct 1:1 correspondence.                                                                                    Use as-is.
+  **species**                                                    string (free text)   subject\_details.species   **Conflict**         aind uses NCBI-controlled vocabulary; source uses free-text strings. Requires normalization.                  Map to NCBI Taxonomy during onboarding; flag unrecognized values for curation.
+  **race / ethnicity**                                           string               --- (no analog)            **Gap**              HumanSubject type has no race or ethnicity fields.                                                            R3: Extend HumanSubject with controlled-vocab race/ethnicity fields (WS2).
+  **ageAtEnrollment (\"90+\")**                                  string / int         --- (no analog)            **Gap**              HIPAA requires capped representation for ages \> 89. Schema currently uses full year\_of\_birth.              R7: Add HIPAA-aware age/date fields to schema; implement validator (WS2).
+  **accountGuid**                                                uuid                 --- (platform)             **Unmappable**       Tenant-identity field; belongs in Registry RBAC layer, not the portable JSON schema.                          Map to Organization/Space in Registry platform (WS1/WS4).
+  **cohortId**                                                   uuid                 --- (no analog)            **Needs Review**     Depends on whether Registry introduces a first-class Cohort entity (R1). Tags are an inadequate substitute.   Decision needed: schema-level Cohort (WS2) or typed platform Collection (WS1)?
+  -------------------------------------------------------------- -------------------- -------------------------- -------------------- ------------------------------------------------------------------------------------------------------------- --------------------------------------------------------------------------------
+
+**5.2 Data Asset / File Unit**
+
+Brief description of how this entity is modeled in the source system.
+
+  ----------------------------------------------------------------------------- ----------------- ------------------------------ -------------------- --------------------------------------------------------------------------------------------------- ------------------------------------------------------------------------------------
+  **Entity: Data Asset / File Unit \| Source: \[Source System / Team Name\]**                                                                                                                                                                             
+  **Source Field**                                                              **Source Type**   **Target Field (aind)**        **Classification**   **Notes / Mismatch Detail**                                                                         **Recommendation**
+  **storageUri**                                                                string (URI)      metadata.location              **Mapped**           Single current location string.                                                                     Use as-is.
+  **checksum (MD5)**                                                            string            --- (no analog)                **Gap**              No checksum field in aind metadata core.                                                            R9: Add checksum field to core or hold at platform layer (WS1).
+  **sampleNames\[\] (multi-subject)**                                           string\[\]        subject.subject\_id (scalar)   **Conflict**         Critical cardinality mismatch. aind enforces 1 subject per asset; source references many samples.   R2: Decide between decomposition (WS3) vs. schema extension to subjects\[\] (WS2).
+  **visibility (public/private/protected)**                                     enum              --- (platform)                 **Unmappable**       Access-control flag; belongs in Registry RBAC, not the schema.                                      Map to Registry sensitive flag + share scope (WS4).
+  ----------------------------------------------------------------------------- ----------------- ------------------------------ -------------------- --------------------------------------------------------------------------------------------------- ------------------------------------------------------------------------------------
+
+**5.3 \[Next Entity --- e.g., Sample / Specimen\]**
+
+Copy the fieldMappingTable block above and fill in fields for this
+entity.
+
+**5.4 \[Next Entity --- e.g., Procedure\]**
+
+Copy the fieldMappingTable block above and fill in fields for this
+entity.
+
+6. Cross-Cutting Concerns
+=========================
+
+Document structural or governance concerns that affect multiple entities
+and do not belong in a single field row.
+
+**6.1 Governance, Identity & Multi-Tenancy**
+
+Describe how tenancy, access control, soft-delete, audit trail, and
+revision history work in the source system, and confirm they belong in
+the Registry platform layer (WS1/WS4), not the portable JSON schema.
+Reference the Platform field crosswalk in Section 5 rows tagged
+Unmappable.
+
+**6.2 Human Data & HIPAA Considerations**
+
+Document any HIPAA-sensitive fields (date granularity, age capping,
+de-identification). Flag date fields that assume full-precision dates
+vs. those that require year-only or month/year. Note whether the source
+system HIPAA handling has a counterpart in the aind schema.
+
+**6.3 Provenance & Derived Data**
+
+Document how the source system tracks data lineage (raw vs. derived,
+source asset references, processing steps). Note gaps relative to aind
+data\_description.data\_level, source\_data\[\], and processing.json.
+
+**6.4 Extensibility & Controlled Vocabulary**
+
+Describe the source system approach to controlled vocabulary (e.g.,
+per-account dictionaries, free text, external ontologies). Contrast with
+the aind approach (vocabulary baked into schema and registries). Flag
+fields that require new controlled-vocabulary additions.
+
+7. Proposed Schema Adjustments
+==============================
+
+The following recommendations address the gaps and conflicts identified
+in Section 5. Number them R1, R2, ... and cross-reference gap IDs from
+Section 2. Each recommendation notes whether it is a schema change (WS2)
+or a platform/service concern (WS1/WS4).
+
+  ---------- --------------- ----------------------- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- ----------------------
+  **Rec.**   **Addresses**   **Layer**               **Description**                                                                                                                                                                                                              **Workstream**
+  R1         G1              Schema                  Introduce a first-class Cohort/Study entity with stable ID, name, and description. Allow subjects and assets to reference it. Alternatively, formalize platform Collections with stable IDs as a Cohort stand-in.            WS2 (decision) / WS1
+  R2         G2              Schema or WS3           Resolve asset-to-biology cardinality. Either (a) enforce 1-per-acquisition and provide decomposition logic at onboarding (WS3), or (b) extend schema with subjects\[\]/specimens\[\] linkage for multiplexed assays (WS2).   WS2 + WS3
+  R3         \[Gap IDs\]     \[Schema / Platform\]   \[Describe the recommendation\]                                                                                                                                                                                              \[WS\]
+  R4         \[Gap IDs\]     \[Schema / Platform\]   \[Describe the recommendation\]                                                                                                                                                                                              \[WS\]
+  ---------- --------------- ----------------------- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- ----------------------
+
+8. Open Questions
+=================
+
+Questions that must be resolved before migration can proceed or that
+require a cross-workstream decision.
+
+  -------------------- --------------------------------------------------------------------------------------- --------------- -------------------------
+  **Open Questions**                                                                                                           
+  **\#**               **Question**                                                                            **Blocking?**   **Owner / Target Date**
+  **Q1**               \[State the question clearly, e.g.: How should multi-subject assets be represented?\]   Yes / No        \[WS2 · Aug 21\]
+  **Q2**               \[\...\]                                                                                                
+  **Q3**               \[\...\]                                                                                                
+  -------------------- --------------------------------------------------------------------------------------- --------------- -------------------------
+
+9. Milestone 0 Metrics
+======================
+
+Populate these after completing Sections 4--7. These feed the DDM Gate
+review.
+
+  ----------------------------------- ---------------- -------------------------------------
+  **Metric**                          **Value**        **Notes**
+  Total fields examined               \[N\]            
+  Fields classified as Mapped         \[N\] (\[X\]%)   
+  Fields classified as Gap            \[N\] (\[X\]%)   
+  Fields classified as Conflict       \[N\] (\[X\]%)   
+  Fields classified as Unmappable     \[N\] (\[X\]%)   Platform layer; counted separately.
+  Fields classified as Needs Review   \[N\] (\[X\]%)   
+  Entities covered                    \[N\]            List entity names.
+  Recommendations raised              \[N\]            Cross-reference Section 7.
+  Open questions (blocking)           \[N\]            Cross-reference Section 8.
+  ----------------------------------- ---------------- -------------------------------------
+
+10. Sources & Method
+====================
+
+Describe the documents and schema versions reviewed to produce this
+analysis. Be specific about which version of aind-data-schema was used;
+schema details should be re-verified against the pinned version used by
+the Registry.
+
+-   \[Source document 1 --- title, URL or file reference, version/date\]
+
+-   \[Source document 2\]
+
+-   \[Sample data files reviewed --- list asset IDs or filenames\]
+
+-   aind-data-schema --- \[pinned version/commit\].
+    https://aind-data-schema.readthedocs.io/en/latest/
+
+-   BioData Registry overview and charter (kick-off deck, July 23 2026)
+
+Prepared as a draft for Workstream 2 (Schema & Data Model) and
+Workstream 3 (Metadata Onboarding & Migration). Field details should be
+re-verified against the pinned schema version before the DDM Gate
+review.

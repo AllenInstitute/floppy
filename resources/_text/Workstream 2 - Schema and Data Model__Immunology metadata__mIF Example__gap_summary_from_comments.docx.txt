@@ -1,0 +1,67 @@
+# source: resources/Workstream 2 - Schema and Data Model/Immunology metadata/mIF Example/gap_summary_from_comments.docx
+# original kept: yes
+
+Here\'s the consolidated summary of gaps between the mIF example data
+and the aind-data-schema:
+
+**Subject schema**
+
+The schema has no type for histological specimens. All three subject
+detail types (Mouse, Human, NonHumanPrimate) describe live subjects;
+TissueSection needs to be added with fields for tissue/slide IDs,
+fixation method, embedding medium, section thickness, and antigen
+retrieval parameters. For the human subject type specifically: species
+is redundant with the subject type and can be dropped; source is
+designed around animal acquisition and doesn\'t translate to a human
+collaborator/collection site; year\_of\_birth needs HIPAA-compliant
+handling for subjects over 89 (aggregation, and a mechanism to update
+this over time). Several fields present in the data have no home in the
+schema at all: diagnosis (multi-value, updatable), ethnicity, race,
+consent, and cohort --- all of which are more naturally attached to the
+subject than to the acquisition.
+
+**Data description schema**
+
+subject\_id as the primary key breaks down when an acquisition covers
+multiple specimens, or when the meaningful identifier is a sample rather
+than a subject (e.g., a tissue section or a tube). The auto-generated
+name field (subject\_id + timestamp) risks collision if two datasets are
+created on the same day without a precise time. project\_name needs
+clarification on whether it should be a human-readable name, an
+experiment ID like EXP-01367, or both. modalities doesn\'t include mIF
+or any cyclic/multiplexed imaging modality --- this is a registry gap,
+not just a naming question. tags, source\_data, and restrictions all
+lack guidance: what controlled vocabulary applies to tags, how
+source\_data gets populated (manual vs. automated), and whether
+restrictions should hold a legal document ID or overlap with consent
+fields already in the subject schema.
+
+**Acquisition schema**
+
+The biggest structural gap: DataStream models simultaneous data
+collection, but Cell DIVE (and any cyclic assay) is inherently
+sequential --- 10 staining rounds, each with its own operator, date,
+antibody plan, reagent lots, deactivation step, and QC flags. There\'s
+no model for this cyclic structure. The antibody panel itself ---
+channel assignments, antibody name, clone, fluorophore, concentration,
+lot number, and barcode verification --- has no place anywhere in the
+current schema. This gap applies beyond mIF: Xenium gene panels and Flex
+scRNA have the same problem. subject\_details within acquisition is
+mouse-centric (weight, platform, reward) and mislabeled --- for human
+tissue experiments the relevant \"subject at acquisition\" information
+is clinical or survey data (e.g., smoking history at time of
+collection), which needs to be searchable. ethics\_review\_id is noted
+as mouse-schema-specific and not applicable for human subjects.
+calibrations and maintenance are questioned as better fits under QC than
+acquisition. stimulus\_epochs and manipulations are entirely
+inapplicable to fixed tissue experiments.
+
+**Proposed additions (from the comments)**
+
+Four new models were flagged as needed: TissueSection (subject type),
+StainingRound (cyclic acquisition unit with antibody plan, deactivation,
+and reagent log), AntibodyChannel (per-channel reagent metadata with
+barcode verification), and DeactivationStep (reagent lots and protocol
+parameters between rounds). mIF also needs to be added to the modality
+registry, with a question about granularity --- whether \"Cell DIVE\"
+should be its own modality or a platform-level detail within mIF.

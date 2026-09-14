@@ -1,0 +1,940 @@
+# source: resources/Workstream 2 - Schema and Data Model/workstream_2_doc.pdf
+# original kept: yes
+
+🔭 Overview
+BioData Registry Worksteam 2 & 3
+Task: (By December 2026) A working data model with a prototype metadata
+schema and user testing. ​
+
+Milestone       Deliverable                                Date
+
+Milestone 0       Milestone 0 Report: Mapping Accelerat…   2026-08-13
+
+Milestone 1
+milestone 1/ Track C
+Workstream 2
+Owner:
+Members: Alina Ott Aishwarya Chander Nathan Gouwens Daniel Birman Saskia de Vries
+Nathalie Gaudreault
+Collaborators: SeaHub Collaborator TBD
+
+Key Deliverable: A templatized gap analysis diagnostic report applying the current
+biodata-schema to 2 additional datasets (Cell Science and SeaHub)​
+
+      ​ Task 1: Identify Workstream owners​
+      ​ Task 2: Identify and source 1 Cell Science microscopy dataset and 1 representative
+        SeaHub dataset​
+      ​ Task 3: Consolidate previous M0 gap analysis documents into a single re-usable
+        template
+      ​ Task 4: Each dataset mapped to core schemas + extension
+      ​ Task 5: Each dataset’s gaps, conflicts, unmappable fields are captured and categorized
+
+Homework – Due 09/11:
+  1.​ Gap analysis template + agent.md doc for future gap mapping
+  2.​ Cell Sci + SeaHub Gap Analysis
+  3.​ Consolidated Q&A Doc
+milestone 0/ Track C
+Workstream 2 & 3
+Owner: Alina Ott
+Members: Alina Ott Saskia de Vries Aishwarya Chander Tim Dolbeare
+Doug Ollerenshaw Mekhla Kapoor Daniel Birman Nathan Gouwens Raymond Sanchez
+
+Key Deliverables: A diagnostic report applying the current biodata-schema to 3 datasets
+cataloging every gap, conflict and unmappable field each categorized by type and tagged to the
+dataset(s) it affects.​
+
+      ​ Task 1: Identify Workstream owners​- Alina Ott (2), Ray Sanchez (3)
+      ​ Task 2: Answer M0 relevant questions, Document new questions​
+      ​ Task 3: Identify and source 3 PoC datasets (bs, nd, im) confirm with owners​
+      ​ Task 4: Each dataset mapped to core schemas+ extension
+      ​ Task 5: Each dataset’s gaps, conflicts, unmappable fields are captured and categorized
+
+
+DDM Gate Decision Prompt​
+“Do we have clarity on what we are building and why?”​
+“Are cross-workstream dependencies sufficiently defined?”​
+”Are there blocking questions remaining?”
+
+Success Criteria:​
+     ​ Workstream Owners identified​
+     ​ Blocking questions resolved​
+     ​ Use cases are validated based on real customer feedback/behavior​
+     ​ Consensus that architectural proposal is stable enough for MVP development​
+     ​ All schema gaps, conflicts, and unmappable fields are documented for all 3 datasets.
+
+Links to things:
+    1.​ schema.md - single-cell-curation CZIs Omics Schema
+    2.​ Metaxy tool - https://docs.metaxy.io/stable/guide/concepts/metadata-stores/
+    3.​ Current ND Schema: https://aind-data-schema.readthedocs.io/en/latest/
+    4.​ aind-metadata-service: http://aind-metadata-service/docs
+📊 Datasets
+Datasets/
+   ●​ Imaging/Microscopy
+         ○​ Immunology - 1 CellDive Dataset → Image based TIFF file (from 1 or 2 tissue
+             blocks)
+         ○​ Neural Dynamics - 1 Data Asset (any) → Time series data from Mouse
+         ○​ Brain Science - 1 Data Asset → Patch-seq
+   ●​ Transcriptomics
+   ●​ Multimodal Datasets (Patch-seq, TEA-seq, CITE-seq)
+   ●​ Behavioral datasets (sometimes both at once imaging + action)​
+
+Workstream Sharepoint: Link
+Dataset           Location      Accelerator Type                  Metadata           Folder
+                                                                  Source
+
+Cell DIVE         AWS/Vast      Immunology   Microscopy           SLIMS, Google      sharepoint
+                                                                  Sheets
+
+TEA-seq:          HISE          Immunology   Multiomics           SLIMS →            sharepoint
+scATAC,                                                           HISE, Google
+scRNA and                                                         Sheets
+CITE-seq
+
+Patch-seq         Isilon/LIMS   Brain        Transcriptomic,      LIMS               sharepoint
+                                Science      electrophysiology,
+                                             single-cell
+                                             morphology
+behavior_84491    AWS/Vast      Neural       Ecephys,             Metadata-servi     s3://aind-
+7_2026-06-02_1                                                                       open-data/
+1-08-15_sorted-
+                                Dynamics     behavior, behavior   ce (sharepoint,    behavior_8
+opto_2026-06-1                               videos               SLIMS, etc),       44917_2026
+                                                                                     -06-02_11-
+0_11-52-21                                                        acquisition data   08-15_sort
+                                                                  files              ed-opto_20
+                                                                                     26-06-10_1
+                                                                                     1-52-21
+                                                                  Post migration:
+                                                                  Dataverse, etc.
+
+                                Cell         Microscopy
+                                Science
+
+                                SeaHub
+⛓️‍💥 Gaps
+                                          Gaps
+General
+   ●​ Alignment on procedure (pre-data acquisition steps) + subject vs specimen and whether
+      all specimen conditions can be captured by procedure + subject
+           ○​ Cases where there is no subject (i.e., cultured cells) - need to identify additional
+              use cases where procedure + subject wouldn’t be appropriate
+           ○​ Still need a way to capture the specimen ID as it relates to LIMS but not as its
+              own schema
+           ○​ General preference to procedure + subject with ability to capture other cases
+   ●​ Expansion and clarification of schema definitions and pre-defined fields (e.g. enums) for
+      applicability across accelerators
+           ○​ When are there defined fields, where are there best practices, etc.
+           ○​ How to add to pre-defined fields?
+           ○​ Which classes should be pre-defined vs generic (ex: BloodDraw vs
+              SampleCollection)
+                   ■​ More generic is easier to search/compare
+           ○​ Majority of the work
+   ●​ Expansion and review of data access restrictions (patient consent, contracts, etc.)
+   ●​ Method for updating information or audit log and where this lives, which may not be
+      within the data schema
+
+Data description
+   ●​ Information on how to find the data and which files are relevant
+          ○​ Current schema is closely tied to neural dynamics data storage policies and
+               expectations
+
+Acquisition
+   ●​ Path many to one mapping for subjects to acquisition (ex. pooled sequencing data,
+       interactive social behavior studies)
+
+Subject:
+   ●​ Ability to track disease state, which may be updated over time
+   ●​ HIPAA/PII compliance for human subject metadata (ex. birth year aggregation for ages >
+       89)
+           ○​ More clarity and discussion around how to meet requirements and best practices
+   ●​ Human subject fields (diagnosis, ethnicity, race, consent, cohort)
+   ●​ Human clinical and survey data
+           ○​ Very messy - not consistent fields, not consistent information
+           ○​ Is this data or metadata?
+
+Procedure:
+   ●​ Tissue slicing and sectioning information
+           ○​ Improvement rather than gap - substantial effort required
+         ○​ Need to assess all the ways this is done
+   ●​ Pooling of multi-subject specimens
+
+Instrument
+    ●​ Specific to custom-built instruments and may be simplified for “off the shelf” devices
+
+Tasks:
+     ​ Remap mIF based on comments
+☕ TEA-seq Gap Analyses
+2026-08-10 TEA-seq analysis exercise – Thoughts & Comments
+By Aishwarya Chander
+
+Gaps for multi-omic, multimodal assays:
+
+   1.​ Need more modalities: The modality list is mostly neural dynamics assays and is
+       missing most assays that Immunology uses (FLOW, OLINK, CITE-seq, TEA-seq etc).
+       acquisition_type is free text with no controlled vocabulary. "TEA-seq", "CITE-seq",
+       "multiome", and "Flex" all need defined terms to be searchable.
+   2.​ No way to capture multiplexed / hashed pooled data: Many 10x methods pool
+       multiple donors into one lane and demultiplexes afterward. It's unclear where this should
+       be logged — by experiment, donor, or acquisition. There is no field for pool ID, pool size,
+       multiplexing method, sample tag assignments, or demultiplexing outputs.
+   3.​ More human subject fields: HumanSubject only has species, sex, year of birth, and
+       source. Missing: ethnicity, age at enrollment, diagnosis, cohort, consent, and
+       participation, clinical survey data (BMI, smoking, alcohol)
+   4.​ Tree structure for multimodal and paired datasets: No way to link related assets (e.g.
+       RNA + ATAC + ADT from one run, or paired spatial and single-cell from the same
+       tissue). Assets are independent records with no parent–child or sibling relationships.
+   5.​ Ontology pinning and versioning: Nice to have
+   6.​ HIPAA compliance checks: Rules like age masking (90+ must be reported as "90+",
+       not an exact age) are documented but not enforced by validators.
+
+AIND Nice things:
+
+   1.​ Acquisition provenance: The subject → specimen → acquisition chain is well modeled.
+   2.​ Data processing lineage: DataLevel and source_data give a clear raw → derived
+       chain. processing.json captures software and parameters per step.
+   3.​ Collapsible, modular multi-document structure: Each document (subject,
+       procedures, instrument, acquisition, QC) has its own schema version and can be
+       validated independently.
+   4.​ Institutional and organizational metadata: ROR organizations, ORCID investigators,
+       and funding records are supported.
+   5.​ QC documents: omg LOVE.
+⚡ mIF Gap Analyses
+For doc with comments:
+https://alleninstitute.sharepoint.com/:w:/r/sites/BioDataRegistryV-Tea
+m/_layouts/15/Doc.aspx?sourcedoc=%7B9873C8F6-BF44-42E3-B1C3-
+F89760072466%7D&file=gap_summary_from_comments.docx&action
+=default&mobileredirect=true
+By Alina Ott
+
+Here's the consolidated summary of gaps between the mIF example data and the
+aind-data-schema:
+
+Subject schema
+The schema has no type for histological specimens. All three subject detail types (Mouse,
+Human, NonHumanPrimate) describe live subjects; TissueSection needs to be added with
+fields for tissue/slide IDs, fixation method, embedding medium, section thickness, and antigen
+retrieval parameters. For the human subject type specifically: species is redundant with the
+subject type and can be dropped; source is designed around animal acquisition and doesn't
+translate to a human collaborator/collection site; year_of_birth needs HIPAA-compliant
+handling for subjects over 89 (aggregation, and a mechanism to update this over time). Several
+fields present in the data have no home in the schema at all: diagnosis (multi-value, updatable),
+ethnicity, race, consent, and cohort — all of which are more naturally attached to the subject than
+to the acquisition.
+
+Data description schema
+subject_id as the primary key breaks down when an acquisition covers multiple specimens, or
+when the meaningful identifier is a sample rather than a subject (e.g., a tissue section or a tube).
+The auto-generated name field (subject_id + timestamp) risks collision if two datasets are created
+on the same day without a precise time. project_name needs clarification on whether it should
+be a human-readable name, an experiment ID like EXP-01367, or both. modalities doesn't
+include mIF or any cyclic/multiplexed imaging modality — this is a registry gap, not just a
+naming question. tags, source_data, and restrictions all lack guidance: what controlled
+vocabulary applies to tags, how source_data gets populated (manual vs. automated), and whether
+restrictions should hold a legal document ID or overlap with consent fields already in the
+subject schema.
+
+Acquisition schema
+The biggest structural gap: DataStream models simultaneous data collection, but Cell DIVE (and
+any cyclic assay) is inherently sequential — 10 staining rounds, each with its own operator, date,
+antibody plan, reagent lots, deactivation step, and QC flags. There's no model for this cyclic
+structure. The antibody panel itself — channel assignments, antibody name, clone, fluorophore,
+concentration, lot number, and barcode verification — has no place anywhere in the current
+schema. This gap applies beyond mIF: Xenium gene panels and Flex scRNA have the same
+problem. subject_details within acquisition is mouse-centric (weight, platform, reward) and
+mislabeled — for human tissue experiments the relevant "subject at acquisition" information is
+clinical or survey data (e.g., smoking history at time of collection), which needs to be searchable.
+ethics_review_id is noted as mouse-schema-specific and not applicable for human subjects.
+calibrations and maintenance are questioned as better fits under QC than acquisition.
+stimulus_epochs and manipulations are entirely inapplicable to fixed tissue experiments.
+
+
+Proposed additions (from the comments)
+Four new models were flagged as needed: TissueSection (subject type), StainingRound (cyclic
+acquisition unit with antibody plan, deactivation, and reagent log), AntibodyChannel
+(per-channel reagent metadata with barcode verification), and DeactivationStep (reagent lots
+and protocol parameters between rounds). mIF also needs to be added to the modality registry,
+with a question about granularity — whether "Cell DIVE" should be its own modality or a
+platform-level detail within mIF.
+🧩 PATCH-seq Gap Analyses
+For doc with comments:
+https://alleninstitute.sharepoint.com/:w:/r/sites/BioDataRegistryV-Tea
+m/_layouts/15/Doc.aspx?sourcedoc=%7BCF01A1F8-F32A-4CF3-A677-
+23277FF97E38%7D&file=mapping%20observations.docx&action=defa
+ult&mobileredirect=true
+By Nathan Gouwens
+Patch-seq data model mapping observations
+Representing patch-clamping as a SpecimenProcedure?
+      ●​ Not explicitly modeled as such in the current example, since it initially seemed
+         redundant with the Acquisition of electrophysiology data, but it might make
+         sense to model it as a procedure that produces the individual cell as an
+         output specimen
+      ●​ It seems like it could be recorded as a manipulation since it is so closely tied
+         to an Acquisition, but then I’m not sure how it gets recorded in other metadata
+         as part of the provenance chain (like for images taken of the cell afterwards)
+
+
+Singular location for data (Metadata.location)
+      ●​ Morphological reconstruction generates a few related files (SWC file, marker
+         file) but these are currently stored in a directory that contains other (not
+         directly related) files.
+      ●​ There are also aspects of morphological reconstruction (image annotations)
+         that are currently saved directly into a database – I didn’t include those in the
+         example, but I’m not sure how to track data recorded that way. We’ve also
+         had conversations with scientists who want to track e.g. clinical
+         characteristics in a database – how does that get referred to by the registry?
+      ●​ The raw transcriptomic data for a Patch-seq cell is a pair of fastq files, but
+         those are in a directory with fastq files from many other cells
+      ●​ The 63X image stack has individual layers spread across multiple directories
+         (which are not in one unifying parent directory)
+
+
+Coordinate systems
+      ●​ An Instrument requires a CoordinateSystem, but it may not be appropriate in
+         all cases (I’m not sure what the coordinate system for a sequencing machine
+         would be)
+     ●​ It wasn’t clear to me how to specify a coordinate system for recording in a
+        slice. We keep track of the cell’s depth in the slice, for example.
+     ●​ I’m not sure the current coordinate system + PlanarSectioning fields can
+        exactly capture how slicing is done for some experiments in practice (like if
+        they move in semi-arbitrary bigger distances that aren’t precisely tracked until
+        they see particular landmarks). Also not sure if the orientation is exactly
+        known for pieces of neurosurgical tissue that get sliced.
+Procedure/processing types and names
+      ●​ Ended up using “OTHER” in several places for procedure types – these could
+         be added to the controlled vocabulary but we’d have to figure out the right set
+         of terms for them.
+      ●​ Similarly, I wasn’t sure about what convention to use for naming things when
+         it wasn’t a controlled vocabulary (procedures, acquisitions, instrument) and
+         whether it was more important to be consistent with names within the
+         metadata for a given data asset vs being consistent across data assets.
+
+
+Other information I wasn’t sure where to put
+      ●​ We want to know if a recorded cell was positive for a fluorescent reporter –
+         maybe could be part of a PatchClamping specimen procedure?
+❓ Questions
+(Workstream 2 Questions)
+Granularity and data types:
+At what data granularity do we want to support and how prescriptive do we want to be?
+strict: acquisitions and collections
+loose: files
+Individual files? Directories? Compressed Archives? Databases?
+     -​ Dan: The current schema puts almost no constraints on files, the metadata generally
+         describes the data without direct links. We’ve started developing per-modality file
+         standards in neural dynamics and we’ve built some infrastructure in the data schema to
+         support defining those. The idea is to have a files.json core file that stores
+         constraints about what files are expected and then validates that they exist.
+     -​ Alina: Beyond what the data schema supports, at what granularity do we expect users
+         would want to search a cross-institute registry? Do we expect a user would want to
+         search for an individual file or a collection event or other grouping of interest (i.e., cohort,
+         modality, model, etc.)? What are the minimum searchable fields? I think that some kind
+         of collection would be most useful (ex. scRNA generated from human blood on healthy
+         subjects), but defining this could be trickier and might rely on having the underlying
+         information about the individual assets that are contained in the collection as well. As a
+         user, I’d want curated data, which might depend on the modality, and raw data, similar to
+         what you can find in GEO/dbGaP.
+     -​ Nathan: If this is for internal users primarily, I think the users aren’t going to only want
+         curated data - they will want to find whatever was recently acquired, define their own
+         collections for intermediate analyses, etc. I think it will need to be pretty granular and
+         flexible.
+     -​ Saskia: at the granularity of an asset
+
+What is an asset?
+What are we considering a data asset? How do Allen Institute groups currently define an asset?
+  -​ Dan: One session creates one raw data asset (for neural dynamics), then raw assets are
+      processed to create an initial derived asset. Users can then group derived data together
+      to create data assets that combine across sessions or subjects. We almost certainly
+      need multi-subject support to properly handle data from the other accelerators.
+  -​ Alina: I’m not sure I understand the terminology here. What does a session translate into
+      in terms of imaging or transcriptomics? The “run” of the instrument? Is multiomics data
+      one session or is each part of the multiomics data a session? Related to the granularity
+      question, I think this gets at “what do we think people want to search”? In our internal
+      system, I’d want to be able to search by quite a few fields (disease state, cohort, project,
+      subject ID, tissue type, modality, etc.) but perhaps all of those are not necessary when
+      searching cross-institute (for example, subject ID may not be relevant). Also, what is the
+      expected output of a search? A tally of the amount of data with directions on where to go
+      to find it?
+  -​ Nathan: I think session also gets complicated when dealing with multiple modalities that
+      get processed at different types. For example, in Patch-seq, the cell gets recorded from
+      and filled with a dye, then the cell contents are extracted. The electrophysiology data file
+        is generated at the time of that recording session, but the imaging is done later after
+        additional procedures, and the transcriptomics data also comes from separate
+        procedures.
+   -​   Aishwarya: To do: Define a minimally viable ‘analysis unit’ that acts as the foundation for
+        the ontology across different experimental conditions.
+
+Ontologies + data models?
+Some ontologies are massive. The anatomy one we use is ~100K entries.
+What's the best way to refer to these massive vocabularies that don't fit well into python
+packages?
+   -​ Dan: biodata-schema has large external registries (EMAPA, for example). We access
+       them via the OLS4 API https://www.ebi.ac.uk/ols4/. I think these can be made more
+       robust and we should think more about how a user in python “sees” these registries, but
+       the general pattern works.
+   -​ Alina: No comments on this one yet. We haven’t used ontologies but are looking at FMA.
+   -​ Aishwarya: Tagging CELLxGENE’s way of doing it here. For fitting the whole ontology
+       into a python package, why do we do this? Can we lazy load a data accessor object
+       that’s a snapshot of the complete ontology?
+   -​ Saskia: We want to use public ontologies that are actively supported. The challenge is
+       how do we ingest the ontology into the metadata.I defer to others on how best to do this
+       in an accurate way without taxing the system.
+
+Schema Language?
+   -​ Dan: the schema should be human-readable/interpretable in some format. How we store
+      it on the backend is sort of inconsequential?
+   -​ Aishwarya: We might want to define upfront how the schema is stored. YAML/JSON/etc?
+   -​ Alina: Agree with Dan. Pretty easy to convert if needed.
+
+What metadata updates to prioritize?
+  -​ Dan: from the neural dynamics side, we have been dissatisfied with how the processing
+      metadata works (the processing graph is currently not that useful and not used by many
+      people, the various ways of storing parameters are somewhat redundant, and the
+      mapping of input data/files into processes is confusing)
+  -​ Alina: Sounds like we need to figure out “specimen” or whether “specimen” is relevant for
+      this effort. Our lessons learned is that we didn't appropriately capture modality in a way
+      that users would want to search.
+  -​ Nathan: Interested in figuring out how to represent disease state information - we have
+      had requests from Brain Health folks about tracking disease characteristics for human
+      subjects/donors, and not sure exactly how to fit that within the metadata schema
+
+Provenance
+How much provenance does Registry hold? e.g. code/environment/input data that produced a
+given data asset.
+   -​   Alina: Would this be captured in the data schema? This would only be relevant for
+        derived assets?
+   -​   Aishwarya: For ontology provenance, we could include pinned versions of the ontology
+        with backwards compatibility. This can be traced / diff-d to see differences over time for
+        how the ontology evolves.
+   -​   Saskia: this question needs to be more specific.
+
+Immunology Registry AI-highlighted gaps (Alina reviewed)
+   ●​ Specimen mapping
+   ●​ File type (Immunology) → modality(ish)
+   ●​ Human subject information
+   ●​ Unit of registration (one acquisition session vs one file)
+   ●​ Identity (DataDescription.name vs uuid)
+   ●​ Subject mapping → one asset to many subjects in Immunology
+   ●​ Grouping of subjects (i.e., cohort)
+   ●​ (doc goes through more detailed field mapping comparison)
+
+New questions:
+Alina:
+    ●​ What is the expected output of a search of the biodata registry?
+    ●​ No schema fields for data location - what would this look like?
+(Workstream 3 Questions)
+What is the versioning strategy?
+Continuous registration vs noise
+Ray:
+    -​ I suspect this will vary a lot depending on the needs of the specific integration/user, but
+         I’d prefer a high bar for adding downstream analysis artifacts to the Registry. For
+         example, intermediate analysis artifacts should live in Code Ocean/other scratch
+         workspace, and data should only be registered when it needs to be shared with others
+         for further analysis, annotation, publication, etc
+Doug: Just taking the counter-argument to Ray, if downstream analysis artifacts are not
+registered, then they aren’t easily searchable. In AIND, we sometimes have issues with the
+current docb going out of sync with code ocean and it makes searching difficult. I think this
+becomes a bigger problem if we’re deliberately not registering assets.
+How to store updates?
+Doug: Is this question about updates to the schema or updates to records?
+    -​ If it’s about updates to the schema, Dan has already established use of standard
+         semantic versioning here, making major/minor/patch updates as necessary
+    -​ If it’s about updates to individual records, I’m not sure we need to store updates. There
+         will undoubtedly be fixes to data (mouse weight recorded incorrectly, for example). I
+         don’t see value in keeping the old data, with the exception of maybe keeping a log of
+         updates for rare cases where we want to audit changes. I’d expect other updates to be
+         purely additive (e.g. adding a procedure to a subjects procedures record)
+Mekhla:
+    -​ I think keeping the update history is important especially as we think about how
+         metadata in the registry will be used for publications (a paper would cite a dataset and its
+         metadata as it was at the time of publication). We could possibly think about immutable
+         records with a revision chain – each update creates a new record version, the old one
+         gets flagged and a pointer forward, and the current version is the head of the chain.
+Relational DB vs Document Store
+Mekhla:
+    -​ Relational DB! Having some form of a DB to store the single ‘subject.json’, etc as a
+         source of truth in the registry that’s separate from the final ‘data asset’.
+Ray: +1 for relational DB over document store.
+Tim: As a consumer of the registry I care more about how its API will function at the boundary
+between ingest (my concern) and the persistence layer, than I do about how data is persisted.
+I’m assuming that choice will be made based on the usage patterns we’re expecting. The
+functional requirements I have for that API include things like being able to CRUD the individual
+entities of the data model, and preferably being able to CRUD a complete instance of the model
+containing all of its component entities. I’d like to be assured of referential integrity across the
+entities in a submission, and between submissions, where that applies. If all of that is supported
+I don’t care what the infra consists of. ​
+Doug: I actually don’t have a strong opinion on relational vs document store. The most important
+thing in my opinion is that information is not duplicated. As a concrete example (repeating
+Mekhla’s point above), there should be one record for a given subject which is updated in a
+single location. Given that the metadata schema is nested/heirarchical, is it actually possible to
+store in a relational DB?
+
+
+Storage System Support
+Ray:
+   -​ This depends a lot on what is meant by support. My understanding is we want the
+       Registry to be able to point users to data, but not necessarily be responsible for
+       brokering access to it, i.e., giving people a file path should be sufficient. If that’s true then
+       we can support arbitrary numbers of storage systems. A single cloud storage provider
+       would certainly make things simpler (AWS) - maybe that’s Workstream 4’s decision to
+       make?
+Doug: I agree with Ray here. Pointing to the storage location seems sufficient.
+
+New questions:
+Mekhla:
+   -​ What is the expectation for the ETL processes for the registry? Different persistence
+      layers across the different accelerators?
+          -​ Ray: This is a critical question that has bigger implications for how each
+              accelerator is going to collaborate with the new Central Scientific Computing
+              department in general. From Jess’ post here, I think we should assume that there
+              will be multiple accelerator-specific data sources that need to be ETL’ed
+              to/synced with the Registry in the near-term
+          -​ Doug: Given that there will be multiple data sources, how can the ETL process
+              be made easier?
+          -​ Tim: My hope is that the boundaries of the shared registry do not extend into
+              everybody’s LIMS and airtables and smartsheets. I would like to draw the
+              boundary at a contract we develop with each data submitter where we agree on a
+              schema for data that we will accept. It would be the submitters’ responsibility to
+              push their data to this registry in that agreed-upon shape. Our responsibility
+              would be to provide the endpoints that are shaped per those contracts, and then
+              do the TL part of the ETL into our single shared registry. Negotiating those
+              contracts is where the work of harmonizing all the data lives; we will need to be
+              able to find a transformation from whatever the submitters’ data model is into the
+              shape of our shared data model.
+Tim:
+   ●​ How are updates and deletions handled?
+          ○​ If this registry is the source of truth and keeper of provenance for the collected
+              data, what will be the policy for changing data? There may be assertions made
+              about the data based on its properties, and those might be propagated
+              downstream into publications. Can we just change the data after the fact?
+              Probably not, so how do we manage corrections? I think there are two paths
+              broadly; either we build change tracking into the model (maybe have a
+              ‘supersedded’ status with pointer to new record) or we create some external
+          audit/provenance log. The former seems simpler, but it requires that readers of
+          the data be aware of that status.
+●​ Does the data we’re ingesting ever include controlled access data?
+      ○​ Probably not, because we’re dealing with the metadata, not the raw data in the
+          registry. But there are some cases where metadata can make raw data
+          identifiable. What will our policy be about holding this kind of metadata in the
+          registry? If it must be part of what the registry manages, our ingest logging/audit
+          trails/error messages are made more complicated and probably less useful.
+📎 AI Draft
+Track C: Q&A
+
+1. At what data granularity do we support registration, and how prescriptive
+should we be?
+
+Contributors: Dan, Alina, Nathan, Saskia
+
+Summary: Register at the level of an asset/collection, keep file-level constraints optional and
+modality-defined, and stay flexible enough for internal users to define their own groupings.
+
+The current schema puts almost no constraints on files — metadata describes the data without
+direct links. Per-modality file standards are being developed in neural dynamics, with schema
+infrastructure to support them: a files.json core file storing constraints about what files are
+expected, then validating that they exist.
+
+For search, the useful unit is some kind of collection (e.g., scRNA generated from human blood
+on healthy subjects) rather than an individual file, though defining a collection may depend on
+having information about the individual assets it contains. Users will want both curated data
+(which may depend on modality) and raw data, similar to GEO/dbGaP.
+
+Because the primary audience is internal, users will not only want curated data — they will want
+to find whatever was recently acquired and define their own collections for intermediate
+analyses. The system therefore needs to be granular and flexible. The working position: the
+asset is the unit of registration.
+
+Open: minimum searchable fields have not been agreed.
+
+2. What is a data asset?
+
+Contributors: Dan, Alina, Nathan, Aishwarya, Tim
+
+Summary: An asset is the output of a data collection event; "session" is too coupled to one kind
+of collection, and the relationship between experiment and asset is not 1:1.
+
+In neural dynamics, one session creates one raw data asset, which is processed into an initial
+derived asset; users can then group derived data across sessions or subjects. Multi-subject
+support is almost certainly needed to handle data from the other accelerators.
+
+"Session" breaks down across modalities. In Patch-seq, the electrophysiology file is generated
+during the recording session, but imaging happens later after additional procedures, and
+transcriptomics comes from separate procedures — so a single conceptual experiment spans
+multiple collection times. Similarly, it is unclear whether multiomics data is one session or one
+session per component.
+The broader framing: the asset is the output of a data collection event, and the metadata
+describes the conditions of that collection. AIBS is generally turning tissue into numbers; AIND
+is turning activity into numbers; immunology appears to do both as part of a single experiment.
+There are many examples with no 1:1 relationship between experiment and asset, further
+complicated by downstream analysis that turns assets into new assets (also not 1:1).
+
+Internally, users would want to search across many fields (disease state, cohort, project, subject
+ID, tissue type, modality); some of these may not be relevant cross-institute (e.g., subject ID).
+
+To do: define a minimally viable "analysis unit" that acts as the foundation for the ontology
+across different experimental conditions.
+
+Open: what the expected output of a search is — e.g., a tally of the amount of data with
+directions on where to find it.
+
+3. How do we handle large external ontologies that don't fit well into Python
+packages?
+
+Contributors: Dan, Alina, Aishwarya, Saskia
+
+Summary: Reference actively supported public ontologies via external APIs rather than
+packaging them; the open problem is ingestion into the metadata.
+
+biodata-schema already holds large external registries (e.g., EMAPA) and accesses them via
+the OLS4 API (https://www.ebi.ac.uk/ols4/). The general pattern works, but it can be made more
+robust, and how a Python user "sees" these registries needs more thought.
+
+CELLxGENE's approach (https://github.com/chanzuckerberg/cellxgene-ontology-guide) is worth
+referencing. The prior question is why the whole ontology needs to fit into a Python package at
+all — a lazily loaded data accessor object holding a snapshot of the complete ontology is a
+candidate alternative.
+
+The requirement is to use public ontologies that are actively supported. The remaining
+challenge is how to ingest the ontology into the metadata accurately without taxing the system.
+
+Note: FMA is under consideration in immunology, which has not previously used ontologies.
+
+​
+4. What schema language do we use?
+
+Contributors: Dan, Aishwarya, Alina
+
+Summary: The schema must be human-readable/interpretable; the specific storage format is
+largely inconsequential and easy to convert.
+The backend storage format is sort of inconsequential, and conversion between formats is
+straightforward. The one caveat raised: we may still want to decide upfront how the schema is
+stored (YAML/JSON/etc.) rather than leaving it implicit.
+
+​
+5. Which metadata updates should we prioritize?
+
+Contributors: Dan, Alina, Nathan
+
+Summary: Processing metadata, modality representation, specimen, and disease state are the
+named priorities.
+
+   ●​ Processing metadata (neural dynamics): the processing graph is currently not that
+      useful and not used by many people, the various ways of storing parameters are
+      somewhat redundant, and the mapping of input data/files into processes is confusing.
+   ●​ Specimen: determine whether "specimen" is relevant to this effort and how it should be
+      defined.
+   ●​ Modality: a documented lesson learned is that modality was not captured in a way users
+      would want to search.
+   ●​ Disease state: Brain Health has requested tracking of disease characteristics for human
+      subjects/donors, and it is not clear how to fit that within the metadata schema.
+
+​
+6. How much provenance does the Registry hold?
+
+Contributors: Alina, Aishwarya, Saskia
+
+Summary: Not yet specified — the question needs to be made more concrete before it can be
+answered.
+
+Open sub-questions: whether provenance (code, environment, input data) is captured in the
+data schema at all, and whether it is only relevant for derived assets.
+
+For ontology provenance specifically, one proposal is to include pinned ontology versions with
+backwards compatibility, so versions can be traced and diffed to see how the ontology evolves
+over time.
+
+7. Immunology Registry — AI-highlighted gaps (reviewed by Alina)
+
+Contributors: Alina
+
+Summary: Mapping gaps between the immunology registry and the current schema, for
+follow-up.
+
+   ●​ Specimen mapping
+   ●​   File type (Immunology) → modality(ish)
+   ●​   Human subject information
+   ●​   Unit of registration (one acquisition session vs one file)
+   ●​   Identity (DataDescription.name vs uuid)
+   ●​   Subject mapping → one asset to many subjects in Immunology
+   ●​   Grouping of subjects (i.e., cohort)
+
+(The source document contains a more detailed field mapping comparison.)
+
+8. Open Workstream 2 questions
+
+Contributors: Alina
+
+   ●​ What is the expected output of a search of the biodata registry?
+   ●​ There are no schema fields for data location — what would this look like?
+
+​
+9. What is the versioning / registration strategy? (continuous registration
+vs noise)
+
+Contributors: Ray, Doug
+
+Summary: Unresolved — the tension is between a high bar for registration and the
+searchability cost of leaving assets unregistered.
+
+One position: the bar for adding downstream analysis artifacts should be high. Intermediate
+analysis artifacts should live in Code Ocean or another scratch workspace, and data should only
+be registered when it needs to be shared for further analysis, annotation, or publication. This will
+likely vary by integration/user.
+
+The counter-argument: artifacts that are not registered are not easily searchable. AIND already
+sees the current docb going out of sync with Code Ocean, which makes searching difficult, and
+deliberately not registering assets would make that worse.
+
+​
+10. How do we store updates?
+
+Contributors: Doug, Mekhla
+
+Summary: Schema versioning is settled (semver); record-level update history is contested
+between "purely additive, no history" and "immutable records with a revision chain."
+
+Schema updates: standard semantic versioning is already established, with major/minor/patch
+updates as necessary.
+Record updates — position A: we may not need to store updates. There will undoubtedly be
+fixes to data (e.g., mouse weight recorded incorrectly), and there is little value in keeping the old
+data — with the possible exception of an update log for rare audit cases. Other updates should
+be purely additive (e.g., adding a procedure to a subject's procedures record).
+
+Record updates — position B: update history matters, especially for publications, since a
+paper would cite a dataset and its metadata as it was at the time of publication. A possible
+design: immutable records with a revision chain — each update creates a new record version,
+the old one is flagged and given a forward pointer, and the current version is the head of the
+chain.
+
+11. Relational DB or document store?
+
+Contributors: Mekhla, Ray, Tim, Doug
+
+Summary: Majority preference is relational, with a strong minority view that the persistence
+choice matters less than the API contract and non-duplication of data.
+
+Two explicit votes for relational: a DB storing the single subject.json etc. as a source of truth in
+the registry, separate from the final data asset.
+
+The API-first view: what matters is how the API functions at the boundary between ingest and
+the persistence layer. Functional requirements include being able to CRUD the individual
+entities of the data model, and preferably CRUD a complete instance of the model containing all
+its component entities, with assurance of referential integrity across entities within a submission
+and between submissions where applicable. If that is supported, the underlying infrastructure is
+not a concern. The infra choice should follow expected usage patterns.
+
+The neutral view: no strong opinion on relational vs document store — the most important thing
+is that information is not duplicated. Concretely, there should be one record for a given subject,
+updated in a single location.
+
+Open: given that the metadata schema is nested/hierarchical, is it actually feasible to store in a
+relational DB?
+
+
+
+
+12. Which storage systems must the Registry support?
+
+Contributors: Ray, Doug
+
+Summary: Pointing users to the storage location is sufficient, so an arbitrary number of storage
+systems can be supported.
+The Registry should point users to data but need not broker access to it — giving people a file
+path should be sufficient. On that basis, arbitrary numbers of storage systems can be supported.
+A single cloud storage provider (AWS) would certainly make things simpler, but that may be
+Workstream 4's decision to make.
+
+13. What is the expectation for ETL into the Registry, given different
+persistence layers across accelerators?
+
+Contributors: Mekhla, Ray, Doug, Tim
+
+Summary: Assume multiple accelerator-specific sources in the near term, and draw the
+boundary at a per-submitter schema contract rather than reaching into each source system.
+
+This is a critical question with broader implications for how each accelerator collaborates with
+the new Central Scientific Computing department. The near-term assumption is that there will be
+multiple accelerator-specific data sources that need to be ETL'd to / synced with the Registry.
+
+The proposed boundary: the shared registry should not extend into everybody's LIMS, Airtables,
+and Smartsheets. Instead, draw the line at a contract developed with each data submitter
+agreeing on a schema for data we will accept. It is the submitters' responsibility to push their
+data to the registry in that agreed-upon shape; our responsibility is to provide endpoints shaped
+per those contracts and then do the "TL" part of ETL into the single shared registry. Negotiating
+those contracts is where the work of harmonizing all the data lives — we will need a
+transformation from each submitter's data model into the shape of our shared data model.
+
+Open: how to make the ETL process easier given multiple data sources.
+
+
+
+
+14. How are updates and deletions handled?
+
+Contributors: Tim
+
+Summary: Corrections need a managed path, not silent overwrite — likely either in-model
+change tracking or an external audit/provenance log.
+
+If the registry is the source of truth and keeper of provenance, we need a policy for changing
+data. Assertions may be made about data based on its properties and propagated downstream
+into publications, so we probably cannot just change data after the fact.
+
+Two broad paths:
+
+   1.​ Build change tracking into the model (e.g., a "superseded" status with a pointer to the
+       new record). Simpler, but requires readers of the data to be aware of that status.
+   2.​ Create an external audit / provenance log.
+(Related to the revision-chain proposal in Q10.)
+
+15. Does the data we're ingesting ever include controlled-access data?
+
+Contributors: Tim
+
+Summary: Probably not, since the registry holds metadata rather than raw data — but
+metadata can sometimes make raw data identifiable, so a policy is needed.
+
+If controlled-access-adjacent metadata must be part of what the registry manages, our ingest
+logging, audit trails, and error messages become more complicated and probably less useful.
+
+Open: what our policy will be for holding this kind of metadata in the registry.
+🟠 ADR Draft
+                                 ADR Draft
+Milestone 0:
+  ●​ The BioData Registry will include both raw assets and derived assets.
+  ●​ The BioData Registry will register raw assets as acquisitions, or instrument and
+     time-bound collections, of data.
+  ●​ The BioData Registry will be capturing metadata about data assets but is not about
+     workflow state management (i.e., LIMS).
+  ●​ Everything in the BioData Registry should apply to an existing data asset.
+
+  ●​ Derived assets are processed from raw data.
+  ●​ While the BioData Registry is meant to encompass both raw and derived assets, the
+     focus will be on ensuring raw assets are appropriately mapped first. (strategy not
+     necessarily decision)
+📖 Common Language
+1.​ Schema
+2.​ Acquisition
+3.​ Specimen
+4.​ Data Description
+5.​ Data Asset
+6.​ Location
+7.​ Business concerns
+📝 Meeting Notes
+2026-08-12
+   1.​ “Humans are animals” - Nathan
+   2.​ Registry needs a specimen ID section that’s not a full schema
+
+2026-08-05 Meeting Notes:
+   1.​ Need clarity on how tissues are being sliced and sectioned
+   2.​ Pooling field for all omics datasets
+   3.​ Goal for backend team is to have registries for just subjects, acquisitions etc – ADR
+   4.​ Derived asset that comes from multiple samples it currently pulls from the parent asset
+       class – issue here is
+
+2026-07-29 Meeting Notes:
+
+
+
+
+Attendees: Alina Ott Aishwarya Chander Tim Dolbeare Mekhla Kapoor Daniel Birman
+Nathan Gouwens Raymond Sanchez
+
+Clarify:
+   1.​ What counts as a data asset
+   2.​ What unit should be registered
+   3.​ What users need to search for
+   4.​ What a registry search should return
+   5.​ Which metadata fields are required across institutes and datasets
+
+1. Defining a data asset
+Possible registration units discussed:
+    ●​ Acquisition
+    ●​ Collection
+    ●​ Individual file was considered but crossed out on the whiteboard
+           ○​ There is currently a linkage gap between acquisitions and collections. The team
+               needs to determine how individual acquisition events are grouped into
+               searchable collections.
+The background document provides the following working definition:
+    ●​ A raw asset is a single, time-bounded acquisition involving one or more subjects or
+       specimens.
+    ●​ A derived asset is created by processing a raw asset.
+
+2. Sample and specimen definitions
+“Sample” and “specimen” still need clear, shared definitions.
+Possible levels within a sample hierarchy include:
+    ●​ Derivation
+    ●​ Tissue
+    ●​ Aliquot or slide
+    ●​ Cell collection or acquisition
+    ●​ Other intermediate sample types
+Important questions:
+    ●​ Is a subject different from a specimen?
+    ●​ How should multi-subject assets be represented?
+    ●​ Should sample-collection events be registered separately?
+    ●​ How do samples connect to acquisition events and resulting data assets?
+
+3. Proposed minimum metadata
+Immunology fields
+    ●​ Modality or assay
+    ●​ Cohort - not in current data schema
+    ●​ Disease state
+    ●​ Tissue type
+    ●​ File location
+    ●​ Subject or specimen - needs discussion
+    ●​ Species
+    ●​ Lab or clinical designation - needs discussion
+    ●​ Survey information - needs discussion
+Neural Dynamics / Brain Science fields
+    ●​ Anatomical location
+      ●​   Subject or specimen
+      ●​   Species
+      ●​   Project
+      ●​   Protocol, code, or tool
+      ●​   Version of the protocol, code, or tool
+      ●​   QC metrics
+      ●​   Acquisition date
+      ●​   Processing information
+      ●​   Processing type
+All
+      ●​ Instrument ID
+
+Strong interest in flexibility to expand to more detailed fields as purely “finding data” is not the
+major benefit and interest from building this system
+
+Highlights:
+   ●​ Disease state as an important field
+   ●​ Protocol/code/tool and QC metrics as priority fields
+   ●​ Specimen as a term that must be defined
+   ●​ Processing type as something users may want to search by
+
+4. Search and discovery
+The registry should be designed around what users actually want to find.
+Key questions:
+    ●​ What fields will users search by?
+    ●​ Do users search for acquisitions, samples, collections, or complete data assets?
+    ●​ What common features should define a collection?
+    ●​ What should users receive after running a search?
+
+A possible cross-institute search result is a pointer or set of directions to the underlying data,
+rather than the data itself.
+
+This means the registry may need to store:
+   ●​ Data location or access information
+   ●​ A link or pointer to the source system
+   ●​ A DOI or similar identifier for published data
+   ●​ Enough metadata to determine whether the data is relevant before accessing it
+
+
+5. Open decisions
+    1.​ Define the minimum viable unit that will be registered.
+    2.​ Decide whether that unit is an acquisition, collection, sample, asset, or another analysis
+        unit.
+    3.​ Define “sample,” “specimen,” and “subject.”
+4.​ Resolve how acquisitions, samples, collections, and derived assets connect.
+5.​ Agree on the minimum searchable metadata fields.
+6.​ Decide which fields are shared across institutes and which are domain-specific.
+7.​ Define what a search returns.
+8.​ Determine how the registry points users to the actual data.
+9.​ Decide how protocol, code, tool, and ontology versions will be tracked.
+10.​Confirm how published datasets and DOIs should be represented.
+

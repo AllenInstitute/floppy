@@ -1,0 +1,654 @@
+{
+  "object_type": "Metadata",
+  "describedBy": "https://raw.githubusercontent.com/AllenNeuralDynamics/aind-data-schema/main/src/aind_data_schema/core/metadata.py",
+  "schema_version": "2.7.4",
+
+  "_COMMENT_PROVENANCE": "PLACEHOLDER EXAMPLE. Built from the DNA Typewriter preprint (bioRxiv 2026.07.29.741625) and the 2026-09 SeaHub scoping meeting, not from a SeaHub metadata export. Values marked Dummy are illustrative; values in <CLARIFICATION NEEDED> require the Benchling field export (contact: Kenny). Pinned against aind-data-schema v2.9.0, commit 18114d7b. Companion document: SeaHub_DNATypewriter_Gap_Analysis.docx.",
+  "_COMMENT_ASSET_CHOICE": "This record describes ONE asset: the sci-RNA-seq3 transcriptome library for embryo #3. Three sibling assets exist from the same embryo (bulk TAPE amplicon-seq, single-cell TAPE recorder library, ddPCR copy-number assay) and have no construct tying them together. See _COMMENT_CARDINALITY_GAP on data_description.",
+
+  "name": "DTTembryo03_2026-02-11_18-00-00",
+  "_COMMENT_name": "Auto-built from subject_id + creation_time. subject_id must never contain '_' (DataDescription enforces NO_UNDERSCORES). Collision risk is acute here: the four assets from this embryo and the co-processed embryo #2 assets all derive from one sequencing run, so creation_time alone does not disambiguate them. Recommend appending an assay token.",
+
+  "location": "<CLARIFICATION NEEDED: authoritative copy is external — see _COMMENT_location>",
+  "_COMMENT_location": "SCHEMA GAP. metadata.location is a single string. Raw data is deposited at GEO (GSE341627), intermediate files (lineage trees, metadata, scRNA-seq matrices) are hosted on the NextCell site, and the working copy is on AWS via Code Ocean. No single string holds all three, and the authoritative copy is not Allen-managed. Same shape as the Patch-seq multi-directory gap and the TEA-seq CellRanger directory tree.",
+
+  "other_identifiers": {
+    "_COMMENT": "Freeform object with no structure for distinguishing internal from external identifiers, or typing them by registry. Same gap TEA-seq raised. Needs structured identifier objects (type, registry, value).",
+    "_geo_accession": "GSE341627",
+    "_preprint_doi": "10.64898/2026.07.29.741625",
+    "_code_repository": "https://github.com/seidels/dtt-mouse-analysis",
+    "_iacuc_protocols": ["2530", "2401"],
+    "_COMMENT_iacuc_protocols": "Two protocols govern this work. acquisition.ethics_review_id is Optional[List[str]] and accepts both; the procedure-level field is a scalar str, so a surgery governed by two protocols forces a choice.",
+    "_benchling_experiment_id": "<CLARIFICATION NEEDED: Benchling entry ID>",
+    "_code_ocean_capsule_id": "<CLARIFICATION NEEDED>"
+  },
+
+  "subject": {
+    "object_type": "Subject",
+    "describedBy": "https://raw.githubusercontent.com/AllenNeuralDynamics/aind-data-schema/main/src/aind_data_schema/core/subject.py",
+    "schema_version": "2.3.2",
+
+    "subject_id": "DTTembryo03",
+    "_COMMENT_subject_id": "Dummy. The manuscript uses the ordinal label 'embryo #3'; a persistent identifier is required at onboarding. 1 of 10 embryos transferred, 1 of 3 carrying detectable recorder integrations.",
+
+    "subject_details": {
+      "object_type": "Mouse subject",
+
+      "species": {
+        "name": "Mus musculus",
+        "common_name": "House mouse",
+        "registry": "National Center for Biotechnology Information (NCBI)",
+        "registry_identifier": "NCBI:txid10090"
+      },
+
+      "strain": {
+        "name": "C57BL/6J",
+        "species": "Mus musculus",
+        "registry": "Mouse Genome Informatics (MGI)",
+        "registry_identifier": "<CLARIFICATION NEEDED: MGI strain ID>"
+      },
+      "_COMMENT_strain": "Required Strain.ONE_OF. C57BL6/J zygotes from The Jackson Laboratory, stock 000664. Maps cleanly.",
+
+      "sex": "<CLARIFICATION NEEDED>",
+      "_COMMENT_sex": "SCHEMA CONFLICT. Sex is a required enum with exactly two values, Female and Male. E13.5 embryos processed whole for nuclei were never sexed, so this record cannot be completed honestly and the field cannot be left null. Needs distinguishable sentinels for not-determined and not-applicable — CELLxGENE keeps separate reserved values for 'unknown' and 'na' for exactly this reason. Sex is in principle recoverable from the sci-RNA-seq3 data post hoc, which makes it a derived annotation rather than a subject fact.",
+
+      "date_of_birth": "<CLARIFICATION NEEDED>",
+      "_COMMENT_date_of_birth": "SCHEMA CONFLICT. Required, typed date, with BEFORE time validation. This embryo was never born — it was harvested at E13.5. It has a conception date (E0.5, the morning of zygote collection) and a harvest date, and no birth date. Any value entered here is a fabrication. Recommend making date_of_birth conditional and requiring an alternative temporal anchor when it does not apply.",
+      "_conception_date": "2026-01-29",
+      "_harvest_date": "2026-02-11",
+      "_COMMENT_dates": "Dummy values, 13 days apart to match E0.5 to E13.5.",
+
+      "_developmental_stage": "<CLARIFICATION NEEDED: MmusDv term for E13.5>",
+      "_COMMENT_developmental_stage": "SCHEMA GAP. No gestational or developmental-stage field exists anywhere on MouseSubject. This is the primary temporal anchor of the entire experiment — it determines how many divisions the recorder had time to write, and therefore the depth of the recoverable tree. CELLxGENE binds this to MmusDv (descendants of MmusDv:0000001), under which E13.5 is an exact validated term requiring no schema release. Adopt the pattern, not the field: a CELLxGENE obs column is per-cell and aind has no per-observation layer, so this needs a stated home on Subject.",
+
+      "alleles": [],
+      "genotype": "piggyBac[PEmax-P2A-dTomato-WPRE]; piggyBac[epegRNA-circTAPE-BC]",
+      "_COMMENT_genotype": "SCHEMA CONFLICT. genotype is a free-text string designed for inherited alleles. This recorder was delivered somatically by pronuclear injection at E0.5, is mosaic across the embryo, and is present at variable copy number between littermates. A single string cannot carry construct identity, integration count, copy number, or activation state. See _proposed_genetic_modification below.",
+
+      "breeding_info": {
+        "object_type": "Breeding info",
+        "maternal_id": "<CLARIFICATION NEEDED: superovulated C57BL6/J donor female ID>",
+        "maternal_genotype": "wild type",
+        "paternal_id": "<CLARIFICATION NEEDED: C57BL6/J stud male ID>",
+        "paternal_genotype": "wild type"
+      },
+      "_COMMENT_breeding_info": "SCHEMA GAP. BreedingInfo models exactly two genetic parents. This dataset has three contributing animals: the superovulated C57BL/6J donor female, the stud male, and a pseudopregnant CD-1 surrogate of a different strain who gestates the embryo and contributes no genetic material. The concepts share a name but not a domain — maternal_id is defined as a genetic parent, so the surrogate has nowhere to go. Both donor and surrogate also undergo procedures while producing no data asset of their own, which leaves it undecided whether they are registered subjects at all.",
+      "_surrogate_dam": {
+        "_subject_id": "<CLARIFICATION NEEDED: CD-1 surrogate ID>",
+        "_strain": "CD-1",
+        "_source": "Charles River, stock 022",
+        "_role": "gestational carrier, no genetic contribution"
+      },
+
+      "source": {
+        "name": "Allen Institute",
+        "abbreviation": "AI",
+        "registry": "Research Organization Registry (ROR)",
+        "registry_identifier": "03cpe7c52"
+      },
+      "_COMMENT_source": "Zygotes from The Jackson Laboratory, surrogates from Charles River, injection and husbandry at the Allen Institute. The field expects one organization and there are three with different roles.",
+
+      "housing": {
+        "object_type": "Housing",
+        "cage_id": "<CLARIFICATION NEEDED>",
+        "room_id": "<CLARIFICATION NEEDED>",
+        "light_cycle": {
+          "object_type": "Light cycle",
+          "lights_on_time": "06:00:00",
+          "lights_off_time": "20:00:00"
+        },
+        "home_cage_enrichment": [],
+        "cohoused_subjects": []
+      },
+      "_COMMENT_housing": "14hr:10hr light-dark cycle per the paper. Dummy clock times. Housing describes the surrogate's conditions, not the embryo's — another consequence of the surrogate having no record of her own.",
+
+      "wellness_reports": [],
+      "restrictions": null,
+      "rrid": null
+    },
+
+    "notes": "Transgenic E13.5 embryo carrying a DNA Typewriter lineage recorder delivered by pronuclear injection at E0.5. High recorder activity: 11 TAPE integration barcodes, approximately 7 PEmax copies by ddPCR. Selected for deep single-cell analysis after a 10-embryo screen in which 3 embryos carried detectable integrations and 1 showed substantial editing.",
+
+    "_COMMENT_GENETIC_MODIFICATION_GAP": "Central SeaHub gap. The engineered recorder is the scientific object of the entire experiment and has no schema surface. NonViralMaterial inherits from Reagent and offers name, source, lot and concentration only — no construct map, cassette composition, vector backbone, promoter, insulator, or designed identifier space. Nothing holds the per-animal measured state. Recommend a subject-level genetic-modification record rather than an extension container.",
+    "_proposed_genetic_modification": {
+      "_delivery_method": "pronuclear injection",
+      "_delivery_stage": "E0.5 zygote",
+      "_delivery_vector": "piggyBac transposon",
+      "_delivery_materials": [
+        { "_name": "piggyBac transposase mRNA", "_source": "GenScript", "_catalog": "RP-A00064-0.2" },
+        { "_name": "PEmax-P2A-dTomato-WPRE-bGHpA plasmid", "_backbone": "piggyBac", "_assembly": "Golden Gate" },
+        { "_name": "epegRNA-circTAPE plasmid library", "_backbone": "piggyBac", "_assembly": "Gibson + Golden Gate" }
+      ],
+      "_germline": false,
+      "_COMMENT_germline": "Somatic and mosaic. This embryo is not a founder line. SeaHub runs both arms — permanent founder lines by pronuclear injection and breeding, and transient injections for lineage tracing that are never carried forward — and the registry must distinguish them.",
+      "_barcode_library_design": {
+        "_tape_barcode_pattern": "NNNNNAANNNNN",
+        "_insertion_pattern": "NNNGGA",
+        "_array_length": 6,
+        "_COMMENT": "Defines the identifier space every downstream lineage call depends on. Recording this as free text would make it unsearchable and unvalidatable. Registering it as a referenced design artifact is the same requirement SeaHub raised for HTS library screening, where barcode count tables are meaningless without the library membership list."
+      },
+      "_integration_barcodes_detected": 11,
+      "_COMMENT_integration_barcodes_detected": "Per-animal, measured rather than designed, and the partition key for all recorder analysis. Embryo #2 showed 17 detected barcodes but approximately 35 actual integrations, because piggyBac excision and re-integration puts some barcodes at multiple copies.",
+      "_transgene_copy_number": { "_value": 7, "_target": "PEmax", "_method": "ddPCR", "_reference_assay": "GAPDH" },
+      "_COMMENT_transgene_copy_number": "Explains the order-of-magnitude difference in recorder activity between littermates — embryo #2 carried approximately 2 copies and showed modest editing. This single number determined which embryo the study pursued, and it has no home.",
+      "_activation_state": "high",
+      "_COMMENT_activation_state": "SeaHub raised transgene present versus transgene activated as a distinction the registry must carry. Neither has a field today."
+    }
+  },
+
+  "data_description": {
+    "object_type": "Data description",
+    "describedBy": "https://raw.githubusercontent.com/AllenNeuralDynamics/aind-data-schema/main/src/aind_data_schema/core/data_description.py",
+    "schema_version": "2.4.1",
+
+    "license": "CC-BY-4.0",
+
+    "subject_id": "DTTembryo03",
+    "_COMMENT_CARDINALITY_GAP": "SCHEMA GAP, both directions at once. Downward: one embryo yields four assay-level assets (bulk TAPE amplicon-seq, sci-RNA-seq3, single-cell TAPE, ddPCR) with nothing tying them to the embryo as a unit. Upward: this sci-RNA-seq3 run carries nuclei from embryos #2 and #3 together, so a scalar subject_id is already wrong for the asset it describes. Acquisition.subject_id is a single required str, and specimen_id may be a list but check_subject_specimen_id requires the subject id to appear in each entry, so it cannot carry a second animal. Sixth appearance of this gap after Patch-seq, mIF, TEA-seq, Immunology and AICS, and the first where both directions appear in one study.",
+
+    "creation_time": "2026-02-11T18:00:00+00:00",
+    "_COMMENT_creation_time": "Dummy. Same ambiguity TEA-seq raised: the per-embryo asset does not exist until demultiplexing completes, which is days after the sequencer run ends.",
+
+    "name": null,
+
+    "institution": {
+      "name": "Allen Institute",
+      "abbreviation": "AI",
+      "registry": "Research Organization Registry (ROR)",
+      "registry_identifier": "03cpe7c52"
+    },
+    "_COMMENT_institution": "SCHEMA CONFLICT. The field expects one registry-resolvable organization. This work spans the Seattle Hub for Synthetic Biology, the Allen Institute, the University of Washington, HHMI and Fred Hutchinson Cancer Center, with the publication led outside the Allen Institute. Same gap as Patch-seq and AICS, and the concrete case behind the Allen-UW ownership question.",
+
+    "funding_source": [
+      {
+        "object_type": "Funding",
+        "funder": {
+          "name": "Allen Institute",
+          "abbreviation": "AI",
+          "registry": "Research Organization Registry (ROR)",
+          "registry_identifier": "03cpe7c52"
+        },
+        "grant_number": null,
+        "fundee": null
+      }
+    ],
+
+    "data_level": "raw",
+
+    "group": null,
+    "_COMMENT_group": "Unresolved across mIF, TEA-seq and now SeaHub: the field does not distinguish the internal group from the external collaborator site. For this dataset the distinction is the whole question.",
+
+    "investigators": [
+      {
+        "object_type": "Person",
+        "name": "<CLARIFICATION NEEDED: Allen Institute investigators on this study>",
+        "registry": "Open Researcher and Contributor ID (ORCID)",
+        "registry_identifier": "<CLARIFICATION NEEDED>"
+      }
+    ],
+    "_COMMENT_investigators": "The preprint carries 18 authors across 5 institutions. Which subset is recorded as investigators on an Allen-registered asset is part of the ownership question.",
+
+    "project_name": "DNA Typewriter in vivo lineage recording",
+
+    "modalities": [
+      { "name": "Single cell RNA sequencing", "abbreviation": "scRNAseq" }
+    ],
+    "_COMMENT_modalities": "SCHEMA GAP. Modality is a closed 22-value enum. scRNAseq covers this asset, but three of the four assets from this embryo have no term at all: bulk targeted amplicon sequencing, the single-cell recorder readout, and ddPCR. BARSEQ and MAPSEQ exist but denote anatomical projection mapping, not a genomic recorder readout, so using either would be semantically wrong. Blocks data_description.modalities, acquisition.data_streams, instrument.modalities and QCMetric.modality simultaneously — the same four-way block TEA-seq hit with scATACseq and ADT.",
+    "_proposed_full_modalities": [
+      { "name": "Single cell RNA sequencing", "abbreviation": "scRNAseq" },
+      { "name": "Targeted amplicon sequencing", "abbreviation": "ampseq", "_proposed": true },
+      { "name": "Lineage recorder sequencing", "abbreviation": "recorderseq", "_proposed": true },
+      { "name": "Digital PCR", "abbreviation": "ddPCR", "_proposed": true }
+    ],
+    "_COMMENT_ontology_alternative": "Alternative to extending the enum: bind assay identity to an ontology subtree, as CELLxGENE binds assay to descendants of EFO:0002772 and EFO:0010183. Under that pattern sci-RNA-seq3 resolves exactly as EFO:0030028 with no schema release. The commitment to an external release cadence is a governance decision for WS2, not a modelling one.",
+
+    "tags": null,
+    "_COMMENT_tags": "Deliberately null. The 10-embryo injection cohort, the two indexing experiments, and the study itself all lack a home, and tags[] is free text with no stable identifier — not a substitute for a Cohort or Study entity. Same position the Immunology and AICS analyses took.",
+
+    "source_data": null,
+    "_COMMENT_source_data": "Null on a raw asset by validator rule (source_data_when_raw raises if set on RAW). Noting here that the derived lineage tree downstream of this asset has no registration shape defined — one derived asset, a family of assets, or a database-resident object the registry references is undecided.",
+
+    "restrictions": null,
+    "_COMMENT_restrictions": "Animal work, no human subjects, data already public at GEO under CC-BY. The open question is not access control but registration responsibility for an externally deposited, jointly owned dataset.",
+
+    "data_summary": "Single-nucleus transcriptome library from an E13.5 mouse embryo carrying a DNA Typewriter lineage recorder. Nuclei from embryos #2 and #3 were co-processed by three-level combinatorial indexing (sci-RNA-seq3) across 6 reverse-transcription plates, 6 ligation plates and 25 PCR plates at approximately 400,000 nuclei per plate. cDNA was split one third to the transcriptome library and two thirds to a recorder-specific amplification, sequenced together at an 80:20 ratio. Paired with the recorder readout, this asset supports reconstruction of a dated cell phylogeny spanning 1,340,794 cells."
+  },
+
+  "procedures": {
+    "object_type": "Procedures",
+    "describedBy": "https://raw.githubusercontent.com/AllenNeuralDynamics/aind-data-schema/main/src/aind_data_schema/core/procedures.py",
+    "schema_version": "2.2.2",
+
+    "subject_id": "DTTembryo03",
+
+    "subject_procedures": [
+      {
+        "object_type": "Surgery",
+        "start_date": "2026-01-29",
+        "experimenters": ["<CLARIFICATION NEEDED>"],
+        "ethics_review_id": "2530",
+        "_COMMENT_ethics_review_id": "Scalar str at procedure level, while two IACUC protocols (#2530, #2401) govern this work. acquisition.ethics_review_id is Optional[List[str]] and takes both; this field forces a choice.",
+        "protocol_id": null,
+        "_COMMENT_protocol_id": "SCHEMA CONFLICT. ProtocolMixin expects a protocols.io DOI. The procedure follows Manipulating the Mouse Embryo, 4th ed. (Behringer, Gertsenstein, Nagy & Nagy, 2014), which is legitimate protocol provenance the field cannot express. Same shape as the Immunology finding that AIFI uses SLIMS IDs.",
+        "animal_weight_prior": null,
+        "animal_weight_post": null,
+        "anaesthesia": null,
+        "notes": "Pronuclear injection of piggyBac transposase mRNA plus plasmid DNA into an E0.5 zygote, followed by transfer into the ampulla of a pseudopregnant CD-1 female.",
+        "procedures": [
+          {
+            "object_type": "Injection",
+            "injection_materials": [
+              {
+                "object_type": "Non-viral material",
+                "name": "piggyBac transposase mRNA + epegRNA-circTAPE and PEmax plasmid mixture",
+                "source": {
+                  "name": "GenScript",
+                  "abbreviation": null,
+                  "registry": null,
+                  "registry_identifier": null
+                },
+                "lot_number": "<CLARIFICATION NEEDED>",
+                "concentration": null,
+                "concentration_unit": null
+              }
+            ],
+            "_COMMENT_injection_materials": "SCHEMA GAP. NonViralMaterial carries name, source, lot and concentration. It cannot express construct architecture, the barcode library design, or the fact that this is a pooled plasmid library rather than a single defined reagent. See subject._proposed_genetic_modification.",
+            "targeted_structure": null,
+            "_COMMENT_targeted_structure": "SCHEMA CONFLICT. Injection.targeted_structure is a MouseAnatomyModel. The target here is the pronucleus of a zygote, a subcellular structure in a single-cell embryo, which the anatomy vocabulary does not cover.",
+            "relative_position": null,
+            "dynamics": [
+              {
+                "object_type": "Injection dynamics",
+                "profile": "Bolus",
+                "volume": null,
+                "volume_unit": null,
+                "duration": null,
+                "duration_unit": null,
+                "injection_current": null,
+                "injection_current_unit": null,
+                "alternating_current": null
+              }
+            ],
+            "protocol_id": null
+          }
+        ]
+      },
+      {
+        "object_type": "Generic subject procedure",
+        "start_date": "2026-01-27",
+        "end_date": "2026-01-28",
+        "experimenters": ["<CLARIFICATION NEEDED>"],
+        "ethics_review_id": "2530",
+        "protocol_id": null,
+        "description": "Superovulation of the donor female by intraperitoneal injection of PMSG then hCG, followed by overnight pairing and E0.5 zygote collection.",
+        "notes": "PERFORMED ON A DIFFERENT ANIMAL. This procedure is done to the C57BL6/J donor female, not to the registered subject. Procedures.subject_id is a single str, so a procedure chain spanning donor, stud male, surrogate and embryo cannot be expressed. Q3 in the gap analysis asks which animals in a reproductive chain are registered subjects."
+      }
+    ],
+    "_COMMENT_subject_procedures": "Two of the four procedures in this chain are performed on animals other than the registered subject — superovulation on the donor female and transfer surgery on the surrogate. The schema assumes procedures act on the subject that produced the data.",
+
+    "specimen_procedures": [
+      {
+        "object_type": "Specimen procedure",
+        "procedure_type": "Other",
+        "procedure_name": "Embryo harvest and flash freezing",
+        "specimen_id": "DTTembryo03-nuclei01",
+        "start_date": "2026-02-11",
+        "end_date": "2026-02-11",
+        "experimenters": ["<CLARIFICATION NEEDED>"],
+        "protocol_id": ["<CLARIFICATION NEEDED>"],
+        "protocol_parameters": null,
+        "procedure_details": [],
+        "notes": "Embryo harvested at E13.5, rinsed in 1x PBS, dabbed dry and flash frozen in liquid nitrogen. No SpecimenProcedureType covers harvest or cryopreservation; STORAGE describes conditions rather than the freezing step. Using Other.",
+        "_COMMENT_specimen_id": "SCHEMA CONFLICT. check_subject_specimen_id requires subject_id to be a substring of specimen_id. This identifier was constructed to satisfy that rule. TEA-seq recorded the same workaround for real SLIMS barcodes, which do not follow the pattern. Relax to an explicit subject-specimen relationship."
+      },
+      {
+        "object_type": "Specimen procedure",
+        "procedure_type": "Other",
+        "procedure_name": "Nuclei isolation",
+        "specimen_id": "DTTembryo03-nuclei01",
+        "start_date": "2026-02-11",
+        "end_date": "2026-02-11",
+        "experimenters": ["<CLARIFICATION NEEDED>"],
+        "protocol_id": ["<CLARIFICATION NEEDED: sci-RNA-seq3 nuclei isolation SOP>"],
+        "protocol_parameters": null,
+        "procedure_details": [],
+        "notes": "Nuclei isolated from the frozen embryo following the sci-RNA-seq3 protocol. Nuclei isolation is not a valid SpecimenProcedureType; using Other."
+      },
+      {
+        "object_type": "Specimen procedure",
+        "procedure_type": "Fixation",
+        "procedure_name": "Two-step nuclei fixation",
+        "specimen_id": "DTTembryo03-nuclei01",
+        "start_date": "2026-02-11",
+        "end_date": "2026-02-11",
+        "experimenters": ["<CLARIFICATION NEEDED>"],
+        "protocol_id": ["<CLARIFICATION NEEDED>"],
+        "protocol_parameters": null,
+        "procedure_details": [],
+        "notes": "Methanol fixation on ice, rehydration in SPBSTM, then BS3 crosslinking. FIXATION is a valid type, but the source system treats isolation and fixation as one continuous procedure while the schema splits them across one mapped concept and one catch-all."
+      },
+      {
+        "object_type": "Specimen procedure",
+        "procedure_type": "Other",
+        "procedure_name": "Genomic DNA extraction",
+        "specimen_id": "DTTembryo03-gdna01",
+        "start_date": "2026-02-12",
+        "end_date": "2026-02-12",
+        "experimenters": ["<CLARIFICATION NEEDED>"],
+        "protocol_id": ["<CLARIFICATION NEEDED>"],
+        "protocol_parameters": null,
+        "procedure_details": [],
+        "notes": "10 percent of fixed nuclei taken for gDNA extraction using the Qiagen AllPrep DNA/RNA kit (80204). Produces the input to the bulk amplicon and ddPCR assays. No nucleic-acid extraction type exists; using Other.",
+        "_COMMENT_branch_point": "This is where the four sibling assets diverge from one specimen. The specimen tree branches, and nothing in the schema records that the amplicon, ddPCR and single-cell assets share an origin."
+      },
+      {
+        "object_type": "Specimen procedure",
+        "procedure_type": "Other",
+        "procedure_name": "sci-RNA-seq3 library construction",
+        "specimen_id": "DTTembryo03-nuclei01",
+        "start_date": "2026-02-13",
+        "end_date": "2026-02-16",
+        "experimenters": ["<CLARIFICATION NEEDED>"],
+        "protocol_id": ["<CLARIFICATION NEEDED: protocols.io DOI for sci-RNA-seq3>"],
+        "protocol_parameters": null,
+        "procedure_details": [],
+        "notes": "Three-level combinatorial indexing: indexed reverse transcription, second-strand synthesis, protease disruption, then Tn5 tagmentation with Nextera N7 oligos for the transcriptome fraction. cDNA split one third transcriptome, two thirds recorder amplification. Library construction is not a valid SpecimenProcedureType; using Other.",
+        "_COMMENT_procedure_type": "SCHEMA GAP, fifth independent appearance. The closed SpecimenProcedureType vocabulary has no nucleic-acid or library-construction entry, so every molecular step between the animal and the sequencer falls to Other. Patch-seq recorded this for SMARTer v4 and Nextera preparation, TEA-seq for all five of its preparation steps. These need controlled vocabulary additions, not free-text workarounds, in order to be searchable across datasets."
+      }
+    ],
+
+    "coordinate_system": null,
+    "global_coordinate_system": null,
+    "notes": null
+  },
+
+  "instrument": {
+    "object_type": "Instrument",
+    "describedBy": "https://raw.githubusercontent.com/AllenNeuralDynamics/aind-data-schema/main/src/aind_data_schema/core/instrument.py",
+    "schema_version": "2.2.7",
+
+    "location": "Seattle Hub for Synthetic Biology, Seattle, WA",
+    "instrument_id": "<CLARIFICATION NEEDED: sequencer ID from Benchling>",
+    "_COMMENT_instrument_id": "Scalar, and one logical library pool here was sequenced across two instrument models (NextSeq 2000 and NovaSeq X). Same scalar-instrument gap TEA-seq recorded for the 10x controller plus NovaSeq pairing.",
+
+    "modification_date": "2026-02-01",
+
+    "modalities": [
+      { "name": "Single cell RNA sequencing", "abbreviation": "scRNAseq" }
+    ],
+
+    "components": [
+      {
+        "object_type": "Device",
+        "name": "NextSeq_2000",
+        "serial_number": "<CLARIFICATION NEEDED>",
+        "manufacturer": { "name": "Illumina", "abbreviation": null, "registry": null, "registry_identifier": null },
+        "model": "NextSeq 2000",
+        "additional_settings": null,
+        "notes": "Used for bulk TAPE amplicon libraries and part of the single-cell sequencing."
+      },
+      {
+        "object_type": "Device",
+        "name": "NovaSeq_X",
+        "serial_number": "<CLARIFICATION NEEDED>",
+        "manufacturer": { "name": "Illumina", "abbreviation": null, "registry": null, "registry_identifier": null },
+        "model": "NovaSeq X",
+        "additional_settings": null,
+        "notes": "Alternative sequencer for the sci-RNA-seq3 and TAPE library pools, with custom sequencing primers."
+      },
+      {
+        "object_type": "Device",
+        "name": "QX600_ddPCR",
+        "serial_number": "<CLARIFICATION NEEDED>",
+        "manufacturer": { "name": "Bio-Rad", "abbreviation": null, "registry": null, "registry_identifier": null },
+        "model": "QX600 AutoDG Digital Droplet PCR System",
+        "additional_settings": null,
+        "notes": "Copy-number quantification. Registered here as a generic Device because no sequencer or PCR device class exists."
+      }
+    ],
+    "_COMMENT_components": "No dedicated device class exists for a sequencer or a digital PCR system, so all three register as generic Device. Read structure, chemistry and flow cell type have nowhere to go.",
+
+    "calibrations": null,
+    "temperature_control": null,
+    "coordinate_system": null,
+    "global_coordinate_system": null,
+    "_COMMENT_global_coordinate_system": "SCHEMA CONFLICT. Instrument.global_coordinate_system is required and every transform is validated against it by recursive_coord_system_check. None of the four acquisitions from this embryo has a spatial frame, so all four would be obliged to declare a fiction. Patch-seq recorded an Illumina sequencer forced to declare IMAGE_XYZ. Exempt non-spatial modalities, or add an explicit not-applicable coordinate system the validator accepts.",
+    "connections": [],
+    "notes": null
+  },
+
+  "processing": {
+    "object_type": "Processing",
+    "describedBy": "https://raw.githubusercontent.com/AllenNeuralDynamics/aind-data-schema/main/src/aind_data_schema/core/processing.py",
+    "schema_version": "2.3.1",
+
+    "data_processes": [
+      {
+        "object_type": "Data process",
+        "process_type": "Other",
+        "name": "Base call conversion and demultiplexing",
+        "stage": "Processing",
+        "code": {
+          "object_type": "Code",
+          "name": "bcl2fastq",
+          "version": "2.20",
+          "url": "<CLARIFICATION NEEDED>"
+        },
+        "experimenters": ["<CLARIFICATION NEEDED>"],
+        "start_date_time": "2026-02-17T00:00:00+00:00",
+        "end_date_time": "2026-02-17T06:00:00+00:00",
+        "output_path": null,
+        "notes": "Base calls converted to FASTQ, then demultiplexed by PCR i5 and i7 barcodes using the deML maximum-likelihood demultiplexer, then filtered on reverse-transcription and ligation indices at edit distance below 2.",
+        "_COMMENT_process_type": "SCHEMA GAP. ProcessName has no demultiplexing entry. This is the step that assigns reads to plates and therefore to embryos — the only point at which the two pooled animals are separated — and it records as Other."
+      },
+      {
+        "object_type": "Data process",
+        "process_type": "Other",
+        "name": "Read alignment",
+        "stage": "Processing",
+        "code": {
+          "object_type": "Code",
+          "name": "STAR",
+          "version": "2.6.1d",
+          "url": "<CLARIFICATION NEEDED>"
+        },
+        "experimenters": ["<CLARIFICATION NEEDED>"],
+        "start_date_time": "2026-02-17T06:00:00+00:00",
+        "end_date_time": "2026-02-18T00:00:00+00:00",
+        "output_path": null,
+        "notes": "Adapter trimming with trim_galore 0.6.5, alignment to mouse reference mm39 with GENCODE vM37 annotations, unique mapping retained.",
+        "_COMMENT_reference": "SCHEMA GAP. No alignment entry in ProcessName, and no dedicated fields for reference genome build or annotation version. Both are load-bearing for reuse and currently survive only as prose in notes."
+      },
+      {
+        "object_type": "Data process",
+        "process_type": "Other",
+        "name": "UMI deduplication and count matrix generation",
+        "stage": "Processing",
+        "code": {
+          "object_type": "Code",
+          "name": "sci-RNA-seq3 pipeline",
+          "version": "MEGAsci",
+          "url": "https://github.com/bethmartin/sci-RNA-seq3_pipeline/tree/MEGAsci"
+        },
+        "experimenters": ["<CLARIFICATION NEEDED>"],
+        "start_date_time": "2026-02-18T00:00:00+00:00",
+        "end_date_time": "2026-02-18T12:00:00+00:00",
+        "output_path": null,
+        "notes": "Duplicates collapsed on UMI, RT index, ligation index and tagmentation site within edit distance 2, producing the gene count matrix.",
+        "_COMMENT_process_type": "SCHEMA GAP. The principal derived artifact of every transcriptomic dataset in the registry has no process name."
+      }
+    ],
+    "_COMMENT_code_url": "Worth noting against the corpus baseline: code URLs are populated for this dataset, where Patch-seq and AICS had none. The provenance model works when the group already versions its code publicly.",
+
+    "_COMMENT_REFERENCE_SET_GAP": "SCHEMA GAP with no clean shape. Two artifacts derived by tape/reference.py are required to parse the raw data: a whitelist of 12-base integration barcodes (admitted above 0.2 percent frequency and at least 3 mismatches apart) and an insertion vocabulary of admitted edit symbols. For embryo #3 the same sets are reused across the bulk and single-cell datasets. They are simultaneously derived outputs and required inputs, which the linear source_data[] model cannot express. A file required to parse the raw data is part of the registered asset, not an annotation about it.",
+    "_proposed_reference_sets": [
+      { "_name": "integration_barcode_whitelist", "_scope": "per embryo", "_derived_from": "bulk TAPE amplicon FASTQ", "_required_to_parse": ["bulk amplicon asset", "single-cell TAPE asset"] },
+      { "_name": "insertion_vocabulary", "_scope": "per embryo", "_derived_from": "bulk TAPE amplicon FASTQ", "_required_to_parse": ["bulk amplicon asset", "single-cell TAPE asset"] }
+    ],
+
+    "_COMMENT_DERIVED_TREE_GAP": "The principal scientific product downstream of this asset is a dated phylogeny of 1,340,794 cells, expanded from a 640,012-cell placement-free backbone, with node-level ages and imputed transcriptional annotations. Whether that registers as one derived asset, a family of assets, or a database-resident object the registry references is undecided — the same unresolved question Patch-seq raised for reconstruction annotations held in a database.",
+
+    "notes": null
+  },
+
+  "acquisition": {
+    "object_type": "Acquisition",
+    "describedBy": "https://raw.githubusercontent.com/AllenNeuralDynamics/aind-data-schema/main/src/aind_data_schema/core/acquisition.py",
+    "schema_version": "2.5.3",
+
+    "subject_id": "DTTembryo03",
+
+    "specimen_id": "DTTembryo03-nuclei01",
+
+    "acquisition_start_time": "2026-02-16T08:00:00+00:00",
+    "acquisition_end_time": "2026-02-17T00:00:00+00:00",
+    "_COMMENT_acquisition_times": "Dummy.",
+
+    "experimenters": ["<CLARIFICATION NEEDED>"],
+
+    "ethics_review_id": ["2530", "2401"],
+    "_COMMENT_ethics_review_id": "Optional[List[str]] takes both IACUC protocols without a workaround. Worth recording as something the schema handles well, because the procedure-level field does not.",
+
+    "instrument_id": null,
+    "_COMMENT_instrument_id": "Null because ExternalDataStream is used below, the same pattern TEA-seq adopted to avoid the instrument_id requirement while modalities are unresolved.",
+
+    "acquisition_type": "sci-RNA-seq3",
+    "_COMMENT_acquisition_type": "Free text with no controlled vocabulary, flagged for Patch-seq and TEA-seq before this. CELLxGENE identifies this assay exactly as EFO:0030028.",
+
+    "protocol_id": ["<CLARIFICATION NEEDED: protocols.io DOI>"],
+
+    "notes": "Three-level combinatorial indexing run carrying nuclei from embryos #2 and #3. This asset is the per-embryo transcriptome library resolved from that run.",
+
+    "calibrations": [],
+    "maintenance": [],
+
+    "data_streams": [
+      {
+        "object_type": "ExternalDataStream",
+        "stream_start_time": "2026-02-16T08:00:00+00:00",
+        "stream_end_time": "2026-02-17T00:00:00+00:00",
+        "modalities": [
+          { "name": "Single cell RNA sequencing", "abbreviation": "scRNAseq" }
+        ],
+        "notes": "Transcriptome fraction only. The recorder fraction from the same cDNA pool is a sibling asset with no modality term, and the two were sequenced together at an 80:20 ratio in one run. DataStream should replace ExternalDataStream, with active_devices naming the sequencer, once modalities are resolved."
+      }
+    ],
+
+    "stimulus_epochs": [],
+    "manipulations": [],
+
+    "subject_details": null,
+    "_COMMENT_subject_details": "Null is correct. AcquisitionSubjectDetails is designed for in vivo acquisitions with animal weight, anaesthesia and mouse platform. This is a post-mortem molecular assay on isolated nuclei.",
+
+    "_COMMENT_POOLING_GAP": "Central structural gap, and the direct analogue of the TEA-seq pooled lane. Nuclei from two embryos were co-processed and are separated only by the reverse-transcription index. The pooled run is a real experimental unit that produced the data and is not registered as an asset.",
+    "_pooled_run": {
+      "_run_id": "<CLARIFICATION NEEDED: run identifier from Benchling>",
+      "_member_subjects": ["DTTembryo02", "DTTembryo03"],
+      "_nuclei_input": { "DTTembryo02": 24000000, "DTTembryo03": 10000000 },
+      "_multiplexing_method": "combinatorial indexing",
+      "_COMMENT": "Unlike TEA-seq, there is no hashtag oligo here. Donor identity is carried by the reverse-transcription index alone, which makes the plate hierarchy below the only demultiplexing provenance that exists."
+    },
+
+    "_COMMENT_COMBINATORIAL_INDEX_GAP": "SCHEMA GAP. Cell identity is the composition of three indices across three plate levels. AICS raised the same absence for plate and well; this dataset nests it three deep and adds pooling on top. A generic nesting Container entity with a parent reference and a well coordinate would answer both.",
+    "_combinatorial_index": {
+      "_level_1": { "_stage": "reverse transcription", "_plates": 6, "_format": "96-well", "_carries": "embryo identity" },
+      "_level_2": { "_stage": "ligation", "_plates": 6, "_format": "96-well" },
+      "_level_3": { "_stage": "PCR", "_plates": 25, "_nuclei_per_plate": 400000 },
+      "_COMMENT_level_3": "23 plates in the first experiment plus 2 in a second, smaller experiment on additional embryo #3 nuclei. The two experiments are a grouping with no Study or Cohort entity to sit in."
+    },
+
+    "_library_split": {
+      "_transcriptome_fraction": 0.333,
+      "_recorder_fraction": 0.667,
+      "_sequencing_ratio": "80:20 transcriptome:recorder",
+      "_COMMENT": "Two libraries derive from one cDNA pool and are sequenced in one run. Neither one acquisition nor two independent acquisitions describes this correctly."
+    },
+
+    "_COMMENT_SIBLING_ASSETS": "Three further assets derive from this embryo and have no construct linking them: bulk TAPE amplicon-seq (NextSeq 2000, read structure 318/10/10 single-end, 5 ng gDNA input, 25-28 then 6-8 PCR cycles), the single-cell TAPE recorder library, and the ddPCR copy-number assay. Read structure, input mass and cycle count have no acquisition fields and would land in additional_settings, which is an extension container and not a semantic match."
+  },
+
+  "quality_control": {
+    "object_type": "Quality control",
+    "describedBy": "https://raw.githubusercontent.com/AllenNeuralDynamics/aind-data-schema/main/src/aind_data_schema/core/quality_control.py",
+    "schema_version": "2.4.2",
+
+    "key_experimenters": ["<CLARIFICATION NEEDED>"],
+
+    "default_grouping": ["modality", "stage"],
+
+    "allow_tag_failures": [],
+
+    "metrics": [
+      {
+        "object_type": "QCMetric",
+        "name": "nuclei_recovered",
+        "modality": { "name": "Single cell RNA sequencing", "abbreviation": "scRNAseq" },
+        "stage": "Raw data",
+        "value": 1340794,
+        "_COMMENT_value": "Dummy, set to the published tree size. The real per-embryo recovery figure differs.",
+        "status_history": [
+          {
+            "evaluator": "<CLARIFICATION NEEDED>",
+            "status": "Pass",
+            "timestamp": "2026-02-20T00:00:00+00:00"
+          }
+        ],
+        "description": "Number of nuclei passing QC filters for this embryo after demultiplexing.",
+        "reference": null,
+        "tags": { "assay_component": "scRNAseq", "embryo": "DTTembryo03" },
+        "evaluated_assets": null
+      },
+      {
+        "object_type": "QCMetric",
+        "name": "doublet_rate",
+        "modality": { "name": "Single cell RNA sequencing", "abbreviation": "scRNAseq" },
+        "stage": "Raw data",
+        "value": 0.05,
+        "_COMMENT_value": "Dummy. Loading density of approximately 400,000 nuclei per plate drives collision rate, and the published pipeline runs a dedicated doublet-removal stage.",
+        "status_history": [
+          {
+            "evaluator": "<CLARIFICATION NEEDED>",
+            "status": "Pass",
+            "timestamp": "2026-02-20T00:00:00+00:00"
+          }
+        ],
+        "description": "Fraction of barcodes called as doublets.",
+        "reference": null,
+        "tags": { "assay_component": "scRNAseq", "embryo": "DTTembryo03" },
+        "evaluated_assets": null
+      }
+    ],
+
+    "_COMMENT_RECORDER_QC_GAP": "The recorder-specific quality metrics cannot be expressed, because QCMetric.modality requires Modality.ONE_OF and no recorder or amplicon modality exists. These are the metrics that decide whether an embryo is analysable at all, and the 10-embryo screen turned on exactly these numbers. Add the entries below when the modality gap is closed.",
+    "_proposed_recorder_metrics": [
+      {
+        "_name": "integration_barcodes_detected",
+        "_modality": { "name": "Targeted amplicon sequencing", "abbreviation": "ampseq", "_proposed": true },
+        "_stage": "Raw data",
+        "_value": 11,
+        "_description": "Distinct TAPE integration barcodes passing the whitelist threshold. Embryos with too few integrations cannot resolve a tree.",
+        "_threshold": ">= 5"
+      },
+      {
+        "_name": "pemax_copy_number",
+        "_modality": { "name": "Digital PCR", "abbreviation": "ddPCR", "_proposed": true },
+        "_stage": "Raw data",
+        "_value": 7,
+        "_description": "PEmax copies per genome by duplex ddPCR, calculated as (Cas9 / GAPDH) x 2. Predicts recorder activity: approximately 2 copies gave modest editing in embryo #2, approximately 7 gave high editing here.",
+        "_threshold": "no fixed threshold; used for embryo selection"
+      },
+      {
+        "_name": "ordering_violation_rate",
+        "_modality": { "name": "Lineage recorder sequencing", "abbreviation": "recorderseq", "_proposed": true },
+        "_stage": "Processing",
+        "_value": 0.03,
+        "_COMMENT_value": "Dummy.",
+        "_description": "Fraction of reads discarded because an edit follows an unedited site. Editing is strictly ordered, so ordering violations indicate PCR chimeras or sequencing error."
+      }
+    ],
+
+    "notes": "Recorder QC is the blocking case for the modality gap: the metrics that gate dataset usability are exactly the ones with no modality term."
+  },
+
+  "model": null
+}

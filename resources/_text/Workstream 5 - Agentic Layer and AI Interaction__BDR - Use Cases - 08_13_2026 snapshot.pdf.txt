@@ -1,0 +1,846 @@
+# source: resources/Workstream 5 - Agentic Layer and AI Interaction/BDR - Use Cases - 08_13_2026 snapshot.pdf
+# original kept: yes
+
+BioData Registry Use Cases
+Note: This is a snapshot of the first iterations beyond Jess’ original primer. It is intended to
+spark conversation with other workstreams and be subject to revisions. The latter will be
+informed by infrastructure and schema decisions. This is not yet a prescribed approach or
+locked in design. Please leave comments to get the conversation started.
+
+SCI — Scientist / Researcher
+Consumes the Registry to find, evaluate, and access data for analysis and model training. Rarely
+writes metadata; cares most about discovery, fitness, provenance, and getting to the bytes.
+
+P0
+SCI-1: Structured, faceted search. A scientist narrows results deterministically, refining
+facets until the candidate set is right. Key facets to be defined based on central schema &
+accelerator needs.
+
+Success criteria:
+
+     •   Relevance: 80% of searches return a useful dataset.
+     •   Usability: scientists can combine facets to narrow results unaided—no technical
+         knowledge required.
+     •   Effectiveness: 80% of scientists find their intended dataset via faceted search, in
+         under 2 minutes.
+     •   API parity: 100% of UI facet, filter, and sort are available through the Query API and
+         MCP with identical semantics—stable IDs, total counts, and deterministic
+         pagination.
+
+
+
+SCI-4: Evaluate dataset fitness before use. Before committing to a dataset, the scientist
+judges whether it suits their analysis.
+
+Key factors: 1) artifact types (raw data, analysis artifact, publication artifact), 2) metadata
+completeness (FAIR score), 3) quality-control metrics, 4) lineage
+
+Success criteria:
+
+     •   Artifacts: scientists can review a dataset's artifact types (raw, analysis, publication).
+   •   Metadata: datasets show a metadata-completeness/FAIR score with enough detail
+       to interpret it.
+   •   Quality: relevant QC metrics and results are visible and clearly explained.
+   •   Lineage: dataset shows sources, transformations, processing steps, and related
+       outputs.
+   •   Decision support: scientists can compare these factors to judge suitability, with
+       >80% reporting they have enough information to confidently decide on a dataset.
+   •   API access: artifact type, FAIR score, QC results, and lineage summary are
+       retrievable per entity via the API (not UI-only), enabling programmatic ranking and
+       filtering.
+
+SCI-5: Locate & access underlying files. Scientists retrieve the storage location(s) from
+results and pull the data with native tooling (boto3, gcloud, rclone). The registry points to
+the data.
+
+Key enables: 1) File manifest download for bulk (.csv), 2) Easy copy & paste of file paths. 3)
+Location prominent in UI e.g. default field?
+
+Stretch: 1) The registry brokers credentials to further streamline user path from locate >>>
+access, 2) Open [DataAsset] in CodeOcean (or other analysis platforms - neural dynamics
+has some prior art in their data catalog linked w/ CodeOcean)
+
+Success criteria:
+
+   •   Paths: scientists can view prominent storage locations and copy paths for native
+       tools (boto3, gcloud, rclone).
+   •   Bulk access: scientists can download a CSV manifest of file paths and relevant
+       metadata.
+   •   Resolution: registry links resolve to correct file locations without duplicating or
+       moving data.
+   •   Permissions: access respects existing permissions and clearly flags unavailable
+       locations or required credentials.
+
+SCI-6: Trace up & downstream provenance
+
+Upstream: Scientists follow a processed asset back through its processing steps to the
+primary acquisitions and the subject/specimen it came from, to understand and trust the
+result
+
+Downstream: Scientists search downstream lineage to find related entities from a specific
+donor, acquisition run, analysis artifact.
+Success criteria:
+
+   •   Upstream: scientists can trace a processed asset through each processing step to
+       its primary acquisitions or other key lineage entities.
+   •   Downstream: scientists can explore from a key lineage entity to all related entities
+       and outputs.
+   •   Detail: each lineage relationship identifies its source, transformation, timestamp,
+       and responsible process or user.
+   •   Accuracy: scientists can see when the system last synced, provenance accurately
+       reflects lineage relationships, and <1% of relationships are reported inaccurate.        Commented [SO3]: That's assuming that these
+                                                                                                relationships are key for data reproducibility and feed
+   •   Lineage and other entity relationships - shared donor, specimen, protocol, or            automated pipelines.
+       instrument - are traversable programmatically.                                           Commented [AR4]: P1 dependency for agentic layer.
+
+
+SCI-10: Documentation & User Support A user can find documentation on how to use the
+Registry and troubleshoot common issues. A user can also file a bug report or support
+request, and find a point of contact to get help.
+
+Success criteria:
+
+   •   Documentation: users can easily find current, searchable docs covering 80% of key
+       Registry workflows and features.
+   •   Troubleshooting: guidance addresses 80% of common issues with clear, actionable
+       resolution steps.
+   •   Bug reports: users can submit bug reports and support requests with relevant
+       details in 3 steps (click create, fill out form, click submit) and track their status.
+   •   Escalation: a clearly identified point of contact and escalation path is available
+       when docs don't resolve the issue.
+   •   Support: common support questions decline over 30/60/90 days from Accelerator’s
+       BDR adoption, and users can increasingly complete core BioRegistry tasks using
+       docs alone—without support or a Data Curator.
+   •   Schema definitions, controlled vocabularies, validation rules, and the list of
+       available operations are published in a machine-readable, versioned form
+       retrievable through the API, so that the documentation a person reads and the
+       description a tool consumes resolve to the same source and cannot drift apart.           Commented [AR5]: P0 dependency for agentic layer.
+
+
+
+SCI-11: Sharing selections of files and metadata quickly. Scientist wants to share the
+exact dataset they're referencing with collaborators without sending or duplicating files.
+Scientist wants to ensure collaborators, reviewers, or analysis pipelines are working from
+the same reproducible set of files.
+
+Success criteria:
+
+     •   Reference: a scientist can create and share a reference to an exact selection of files
+         and metadata without duplicating the underlying data in 3 steps (click share; define
+         audience, permissions, optional message; click send)
+     •   Access: collaborators, reviewers, and analysis pipelines can access the selection
+         per their granted permissions.
+     •   Auditability: the selection's contents, version, creator, timestamp, and provenance
+         are clearly recorded and auditable.
+     •   Recipient clarity: 90% of recipients can understand which files and metadata were
+         sent. There is a point of contact included for clarifying questions.
+     •   Permissions: access respects existing permissions and clearly flags unavailable
+         locations or required credentials.
+     •   Machine-readable specs: 100% of schema definitions, controlled vocabularies,
+         validation rules, and available operations are published in versioned, machine-
+         readable form via the API, so human docs and tool-consumed descriptions share
+         one source and can't drift.
+
+P1
+SCI-0: Meaningful front doors. A scientist enters the BioData Registry through a front door
+that matches their priorities & mental model to jump start their discovery.
+
+Example front doors: 1) MY DATA/PROJECTS (curated based on scientists project
+membership or by them starring specific entities) 2) Anatomy 3) Cell types 4)
+Donors/subject 5) Specimens 6) Processes 7) Digital Assets
+
+
+
+SCI-2: Natural-language cross-modal discovery. A scientist uses their own search terms            Commented [SO7]: I'd argue that as far as P1s go, this
+                                                                                                  should be top of the list as only faceted search only gets
+in plain language and the Registry translates it into a structured + semantic query, shows        you so far. Even a basic level of free text search would
+the query it ran, and returns matching assets across modalities, each with its storage            significantly lower the barrier of entry.
+location and the caller's access status.                                                          Commented [AR8R7]: AGT-1 P0 should enable this
+                                                                                                  using a client's harness, AGT-3 in P1 will tailor this
+Example: 1) “P56 mouse spatial transcriptions data from HMBA” 2) “VS200 images                    specifically to scientific use-cases.
+
+generated from macaque donors after date x” 3) “10x v3 libraries aligned after date y”
+NOTE: Beyond text search across whole registry, we should also support text search
+matching within search facets. Nobody wants to be forced to scroll through 100s of
+possible options.
+
+
+
+SCI-8: “At a glance” summary of search results. A scientist can quickly scan and
+comprehend the datasets contained in their search results via summary overview before
+digging into results
+
+These are more visualization based but can be simplified. Examples scientists have given
+us before: - cBioPortal - GCD Data Portal - Summary View
+
+P2
+SCI-7: Related data recommendations. Scientists receive recommendations of other
+similar datasets they may be interested in when they engage with a dataset in detail. This
+should also work in reverse: given a candidate dataset the scientist supplies that is not yet
+in the Registry, return the Registry entities most comparable to it, so the scientist can judge
+relevance and redundancy before ingest.                                                           Commented [AR9]: P2 dependency for agentic layer.
+                                                                                                  But this addresses an important scientist goal that is
+A given dataset’s details view should contain both: 1) directly related dataset siblings 2)       otherwise absent: 'is this thing I already have relevant to,
+                                                                                                  or redundant with, what we hold?' That question comes
+indirectly related dataset siblings that match similar search criteria                            up constantly with cross-institute collaborations and
+                                                                                                  public datasets.
+
+
+
+SCI-9: Reporting and viewing inaccuracies. A scientist can report data inaccuracies or
+request updates to the data curators. Other scientists can see reported inaccuracies for
+visibility.
+
+
+
+CUR — Data Curator
+Registers, validates, corrects, versions, and publishes metadata. The primary writer into the
+Registry and the main beneficiary of AI assistance.
+
+P0
+CUR-0 (Pre-ingest) metadata validation Curators validate data against the BioData
+Registry schema and receive a validation report. This can occur: 1) standalone pre-ingest 2)
+as part of the ingest flow
+   •   Ingest (to production) is flagged for data with fundamental validation errors, e.g.
+       controlled vocabulary flaws, missing required fields, etc.
+   •   If controlled vocabulary isn’t available yet, points of contact & process to add
+       support for new entries are explicitly called out.
+   •   If there are issues with optional fields, ingest can proceed, but they are encouraged
+       to resolve these issues to improve data discoverability. They need to explicitly
+       acknowledge this dialogue.
+   •   If pre-ingest validation succeeds outright, they receive a success message and are
+       asked whether they want to execute the ingest now.
+
+Success criteria:
+
+   •   Validation: curators can validate data against the current BioData Registry schema,
+       standalone or during ingest, and 80% indicate that they receive a clear, actionable
+       report.
+   •   Blocking errors: production ingest is flagged for fundamental errors—missing
+       required fields, invalid formats, or unsupported controlled-vocabulary values.
+   •   Vocabulary requests: when a required term is unavailable, the report identifies the
+       process and point of contact for requesting its addition.
+   •   Warnings: optional-field issues don't block ingest, but curators must explicitly
+       acknowledge them before proceeding.
+   •   Success: on passing validation, the curator gets confirmation and can immediately
+       begin ingest.
+   •   Absence semantics: the schema distinguishes "not recorded," "unknown," and "not
+       applicable" from a confirmed value, so missing values are machine-interpretable
+       and completeness scores aren't penalized for inapplicable fields.
+
+
+CUR-2: Correct and enrich metadata. Curators can [EDIT] single or bulk entities in
+BioData Registry. This can be done programmatically and through a UI interface. See CUR-
+O for validation business rules that should allow/block updates. Changes to an entity are
+versioned.
+
+Success criteria:
+
+   •   Scale: curators can edit a single entity or ≥1,000 entities per bulk operation, via both
+       UI and API.
+   •   Validation: 100% of proposed updates are validated against CUR-0 rules—blocking
+       errors prevent submission, optional-field warnings require acknowledgment.
+     •   Reliability: ≥99% of valid bulk updates complete successfully, with item-level error
+         reporting for failures.
+     •   Versioning: 100% of accepted changes create a timestamped version recording
+         editor, changed fields, previous values, and update method.
+
+CUR-4: Manage change history & roll backs. A curator browses the timestamped revision
+history of a core entity and reverts or supersedes a change, relying on the fact that history is
+never destroyed. Instead, entities that were reverted or superseded are archived and
+receive a tombstone that points to the new consolidated entity. This avoids dead ends.
+
+Success criteria:
+
+     •   History: curators can browse a complete, timestamped revision history showing
+         who changed what.
+     •   Revert/supersede: curators can revert to a prior revision or supersede an entity with
+         a consolidated version.
+     •   Immutability: revision history is immutable—reverting or superseding never deletes
+         previous entities or changes.
+     •   Archiving: reverted or superseded entities are archived and given a tombstone
+         linking to the current consolidated entity.
+     •   Redirection: users following an archived entity are automatically directed to its
+         replacement, avoiding dead ends while preserving provenance.
+     •   Traceability: 100% of rollbacks are logged and traceable, with no changes to
+         unrelated data.
+
+P1
+CUR-9: Access and Maintain Glossary. A curator can learn and maintain a list of
+controlled-vocabulary terms to help with consistent metadata entry and allow users to
+discover and find data in the registry. The glossary is readable by all Registry users and
+retrievable programmatically - term identifiers, definitions, synonyms, parent and child
+relations, and cross-references to external ontologies - so that free-text terms can be
+resolved to controlled terms deterministically by a person, a pipeline, or an agent.               Commented [AR11]: P0 dependency for agentic layer.
+
+
+
+
+CUR-10: Archive or retract. A curator archives stale data or retracts a published record;
+the record is hidden from default discovery and flagged, but its history and the fact of
+retraction are retained. Archived - everyone should be able to view it. See CUR-6.
+Retracted - more restricted
+CUR-3: Ensure provenance linkage. A curator links an analysis artifact or publication
+artifact to the primary assets and the processing steps that produced it, so lineage is
+explicit from the moment of registration. This can be done programmatically & in the UI. In
+the UI, this type of editing can be illustrated in a text view for easy field editing and in a
+graph views to better illustrate dependencies & directionality. Provenance records identify
+whether each step was performed by a person, a pipeline, or an agent, and record the
+acting principal and the tool or model version used.                                              Commented [AR12]: P1/P2 dependency for agentic
+                                                                                                  layer.
+
+
+
+CUR-5: Publish (manuscript) Collections. A curator assembles a Collection (which may
+nest and span Spaces — e.g., all assets behind a manuscript) and publishes it.
+
+Preconditions: 1) metadata must validate 2) the version is frozen 3) a DOI is minted that
+resolves to the Registry's web-app landing page.
+
+CUR-1: Register entities (single and bulk). Curators can [WRITE] single or bulk entities to
+BioData Registry. This can be done programmatically and through a UI interface. Supported
+file formats: .CSV, .JSON
+
+The user flow is: 1) data entry / file upload 2) system data validation 3) user confirmation 4)
+registration. See CUR-O for validation business rules that should allow/block registration
+
+
+
+CUR-7: Review queue. Curators can view a feed of new data or edits that are pending their         Commented [AR13]: P0 dependency for agentic layer,
+                                                                                                  please consider pushing to P1 fhere. Seems like we
+review. That’s assuming there are some updates users can make outright and some that
+                                                                                                  would need this before CUR-2 ...
+are gated behind curator review. Proposals can be created through the UI and
+                                                                                                  Commented [SM14R13]: Can you elaborate? IMO
+programmatically - including by an agent acting on behalf of a user - and carry the               these seem separate
+proposing principal, the evidence or source for each proposed value, and a per-field accept       Commented [AR15R13]: I agree separate. But, how
+/ edit / reject decision by the reviewer.                                                         would a user actually correct and apply changes to
+                                                                                                  achieve CUR-2 without having a mechanism to "Create a
+                                                                                                  change/proposal" ?
+This could also be relevant to the Scientist cohort. It allows them to see the status of
+                                                                                                  Commented [SM16R13]: The way I see it is CUR-2 is
+change requests. Take inspiration from https://civicdb.org/curation/queues/pending-               about a user just generally being able to edit metadata
+sources                                                                                           meanwhile CUR-7 is a feature on top of that that creates
+                                                                                                  a queue of edits / additions to review.
+P2                                                                                                CUR-7 depends on CUR-2
+                                                                                                  CUR-2 without CUR-7 is just direct edits without a review
+CUR-6: Consolidate entity duplicates. The registry delivers a queue of potential                  process which seems fine IMO for an MVP
+duplicates for curators to clean up. This queue can be retrieved progammatically and              Commented [AR17R13]: Sounds good no problem. We
+viewed in a UI. If a curator finds entities to not be duplicates, the can provide feedback as     can mitigate the dependency i was mentioning in some of
+                                                                                                  the governance/admin tasks then, or in the Auth.
+such to remove the system flags from these entities for the queue. There is a separate
+admin queue where the flags are retained.
+
+Consolidating entities flags cross-entity dependencies that need to be resolved to avoid
+breakage. Consolidating requires explicit user confirmation before it’s executed. Entities that
+were consolidated aren’t deleted outright but archived and receive a tombstone that points to
+the new consolidated entity. This avoids dead ends.
+
+
+
+CUR-8: Submission feed. Curators can view a feed of new data and edits that were
+accepted. This would also be relevant to the Scientist cohort. It allows them to see the
+latest data that’s streamed into BioData Registry or changes that were made.
+
+Take inspiration from https://civicdb.org/curation/activity/curation-timeline
+
+
+
+ADM — Organization & Space Administrator
+Governs who can see and do what, organizes and shares data across Spaces and Organizations,
+gates sensitive publishing, and monitors the health of the holdings.
+
+P0
+ADM-0: Manage organizing units, users, and roles. An Accelerator admin creates
+[organizing units], assigns [organizing unit] admins and members, and sets baseline
+permissions within the Accelerator → [organizing unit] hierarchy.
+
+Success criteria:
+
+     •   Unit management: an Accelerator admin can create, edit, deactivate, and view
+         organizing units.
+     •   User management: admins can add/remove users and assign them as organizing-
+         unit admins or members.
+     •   Permissions: baseline permissions can be configured at both Accelerator and
+         organizing-unit levels; users can access only the units and actions their roles
+         permit.
+     •   Responsiveness: role and membership changes take effect promptly and are clearly
+         reflected in the UI, and the system prevents invalid assignments.
+     •   Self-service: 90% of core admin workflows complete without technical support,
+         90% of admins report high confidence in core tasks, and 75% can identify and
+         correct common configuration errors unaided.
+   •   Permission trust: >90% of admins reporting other roles access datasets accurately
+       within permissions and hit no unexpected access restrictions.
+   •   Non-human principals: agents, pipelines, and service accounts can be issued
+       scoped, expiring credentials that act on behalf of a named user, never exceed that
+       user's effective permissions, and are attributable to both principal and user in audit
+       records.
+
+
+
+ADM-1: Data sharing. An Accelerator admin shares specific entities with another
+[organizing units] or Accelerator for collaboration.
+
+Entities that can be shared are any explicitly registered entities in BioData Regsitry, e.g. 1)
+Donors/subject 2) Specimen 3) Datasets 4) Digital assets 5) Files
+
+Success criteria:
+
+   •   Sharing: an Accelerator admin can share specific registered entities with another
+       organizing unit or Accelerator.
+   •   Authorization: only authorized admins can initiate, modify, or revoke sharing.
+   •   Scope: recipients can access only the entities and actions in the sharing agreement.
+   •   Non-destructive: sharing changes and revocations take effect promptly without
+       altering or deleting source entities.
+   •   Compliance: sensitive or restricted entities remain subject to applicable consent,
+       policy, and access-control requirements.
+   •   Visibility: the interface clearly shows which entities are shared, with whom, at what
+       permission level, and by whom.
+   •   Access trust: >90% of admins report other organizing units access datasets
+       accurately within permissions and hit no unexpected access restrictions.
+
+ADM-2: Flag and govern sensitive data. An Accelerator admin marks data and/or
+metadata as sensitive so it is excluded from search for anyone without a share, and runs
+the required sensitivity review before any human-subject Collection is published.
+
+Success criteria:
+
+   •   Marking: an Accelerator admin can mark specific data as sensitive.
+   •   Exclusion: sensitive content is excluded from search results for users without
+       explicit permission.
+   •   Discovery: users with a valid share can discover sensitive data.
+   •   Publication gate: publication of sensitive data is blocked until a review passes.
+     •   Awareness: other admins or users with a valid share can tell whether data was
+         marked sensitive.
+     •   Trust: 90% of users trusting that data sensitivity and its handling in the registry are
+         reliable, and <20% of scientists needing to contact an admin or curator to learn how
+         they can use a dataset or whether it's sensitive.
+
+P1
+
+ADM-3: Monitor holdings and quality. An admin views dashboards showing: 1) the count
+and size of assets under their control over time 2) metadata-quality and completeness
+signals. These are key indicators for: 1) budget forecasting 2) cost administration 3)
+targeting curation effort. Quality and completeness signals are computed per entity and
+available through the API, so they can be aggregated over any scope the caller is authorized
+to see.ADM-5: Configurable Workspace Personalization                                                Commented [AR19]: P2 dependency for agentic layer.
+
+
+Teams across accelerators operate with distinct workflows and data needs, making
+standard views and basic bookmarks insufficient for efficient navigation
+
+We can provide role-based configuration capabilities allowing admins and data curators to
+customize default registry environments for their specific teams and workflows.
+
+Examples are:
+
+     •   Pre-configured search facets aligned with team domain needs
+     •   Customizable default starting states for views
+     •   Tailored workflow settings per team or accelerator
+
+
+P2
+ADM-4: AI cost monitoring. A data curator can use AI cost monitoring to understand which
+datasets, workflows, and models consume the most resources. By tracking spending
+across projects, they can spot inefficiencies, set budgets, and prevent unexpected cost
+overruns. These insights help balance data quality and operational value against the cost of
+AI processing.
+
+
+
+AGT —AI Agent
+This section covers agentic and AI interaction with the Registry. Capabilities are defined
+independently of the surface that delivers them. The Registry exposes its features as a versioned
+API, the MCP server wraps that API, and an in-product chat interface, an external MCP client, a
+workflow step, and a scientist's own code are all clients of the same operations. A capability is
+specified once and reached through any of them.
+
+The Registry, not the agent, remains authoritative. Every caller acts with scoped, auditable
+credentials, and Registry services enforce every access decision for the calling principal. An
+agent may prepare a proposed change, but an authorized human reviews and approves the
+exact version written to the Registry. Natural language is a convenience over the API rather
+than a separate path into the data, and it grants no access the caller does not already hold.
+
+Dependencies: this section adds no storage, schema, or permission machinery of its own. It
+consumes SCI-1 (query parity across the web application and the API), SCI-2 (natural-language
+discovery), SCI-4 (per-entity fitness signals), SCI-5 (locations and manifests), SCI-6 (typed,
+traversable relationships), SCI-10 (machine-readable schema, vocabularies, and operations),
+SCI-11 (pinned sub-entity selections), CUR-0 (validation, and the distinction between unknown
+and not applicable), CUR-1 (registration), CUR-2 (single and bulk edit), CUR-3 (actor- and
+version-aware provenance), CUR-4 (versioning and rollback), CUR-7 (review queue for proposed
+changes), CUR-9 (readable glossary), ADM-0 (delegated, permission-bounded machine
+principals), ADM-2 (sensitivity), ADM-3 (queryable quality signals), and ADM-4 (cost
+attribution). Where those use cases already deliver a capability, it is not restated here.
+
+P0
+AGT-1: Discover the Registry's schema, vocabularies, and capabilities. A scientist,
+curator, agent, or partner system connects to the Registry through one gateway and can
+ask what it is able to do before attempting anything. This gateway is the entry point for
+every capability in this section. The Registry exposes its features as a versioned API, and
+the MCP server is a wrapper over that API rather than a parallel interface: any operation
+available through MCP is available through the API directly, and both report the same
+version. A caller can therefore begin in a conversational client and move the same work
+into code without a change in what is possible. Among the features the API exposes are
+introspection operations returning the entity types and their schemas, the controlled
+vocabularies that govern each field, the validation rules applied on write, and the catalogue
+of available operations. The catalogue covers operations implemented inside the Registry
+and approved external endpoints reached through it (AGT-6), so a caller finds both in one
+place. Every response is filtered to what the calling principal is permitted to use, and the
+schema and vocabulary definitions returned are the source for the published human                   Commented [AR20]: The foundation for everything else
+                                                                                                    in this section: one gateway, backed by an API, that a
+documentation.                                                                                      scientist, curator, agent, or partner system connects to.
+                                                                                                    Written as a single use case on purpose. The MCP server
+Success criteria:                                                                                   wrapping the API rather than paralleling it is the load-
+                                                                                                    bearing requirement, because it is what lets someone
+                                                                                                    start in a chat client and move the same work into a
+                                                                                                    notebook without hitting a capability wall.
+   •   Discoverability: before invoking anything, a caller can determine which operations
+       are available to them, with input/output schemas and required permissions.
+   •   MCP-API parity: every MCP tool maps to a documented API operation; API and MCP
+       report the same version, and neither exposes operations the other lacks.
+   •   Introspection: introspection operations return entity schemas, per-field controlled
+       vocabularies, write-time validation rules, and the operation catalogue—each
+       versioned. [SCI-10]
+   •   Unified catalogue: the catalogue returns Registry-internal operations and approved
+       external endpoints in one response, each with owner, schemas, and required
+       permissions.
+   •   Permission filtering: responses are filtered to the calling principal's permissions and
+       disclose no operation or resource it can't use.
+   •   Doc parity: published human documentation is generated from the same definitions
+       the API returns. [SCI-10]
+
+AGT-2: Metadata query, filtering, and processing. An authorised caller runs read
+operations over Registry metadata: faceted search, field-level filtering, retrieval of a single
+entity or a defined subset within one, traversal of typed relationships, simple aggregations
+such as counts, group-by distributions, and field completeness, and caller-supplied
+functions that run over a result set and return a derived result. A caller-supplied function
+may be deterministic or model-backed; the Registry treats it as opaque and enforces the
+same authorisation on its inputs. Queries are structured artifacts that can be saved,
+edited, versioned, and re-run, and re-running one against the same data version returns the
+same result. The caller may be a scientist writing code, a workflow step, a partner system,
+an external agent, or the Registry's own web application; all use the same operations under
+the same authorisation, and none can observe records they are not permitted to discover.          Commented [AR21]: This is the read surface, and it
+                                                                                                  absorbs three things that were previously separate or
+Success criteria:                                                                                 missing. Caller-supplied functions are included because
+                                                                                                  post-processing a result set in Python or with a model is a
+                                                                                                  normal data-science step and should not require
+   •   API parity: faceted search, filters, and sorts in the web app are available via the API    exporting first. Note that 'assess the health of the registry'
+       with identical semantics and result parity—stable identifiers, total counts, and           arrives here at P0 as an aggregation capability; agreeing
+                                                                                                  the actual health metrics and building the dashboard
+       deterministic pagination. [SCI-1]                                                          remains ADM-3 at P1.
+   •   Scoped aggregations: aggregations execute over any scope the caller may see and
+       report their denominator and any permission-based exclusions.
+   •   Bounded functions: caller-supplied functions execute against an authorized result
+       set only and cannot widen it or reach records outside it.
+   •   Reproducibility: a query is a saveable, versionable artifact, and re-running it against
+       the same data version returns the same result.
+     •   Absence semantics: absent metadata is distinguishable from a recorded negative or
+         a not-applicable value. [CUR-0]
+     •   No leakage: no response reveals the existence, attributes, or counts of records the
+         caller isn't permitted to discover.
+
+P1
+AGT-3: Natural-language querying and model-backed reasoning over results. A caller
+submits a request in plain language. The service resolves free-text terms to controlled
+vocabulary using the glossary, produces a structured call against the operations described
+in AGT-1, and returns that call with its interpretation of each material requirement before
+executing it. An ambiguous requirement produces a clarifying question rather than a
+widened query. The service also performs model-backed analysis over results a query
+returned, including summarising a result set, comparing entities field by field, explaining a
+lineage path, and characterising what a scope contains. Prose output is generated only
+from records the executed call returned, and each material claim identifies the field and
+version it came from. The service calls the same operations as any other client and holds
+no permissions of its own. Delivery options include an in-product chat interface, an MCP
+client, and a library used inside a notebook.                                                   Commented [AR22]: This is where natural language
+                                                                                                lives, deliberately at P1 rather than P0. Two reasons for
+Success criteria:                                                                               P1: First, a scientist pointing any MCP client at the
+                                                                                                surface gets conversational access as soon as AGT-1 and
+                                                                                                AGT-2 ship, so we do not need to build a chat harness to
+     •   Compilation: plain-language requests compile to structured calls, returned with the    have natural language. Second, what we actually need to
+         interpretation of each material requirement before execution.                          own is translation quality, which is why the last criterion
+                                                                                                asks for a fixed eval set with known-correct structured
+     •   Ambiguity: ambiguous requirements produce a clarifying question, and material          calls, measured per release.
+         criteria are never widened silently.
+     •   Vocabulary resolution: free-text terms resolve to controlled vocabulary via the
+         glossary, and unresolved terms are reported as unresolved. [CUR-9]
+     •   Grounded output: prose is generated only from records the executed call returned,
+         with each material claim traceable to a field and version.
+     •   Delegated authority: the service executes only operations the calling principal is
+         authorized to invoke and holds no standing permissions of its own. [ADM-0]
+     •   Measured accuracy: translation accuracy is measured against a fixed set of
+         representative requests with known-correct structured calls, reported per release,
+         and each translation is logged with the request, compiled call, and surface version.
+
+
+AGT-4: Assemble a reproducible dataset for a computational experiment. A scientist or
+an agent runs a query and receives a pinned selection containing the matching metadata
+and resolved paths to the underlying files, which can be exported together to a staging area
+for processing. Inclusion and exclusion criteria are recorded with the selection, and the
+manifest carries entity identifiers, file locations, metadata versions, and the query that
+produced the set. A pinned selection resolves later to identical content or reports what
+changed. The Registry reports coverage against the stated criteria and flags structural risks
+detectable from metadata: a donor or specimen present on both sides of a proposed split,
+a covariate constant within a batch, labels absent or unevenly available, inconsistent
+processing versions. Risks that cannot be assessed from metadata are reported as
+unassessed. The scientist determines scientific suitability.
+
+Success criteria:
+
+   •   Export: a selection exports as a manifest carrying entity identifiers, resolved file
+       locations, metadata versions, and the originating query, to a staging area for
+       processing. [SCI-5]
+   •   Pinning: pinned selections re-resolve to identical files and metadata versions, or
+       report precisely what changed. [SCI-11]
+   •   Coverage: coverage is reported against the stated criteria, including how many
+       candidates were excluded and why.
+   •   Risk reporting: structural risks detectable from metadata are reported; risks not
+       assessable from metadata are named as unassessed.
+   •   Permission integrity: nothing in the manifest exceeds the caller's permissions; items
+       withheld for permission or sensitivity are reported as withheld, not silently omitted.
+       [ADM-2]
+   •   Reproducibility: a second scientist given only the manifest and the query
+       reconstructs the same set.
+
+
+AGT-5: Machine-assisted ingestion, curation, and harmonization. A data curator,
+scientist, or agent brings new data into the Registry or corrects data already in it, and the
+Registry performs the schema and vocabulary mapping that would otherwise be done by
+hand.
+
+At ingestion, the caller submits files, metadata, protocols, publications, or other
+supporting material. The Registry identifies the applicable schema, extracts candidate field
+values from what was submitted, and maps free text to controlled vocabulary, so that new
+records arrive harmonized rather than requiring a later cleanup pass.
+
+For records already registered, the caller names a scope and the Registry reports values
+within it that are inconsistent or unmapped. Examples include one instrument recorded
+under several different names across acquisitions, or a cell type that was never mapped to
+a controlled term. Corrections are offered as a single reviewable batch rather than one
+record at a time.
+
+Both paths produce a proposal rather than a write. Each proposed field records where the
+value came from, whether it was extracted from the source or inferred, and a confidence
+indicator. Validation runs before a reviewer sees the proposal, and any failure names the
+rule that failed. Information the Registry could not determine is recorded as missing or
+unknown rather than filled in. An authorised human accepts, edits, or rejects each field in
+the standard review queue and approves the exact version written.
+
+This use case follows AGT-4 deliberately. Extraction quality, vocabulary mapping, and
+confidence thresholds need iteration to get right, and the least expensive place to iterate is
+as computational experiments over datasets assembled through AGT-4, where no result is
+written to the Registry.
+
+Initial scope: one agreed schema and one agreed source type for ingestion, and one agreed
+harmonization target, end to end. Broader schema coverage, bulk curation, and scheduled
+quality sweeps follow once these contracts hold.
+
+Success criteria:
+
+   •   Provenance in proposals: ingestion proposals identify the applicable schema and
+       record, per field, the source, whether the value was extracted or inferred, and a
+       confidence indicator.
+   •   Harmonization: harmonization proposals report inconsistent or unmapped values
+       across a caller-specified scope and present corrections as one reviewable batch.
+       [CUR-2]
+   •   Vocabulary mapping: mappings cite the glossary term identifier resolved to;
+       unmapped free text is reported as unmapped. [CUR-9]
+   •   Validation: proposals are validated before review, failures name the rule that failed,
+       and undetermined information is recorded as missing or unknown rather than
+       invented. [CUR-0]
+   •   Human review: every proposal enters the standard review queue for per-field
+       accept/edit/reject, with explicit human approval of the exact version written. [CUR-
+       7]
+   •   Attribution: the stored record identifies the proposing principal, the tool and model
+       versions, and the approving human. [CUR-3, CUR-4, ADM-0]
+P2
+AGT-6: Orchestrate multi-step plans. A caller requests work requiring more than one
+operation, for example retrieving a cohort, running a quality check across it, comparing two
+groups, and registering the result. The Registry returns a plan naming the operations and
+tools each step will use, and the caller approves or edits it before execution begins. Each
+step records its inputs, outputs, tool and model version, acting principal, and the user on
+whose behalf it ran. A failed step halts the plan without leaving partial Registry state.
+Artifacts a plan produces can be registered back, marked as machine-produced and linked
+to their inputs and to the plan that produced them. Re-running a recorded plan against
+pinned inputs reproduces the result or reports why it diverged.
+
+Success criteria:
+
+     •   The plan is returned for approval or editing before execution begins, naming the
+         operations and tools each step will use.
+     •   Each step records inputs, outputs, tool and model version, acting principal, and the
+         user on whose behalf it ran. [ADM-0, CUR-3]
+     •   A failed step halts the plan, identifies which steps completed, and leaves no partial
+         Registry state.
+     •   Artifacts registered back are marked machine-produced and linked to their inputs
+         and to the plan that produced them. [CUR-1, CUR-3]
+     •   Re-running a recorded plan against pinned inputs reproduces the result or reports
+         why it diverged. [SCI-11]
+     •   Any step that mutates the Registry requires human approval through the AGT-5 path,
+         and resource use per plan is attributable. [ADM-4]
+
+
+
+PRT — Partner Organization (external consumer)
+Consumes published or privately shared data from outside the owning Organization,
+programmatically or through the web app.
+
+P0
+None
+
+NOTE: This is due to us focusing MVP of BDR on internal use cases first. Once BDR is also
+used as a publication platform with external sharing & browsing at scale, many of the P2s
+below will increase in relative priority.
+P1
+
+PRT-4: Receive a private cross-org share. A partner Organization that has been granted a
+private share accesses the shared (possibly unvalidated, possibly sensitive) data under the
+permissions the granting admin set. This is supported programmatically & via the UI.
+
+P2
+PRT-8: Ask for data. Whether for cost savings (to avoid hot storage) or for legal reasons a
+file may not be available for immediate access but present as a metadata row in the
+registry. In those cases, a collaborator might want the ability to request this data.
+
+PRT-7: Validate data in published dataset. A publication reader validate data in some way
+either by viewing the images, looking through metadata, or running the analysis
+
+PRT-6: Collaborators contribute to BioData Registry. Choice collaborators can be
+granted scientist, curator, administrator permissions to register & publish their data in the
+registry. This can be as part of consortium efforts or other partnerships, e.g. we’re getting
+paid to release partner date through a visualization tool.
+
+PRT-3: Consume metadata programmatically. A partner's pipeline or agent queries the
+public API (or MCP surface) to pull published metadata for downstream analysis, with no
+credentials required for public data.
+
+PRT-5: Interoperate with external archives. A partner harvests Registry metadata into
+their own system, or the Registry harvests and references theirs (DANDI, BIL, NeMO, NIMP,
+OpenNeuro), so the Registry stays a cross-modal source of truth rather than a silo.
+
+PRT-1: Discover and access published data without an account. A partner researcher
+browses and searches all published assets, collections, and metadata with no
+authentication, then reaches the referenced data through its listed location.
+
+PRT-2: Cite and resolve a Collection by DOI. A partner cites a published Collection; the
+DOI resolves to the Registry landing page with its manifest, contributors, license, and asset
+references.
+
+
+
+
+Prioritization matrix
+Priority:
+
+P0 = foundational, needed for a usable
+P1 = core value, fast-follow
+P2 = important, later.
+
+
+By actor and priority
+ ID         Actor        Use case                                               Priority
+ SCI-1      Scientist    Structured, faceted search                             P0
+ SCI-4      Scientist    Evaluate dataset fitness before use                    P0
+ SCI-5      Scientist    Locate & access underlying files                       P0
+ SCI-6      Scientist    Trace up & downstream provenance                       P0
+ SCI-10     Scientist    Documentation & User Support                           P0
+ SCI-11     Scientist    Sharing selections of files and metadata quickly       P0
+ SCI-0      Scientist    Meaningful front doors                                 P1
+ SCI-2      Scientist    Natural-language cross-modal discovery                 P1
+ SCI-8      Scientist    “At a glance” summary of search results                P1
+ SCI-7      Scientist    Related data recommendations                           P2
+ SCI-9      Scientist    Reporting and viewing inaccuracies                     P2
+ CUR-0      Curator      Pre-ingest metadata validation                         P0
+ CUR-2      Curator      Correct and enrich metadata                            P0
+ CUR-4      Curator      Manage change history & roll backs                     P0
+ CUR-9      Curator      Access and Maintain Glossary                           P1
+ CUR-10     Curator      Archive or retract                                     P1
+ CUR-3      Curator      Ensure provenance linkage                              P1
+ CUR-5      Curator      Publish manuscript Collections                         P1
+ CUR-1      Curator      Register entities single and bulk                      P1
+ CUR-6      Curator      Consolidate entity duplicates                          P2
+ CUR-8      Curator      Submission feed                                        P2
+ CUR-7      Curator      Review queue                                           P1
+ ADM-0      Admin        Manage organizing units, users, and roles              P0
+ ADM-1      Admin        Data sharing                                           P0
+ ADM-2      Admin        Flag and govern sensitive data                         P0
+ ADM-3      Admin        Monitor holdings and quality                           P1
+ ADM-5      Admin        Configurable Workspace Personalization                 P1
+ ADM-4      Admin        AI cost monitoring                                     P2
+ AGT-1      AI Agent /   Discover the Registry's schema, vocabularies, and      P0
+            any          capabilities
+            caller
+ AGT-2      AI Agent /   Metadata query, filtering, and processing              P0
+            Scientist
+ AGT-3      AI Agent /   Natural-language querying and model-backed reasoning   P1
+            any          over results
+            caller
+AGT-4    AI Agent /   Assemble a reproducible dataset for a computational     P1
+         Scientist    experiment
+AGT-5    AI Agent /   Machine-assisted ingestion, curation, and               P1
+         Curator      harmonization
+AGT-6    AI Agent /   Orchestrate multi-step plans                            P2
+         Scientist
+PRT-4    Partner      Receive a private cross-org share                       P1
+PRT-8    Partner      Ask for data                                            P2
+PRT-7    Partner      Validate data in published dataset                      P2
+PRT-6    Partner      Collaborators contribute to BioData Registry            P2
+PRT-3    Partner      Consume metadata programmatically                       P2
+PRT-5    Partner      Interoperate with external archives                     P2
+PRT-1    Partner      Discover and access published data without an account   P2
+PRT-2    Partner      Cite and resolve a Collection by DOI                    P2
+
+By priority
+ID     Actor           Use case                                               Priority
+SCI-1  Scientist       Structured, faceted search                             P0
+SCI-4  Scientist       Evaluate dataset fitness before use                    P0
+SCI-5  Scientist       Locate & access underlying files                       P0
+SCI-6  Scientist       Trace up & downstream provenance                       P0
+SCI-10 Scientist       Documentation & User Support                           P0
+SCI-11 Scientist       Sharing selections of files and metadata quickly       P0
+CUR-0  Curator         Pre-ingest metadata validation                         P0
+CUR-2  Curator         Correct and enrich metadata                            P0
+CUR-4  Curator         Manage change history & roll backs                     P0
+ADM-0  Admin           Manage organizing units, users, and roles              P0
+ADM-1  Admin           Data sharing                                           P0
+ADM-2  Admin           Flag and govern sensitive data                         P0
+AGT-1  AI Agent /      Discover the Registry's schema, vocabularies, and      P0
+       any caller      capabilities
+SCI-0  Scientist       Meaningful front doors                                 P1
+SCI-2  Scientist       Natural-language cross-modal discovery                 P1
+SCI-8  Scientist       “At a glance” summary of search results                P1
+CUR-9 Curator          Access and Maintain Glossary                           P1
+CUR-10 Curator         Archive or retract                                     P1
+CUR-3 Curator          Ensure provenance linkage                              P1
+CUR-5 Curator          Publish manuscript Collections                         P1
+CUR-1  Curator         Register entities single and bulk                      P1
+ADM-3 Admin            Monitor holdings and quality                           P1
+ADM-5 Admin            Configurable Workspace Personalization                 P1
+AGT-2  AI Agent /      Metadata query, filtering, and processing              P0
+       Scientist
+AGT-3   AI Agent /    Natural-language querying and model-backed            P1
+        any caller    reasoning over results
+PRT-4   Partner       Receive a private cross-org share                     P1
+SCI-7   Scientist     Related data recommendations                          P2
+SCI-9   Scientist     Reporting and viewing inaccuracies                    P2
+CUR-6   Curator       Consolidate entity duplicates                         P2
+CUR-8   Curator       Submission feed                                       P2
+CUR-7   Curator       Review queue                                          P1
+ADM-4   Admin         AI cost monitoring                                    P2
+AGT-4   AI Agent /    Assemble a reproducible dataset for a computational   P1
+        Scientist     experiment
+AGT-5   AI Agent /    Machine-assisted ingestion, curation, and             P1
+        Curator       harmonization
+AGT-6   AI Agent /    Integrate and invoke external tools                   P2
+        Integration
+        owner
+AGT-7   AI Agent /    Orchestrate multi-step plans                          P2
+        Scientist
+PRT-8   Partner       Ask for data                                          P2
+PRT-7   Partner       Validate data in published dataset                    P2
+PRT-6   Partner       Collaborators contribute to BioData Registry          P2
+PRT-3   Partner       Consume metadata programmatically                     P2
+PRT-5   Partner       Interoperate with external archives                   P2
+PRT-1   Partner       Discover and access published data without an         P2
+                      account
+PRT-2   Partner       Cite and resolve a Collection by DOI                  P2
+

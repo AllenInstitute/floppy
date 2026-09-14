@@ -1,0 +1,249 @@
+# source: resources/Workstream 2 - Schema and Data Model/Immunology metadata/2026-07-23 Tissue - Tissue Block - Tissue Section fields.xlsx
+# original kept: yes
+
+
+### sheet: Terms Definitions
+
+Reference Data | Field is a drop down option that looks up values in the Reference Data module
+
+### sheet: Tissue Fields
+
+TISSUE |  |  |  |  |  |  | Tissue Block | Tissue Section
+Field | Purpose | Type | Field is updated on | Who updates it? | Notes Comments |  | Field
+AIFI Barcode | The unique ID for the sample, will correspond to a physical barcode placed on the sample | Read only | - | Operations |  |  | AIFI Barcode | AIFI Barcode
+Parent Content | The parent of the content in SLIMS | Read only | - | SLIMS |  |  | Parent Content | Parent Content
+Status | Status of the sample: Pending (not assigned to location), Stored, Removed (no longer physically exists) |  | - | Operations, Lab |  |  | Status | Status
+Mouse date of birth | The mouse date of birth | Read only | Mouse | Operations, Lab |  |  | Mouse date of birth | Mouse date of birth
+Mouse date of sacrifice | The mouse date of sacrifice | Read only | Mouse | Operations, Lab |  |  | Mouse date of sacrifice | Mouse date of sacrifice
+Mouse Donor cell CD45/CD90 congenic | CD45/CD90 congenic of the mouse used for donor cell generation | Read only | Mouse | Operations, Lab |  |  | Mouse Donor cell CD45/CD90 congenic | Mouse Donor cell CD45/CD90 congenic
+Mouse Donor cell Genotype | Genotype of the mouse used for donor cell generation | Read only | Mouse | Operations, Lab |  |  | Mouse Donor cell Genotype | Mouse Donor cell Genotype
+Mouse Donor cell sex | Sex of the mouse used for donor cell generation | Read only | Mouse | Operations, Lab |  |  | Mouse Donor cell sex | Mouse Donor cell sex
+Mouse Donor cell TCR transgenic | TCR transgenic of the mouse used for donor cell generation | Read only | Mouse | Operations, Lab |  |  | Mouse Donor cell TCR transgenic | Mouse Donor cell TCR transgenic
+Mouse Recipient date of donor cell injection | Date the donor cell injection occured | Read only | Mouse | Operations, Lab |  |  | Mouse Recipient date of donor cell injection | Mouse Recipient date of donor cell injection
+Mouse Recipient date of viral infection | Date the viral infection occured | Read only | Mouse | Operations, Lab |  |  | Mouse Recipient date of viral infection | Mouse Recipient date of viral infection
+Mouse Recipient donor cells used - AIFI Barcode | AIFI Barcode of the donor cells from the donor cell mouse (if completed internally) injected to the recipient mouse | Read only | Mouse | Operations, Lab |  |  | Mouse Recipient donor cells used - AIFI Barcode | Mouse Recipient donor cells used - AIFI Barcode
+Mouse Recipient Genotype | Genotype of the recipient mouse | Read only | Mouse | Operations, Lab |  |  | Mouse Recipient Genotype | Mouse Recipient Genotype
+Mouse Recipient sex | Sex of the mouse that received donor cells, infection | Read only | Mouse | Operations, Lab |  |  | Mouse Recipient sex | Mouse Recipient sex
+Mouse Recipient Treatment | Treatment type of the recipient mouse | Read only | Mouse | Operations, Lab
+Mouse Recipient virus used - AIFI Barcode | The AIFI Barcode of the virus used to infect the mouse | Read only | Mouse | Operations, Lab |  |  | Mouse Recipient virus used - AIFI Barcode | Mouse Recipient virus used - AIFI Barcode
+Mouse Recipient virus used - batch | The batch or lot of the virus used to infect the mouse | Read only | Mouse | Operations, Lab |  |  | Mouse Recipient virus used - batch | Mouse Recipient virus used - batch
+Mouse Recipient virus used - name | Name of the virus used to infect the mouse | Read only | Mouse | Operations, Lab |  |  | Mouse Recipient virus used - name | Mouse Recipient virus used - name
+Mouse type | Donor cell, recipient - infected, or N/A | Read only | Mouse | Operations, Lab
+Diagnosis | The clinical diagnosis of the subject (this is different than disease state) | Reference data | Subject | Operations |  |  | Diagnosis | Diagnosis
+Disease State | This is the disease state of the sample at the time of the collection | Reference data | Subject | Operations |  |  | Disease State | Disease State
+Ethnicity | Human only | Reference data | Subject | Operations |  |  | Ethnicity | Ethnicity
+Race | Human only | Reference data | Subject | Operations |  |  | Race | Race
+External Subject ID | The external collaborator mouse or subject ID | Read only | Subject, Mouse | Operations |  |  | External Subject ID | External Subject ID
+Sex | Sex of the subject - human only | Read only | Subject, Mouse | Operations |  |  | Sex | Sex
+Species | Human, Mouse, etc | Reference data | Subject, Mouse | Operations |  |  | Species | Species
+Subject | The AIFI Barcode of the Subject or Mouse | Read only | Subject, Mouse | Operations |  |  | Subject | Subject
+Subject Notes | Notes passed down from the Subject or Mouse level to the derivations | Read only | Subject, Mouse | Operations, Lab
+CMV Status | Viral status at the time of sample collection (human only) | Read only | Sample Aliquot Kit | Operations |  |  | CMV Status | CMV Status
+Collection Date Time | The collection date and time of the sample | Read only | Sample Aliquot Kit | Operations |  |  | Collection Date Time
+COVID-19 Status | Viral status at the time of sample collection (human only) | Read only | Sample Aliquot Kit | Operations |  |  | COVID-19 Status | COVID-19 Status
+EBV Status | Viral status at the time of sample collection (human only) | Read only | Sample Aliquot Kit | Operations |  |  | EBV Status | EBV Status
+HIV Status | Viral status at the time of sample collection (human only) | Read only | Sample Aliquot Kit | Operations |  |  | HIV Status | HIV Status
+Collaborator | The collaborator the sample came from | Reference data | Sample Aliquot Kit | Operations | This is currently the institution or organization the sample came from, but would like to update to the investigator |  | Collaborator
+Legal Project | Integrated with HISE and used to help denote the account | Reference data | Sample Aliquot Kit | Operations | Can we use Collaborator instead of Collaborator captured the Investigator to control for HISE account? |  | Legal Project | Legal Project
+10x Genomics Xenium slide ID | The 10x Genomics slide ID | Short text | Tissue | Lab | Needs to be removed from Tissue once legacy content type cleanup is completed (will only be on Tissue Section contents) |  | 10x Genomics Xenium slide ID | 10x Genomics Xenium slide ID
+Anatomic Site | The specific site location the sample was taken from | Reference data | Tissue | Operations, Lab
+Batch ID | Reference data field to the protocol run the sample is linked with (can be either PIPE-##### or EXP-#####), this is updated on the top primary specimen and becomes read only in children | Reference data - to protocol | Tissue | Operations, Lab |  |  | Batch ID | Batch ID
+Bulk Pool Number | Helper field to allow for bulk sample pooling via a custom plugin script | Reference data | Tissue | Operations, Lab
+Content Owner | The owner of the sample | Reference data | Tissue | Operations |  |  | Content Owner | Content Owner
+Data returned date | If the sample was sent offsite for service, the date the service is completed | Date | Tissue | Operations |  |  | Data returned date | Data returned date
+Experiment Sample Description | The experimental description of the sample, as updated by the user | Short text | Tissue | Lab |  |  | Experiment Sample Description | Experiment Sample Description
+External Container ID | If the sample has a secondary ID | Short text | Tissue | Operations |  |  | External Container ID | External Container ID
+FFPE Block Image | The photo of the FFPE block face | Attachment | Tissue | Operations, Lab |  |  | FFPE Block Image | FFPE Block Image
+Ischemia Time | ?? |  | Tissue | Lab |  |  | Ischemia Time | Ischemia Time
+Material Legal - Regulatory | The legal reference ID to the initial review (MTA, CRA) the sample was brought into the institute under (Inteum AI YYYY-#### format); this will link to the specific sample restrictions associated with the agreement to the samples | Reference data | Tissue | Operations |  |  | Material Legal - Regulatory | Material Legal - Regulatory
+Morphology Image | ?? | Attachment | Tissue | Lab |  |  | Morphology Image | Morphology Image
+Notes | Notes specific to the individual sample | Large text box | Tissue | Lab |  |  | Notes | Notes
+Outbound Shipment Tracking Number | If the sample was sent offsite, the tracking number or reference for the offsite transfer | Short text | Tissue | Operations |  |  | Outbound Shipment Tracking Number | Outbound Shipment Tracking Number
+Outside Service detail | Free text field to help track what/who sent the sample for what purpose (i.e. AIFI-#### jira ticket ID, etc) | Short text | Tissue | Operations |  |  | Outside Service detail | Outside Service detail
+Preservation Matrix Type | The media or matrix the sample is in | Reference data | Tissue | Operations, Lab |  |  | Preservation Matrix Type | Preservation Matrix Type
+Sample Category | The sample group: (assay) control, general experimental sample, on-study collaborator sample, project specific sample | Reference data | Tissue | Operations |  |  | Sample Category | Sample Category
+Sample Source | The gross organ the sample was taken from | Reference data | Tissue | Operations, Lab |  |  | Sample Source | Sample Source
+Section Distance | Thickness of the section |  | Tissue | Lab | Needs to be removed from Tissue once legacy content type cleanup is completed (will only be on Tissue Section contents) |  | Section Distance | Section Distance
+Serial Section Group | Postions | Reference data | Tissue | Lab | Needs to be removed from Tissue once legacy content type cleanup is completed (will only be on Tissue Section contents)
+Shipment Date | If the sample was sent offsite, the date it was shipped | Date | Tissue | Operations |  |  | Shipment Date | Shipment Date
+Shipment Destination | If the sample was sent offsite, who it was sent to | Reference data | Tissue | Operations |  |  | Shipment Destination | Shipment Destination
+Slide Lot Number | The lot number of the slide |  | Tissue | Lab | Needs to be removed from Tissue once legacy content type cleanup is completed (will only be on Tissue Section contents) |  | Slide Lot Number | Slide Lot Number
+Slide Position |  | Reference data | Tissue | Lab | Needs to be removed from Tissue once legacy content type cleanup is completed (will only be on Tissue Section contents) |  | Slide Position | Slide Position
+Slide Preparation Date | Date the slide was prepped |  | Tissue | Lab | Needs to be removed from Tissue once legacy content type cleanup is completed (will only be on Tissue Section contents) |  | Slide Preparation Date | Slide Preparation Date
+Tissue Condition Classification | Inflamed, Normal, Tumor Adjacent, N/A | Reference data | Tissue | Operations, Lab
+Tissue fixation type | Fixation type used | Reference data | Tissue | Operations, Lab |  |  | Tissue fixation type | Tissue fixation type
+Tissue staining method | Stain type used | Reference data | Tissue | Operations, Lab |  |  | Tissue staining method | Tissue staining method
+Tissue sub-type | The type of the tissue sample: FFPE block, FFPE block TMA, OCT block, Tissue - media, Tissue - no media, Microscope slide, 10x Genomics slide | Reference data | Tissue | Operations, Lab |  |  | Tissue sub-type | Tissue sub-type
+Volume |  |  | Tissue | Lab
+Located At Column | Sample position | Read only |  | Operations, Lab |  |  | Located At Column | Located At Column
+Located At Row | Sample position | Read only |  | Operations, Lab |  |  | Located At Row | Located At Row
+Location | Location of the sample, for FFPE blocks, this is a FFPE block location that maps the tissue sample on the block | Read only |  | Operations, Lab |  |  | Location | Location
+
+### sheet: Tissue Sample Hierarchy
+
+
+### sheet: TSS00019 example (mouse)
+
+Field | Purpose | Type | Field is updated on | Who updates it? | Sectioning | Block | Tissue | Subject
+Type | SLIMS content type |  |  |  | Tissue section | Tissue block | Tissue | Mouse
+AIFI Barcode | The unique ID for the sample, will correspond to a physical barcode placed on the sample | Read only | - | Operations | TSS00019 | TMAB00080 | TIS11825-001 | AIFI20178
+Parent Content | The parent of the content in SLIMS | Read only | - | SLIMS | TMAB00080 |  | KT11825
+Status | Status of the sample: Pending (not assigned to location), Stored, Removed (no longer physically exists) |  | - | Operations, Lab | Stored |  |  | Sacrificed
+Mouse date of birth | The mouse date of birth | Read only | Mouse | Operations, Lab |  |  |  | 2025-09-09 09:42:00
+Mouse date of sacrifice | The mouse date of sacrifice | Read only | Mouse | Operations, Lab |  |  |  | 2025-11-24 09:42:00
+Mouse age at death (days) |  |  |  |  |  |  |  | 1900-03-16 00:00:00
+Mouse Donor cell CD45/CD90 congenic | CD45/CD90 congenic of the mouse used for donor cell generation | Read only | Mouse | Operations, Lab
+Mouse Donor cell Genotype | Genotype of the mouse used for donor cell generation | Read only | Mouse | Operations, Lab
+Mouse Donor cell sex | Sex of the mouse used for donor cell generation | Read only | Mouse | Operations, Lab
+Mouse Donor cell TCR transgenic | TCR transgenic of the mouse used for donor cell generation | Read only | Mouse | Operations, Lab
+Mouse Recipient date of donor cell injection | Date the donor cell injection occured | Read only | Mouse | Operations, Lab
+Mouse Recipient date of viral infection | Date the viral infection occured | Read only | Mouse | Operations, Lab
+Mouse Recipient donor cells used - AIFI Barcode | AIFI Barcode of the donor cells from the donor cell mouse (if completed internally) injected to the recipient mouse | Read only | Mouse | Operations, Lab
+Mouse Recipient Genotype | Genotype of the recipient mouse | Read only | Mouse | Operations, Lab
+Mouse Recipient sex | Sex of the mouse that received donor cells, infection | Read only | Mouse | Operations, Lab
+Mouse Recipient Treatment | Treatment type of the recipient mouse | Read only | Mouse | Operations, Lab
+Mouse Recipient virus used - AIFI Barcode | The AIFI Barcode of the virus used to infect the mouse | Read only | Mouse | Operations, Lab
+Mouse Recipient virus used - batch | The batch or lot of the virus used to infect the mouse | Read only | Mouse | Operations, Lab
+Mouse Recipient virus used - name | Name of the virus used to infect the mouse | Read only | Mouse | Operations, Lab
+Mouse type | Donor cell, recipient - infected, or N/A | Read only | Mouse | Operations, Lab
+Diagnosis | The clinical diagnosis of the subject (this is different than disease state) | Reference data | Subject | Operations
+Disease State | This is the disease state of the sample at the time of the collection | Reference data | Subject | Operations
+Ethnicity | Human only | Reference data | Subject | Operations
+Race | Human only | Reference data | Subject | Operations
+External Subject ID | The external collaborator mouse or subject ID | Read only | Subject, Mouse | Operations | 838042,838047,838037,838018,838007,838032,838045,838048,838041,838020,838011,838034,838044 | 838042,838047,838037,838018,838007,838032,838045,838048,838041,838020,838011,838034,838044 | 838042
+Sex | Sex of the subject - human only | Read only | Subject, Mouse | Operations |  |  |  | Male
+Species | Human, Mouse, etc | Reference data | Subject, Mouse | Operations | Mouse
+Subject | The AIFI Barcode of the Subject or Mouse | Read only | Subject, Mouse | Operations |  | AIFI20178,AIFI20181,AIFI20183,AIFI20185,AIFI20187,AIFI20189,AIFI20191,AIFI20194,AIFI20196,AIFI20198,AIFI20200,AIFI20202 | AIFI20178
+Subject Notes | Notes passed down from the Subject or Mouse level to the derivations | Read only | Subject, Mouse | Operations, Lab |  |  |  | Expt 27: Spatial of dLN and tumors of B16-gp33 challenged mice given P14, anti-PD1 treated group, mouse 1, timepoint 1 (Day 14)
+CMV Status | Viral status at the time of sample collection (human only) | Read only | Sample Aliquot Kit | Operations
+Collection Date Time | The collection date and time of the sample | Read only | Sample Aliquot Kit | Operations
+COVID-19 Status | Viral status at the time of sample collection (human only) | Read only | Sample Aliquot Kit | Operations
+EBV Status | Viral status at the time of sample collection (human only) | Read only | Sample Aliquot Kit | Operations
+HIV Status | Viral status at the time of sample collection (human only) | Read only | Sample Aliquot Kit | Operations
+Collaborator | The collaborator the sample came from | Reference data | Sample Aliquot Kit | Operations
+Legal Project | Integrated with HISE and used to help denote the account | Reference data | Sample Aliquot Kit | Operations
+10x Genomics Xenium slide ID | The 10x Genomics slide ID | Short text | Tissue | Lab | 0098051
+Anatomic Site | The specific site location the sample was taken from | Reference data | Tissue | Operations, Lab
+Batch ID | Reference data field to the protocol run the sample is linked with (can be either PIPE-##### or EXP-#####), this is updated on the top primary specimen and becomes read only in children | Reference data - to protocol | Tissue | Operations, Lab
+Bulk Pool Number | Helper field to allow for bulk sample pooling via a custom plugin script | Reference data | Tissue | Operations, Lab
+Content Owner | The owner of the sample | Reference data | Tissue | Operations
+Data returned date | If the sample was sent offsite for service, the date the service is completed | Date | Tissue | Operations
+Experiment Sample Description | The experimental description of the sample, as updated by the user | Short text | Tissue | Lab |  |  | Expt 27: Spatial of dLN and tumors of B16-gp33 challenged mice given P14, anti-PD1 treated group, mouse 1, timepoint 1 (Day 14), dLN 1
+External Container ID | If the sample has a secondary ID | Short text | Tissue | Operations
+FFPE Block Image | The photo of the FFPE block face | Attachment | Tissue | Operations, Lab | image of block (jpeg) | image of block (jpeg)
+Ischemia Time | ?? |  | Tissue | Lab
+Material Legal - Regulatory | The legal reference ID to the initial review (MTA, CRA) the sample was brought into the institute under (Inteum AI YYYY-#### format); this will link to the specific sample restrictions associated with the agreement to the samples | Reference data | Tissue | Operations
+Morphology Image | ?? | Attachment | Tissue | Lab
+Notes | Notes specific to the individual sample | Large text box | Tissue | Lab
+Outbound Shipment Tracking Number | If the sample was sent offsite, the tracking number or reference for the offsite transfer | Short text | Tissue | Operations
+Outside Service detail | Free text field to help track what/who sent the sample for what purpose (i.e. AIFI-#### jira ticket ID, etc) | Short text | Tissue | Operations
+Preservation Matrix Type | The media or matrix the sample is in | Reference data | Tissue | Operations, Lab | Paraffin Embedded | Paraffin Embedded
+Sample Category | The sample group: (assay) control, general experimental sample, on-study collaborator sample, project specific sample | Reference data | Tissue | Operations
+Sample Source | The gross organ the sample was taken from | Reference data | Tissue | Operations, Lab |  | Lymph node
+Section Distance | Thickness of the section |  | Tissue | Lab | 5
+Serial Section Group | Postions | Reference data | Tissue | Lab
+Shipment Date | If the sample was sent offsite, the date it was shipped | Date | Tissue | Operations
+Shipment Destination | If the sample was sent offsite, who it was sent to | Reference data | Tissue | Operations
+Slide Lot Number | The lot number of the slide |  | Tissue | Lab
+Slide Position |  | Reference data | Tissue | Lab
+Slide Preparation Date | Date the slide was prepped |  | Tissue | Lab | 05/12/2026
+Tissue Condition Classification | Inflamed, Normal, Tumor Adjacent, N/A | Reference data | Tissue | Operations, Lab
+Tissue fixation type | Fixation type used | Reference data | Tissue | Operations, Lab | > | Formalin/NBF fixed
+Tissue staining method | Stain type used | Reference data | Tissue | Operations, Lab | Unstained | N/A
+Tissue sub-type | The type of the tissue sample: FFPE block, FFPE block TMA, OCT block, Tissue - media, Tissue - no media, Microscope slide, 10x Genomics slide | Reference data | Tissue | Operations, Lab | 10x Genomics Xenium slide | FFPE block - TMA
+Volume |  |  | Tissue | Lab
+Located At Column | Sample position | Read only |  | Operations, Lab | 1 | 1 | 6
+Located At Row | Sample position | Read only |  | Operations, Lab | A | A | A
+Location | Location of the sample, for FFPE blocks, this is a FFPE block location that maps the tissue sample on the block | Read only |  | Operations, Lab
+Cohort |  |  |  |  | AIFI2 | AIFI2 | AIFI2
+Cohort Description |  |  |  |  | Allen Institute for Immunology LAS mouse samples | Allen Institute for Immunology LAS mouse samples | Allen Institute for Immunology LAS mouse samples
+Location Path |  |  |  |  | LAB520/FZ20-30/30-SH1/BXC-00009/ST-00248/XEN00000442[A,1] | LAB520/FZ20-30/30-SH1/BXC-00009/ST-00248/XEN00000442[A,1] | Workbench/FFPE - Embedded Tissue/FFPE-01093[A,6]
+Slide Expiration Date |  |  |  |  | 06/12/2026
+Slide Kit Lot Number |  |  |  |  | 180413
+FFPE Block location |  |  |  |  |  |  | FFPE-01093
+FFPE Block location position |  |  |  |  |  |  | A6
+
+### sheet: TIS12825-001 example (human)
+
+Field | Purpose | Slide
+Type |  | Tissue
+AIFI Barcode | The unique ID for the sample, will correspond to a physical barcode placed on the sample | TIS12825-001
+Parent Content | The parent of the content in SLIMS | KT12825
+Status | Status of the sample: Pending (not assigned to location), Stored, Removed (no longer physically exists)
+Mouse date of birth | The mouse date of birth
+Mouse date of sacrifice | The mouse date of sacrifice
+Mouse Donor cell CD45/CD90 congenic | CD45/CD90 congenic of the mouse used for donor cell generation
+Mouse Donor cell Genotype | Genotype of the mouse used for donor cell generation
+Mouse Donor cell sex | Sex of the mouse used for donor cell generation
+Mouse Donor cell TCR transgenic | TCR transgenic of the mouse used for donor cell generation
+Mouse Recipient date of donor cell injection | Date the donor cell injection occured
+Mouse Recipient date of viral infection | Date the viral infection occured
+Mouse Recipient donor cells used - AIFI Barcode | AIFI Barcode of the donor cells from the donor cell mouse (if completed internally) injected to the recipient mouse
+Mouse Recipient Genotype | Genotype of the recipient mouse
+Mouse Recipient sex | Sex of the mouse that received donor cells, infection
+Mouse Recipient Treatment | Treatment type of the recipient mouse
+Mouse Recipient virus used - AIFI Barcode | The AIFI Barcode of the virus used to infect the mouse
+Mouse Recipient virus used - batch | The batch or lot of the virus used to infect the mouse
+Mouse Recipient virus used - name | Name of the virus used to infect the mouse
+Mouse type | Donor cell, recipient - infected, or N/A
+Diagnosis | The clinical diagnosis of the subject (this is different than disease state) | Ulcerative colitis
+Disease State | This is the disease state of the sample at the time of the collection | Ulcerative colitis
+Ethnicity | Human only | N/A
+Race | Human only | American Indian
+External Subject ID | The external collaborator mouse or subject ID | AIRetro01-A
+Sex | Sex of the subject - human only | Female
+Species | Human, Mouse, etc | Human
+Subject | The AIFI Barcode of the Subject or Mouse | SCH2015
+Subject Notes | Notes passed down from the Subject or Mouse level to the derivations | Date of UC dx 11/8/2022 Time of colectomy from time of diagnosis 1.5 months H+E path readsevere chronic and active colitits
+CMV Status | Viral status at the time of sample collection (human only) | Unknown
+Collection Date Time | The collection date and time of the sample
+COVID-19 Status | Viral status at the time of sample collection (human only) | Unknown
+EBV Status | Viral status at the time of sample collection (human only) | Unknown
+HIV Status | Viral status at the time of sample collection (human only) | Unknown
+Collaborator | The collaborator the sample came from | Seattle Children's Hospital
+Legal Project | Integrated with HISE and used to help denote the account
+10x Genomics Xenium slide ID | The 10x Genomics slide ID
+Anatomic Site | The specific site location the sample was taken from | Colon Left (descending)
+Batch ID | Reference data field to the protocol run the sample is linked with (can be either PIPE-##### or EXP-#####), this is updated on the top primary specimen and becomes read only in children
+Bulk Pool Number | Helper field to allow for bulk sample pooling via a custom plugin script
+Content Owner | The owner of the sample
+Data returned date | If the sample was sent offsite for service, the date the service is completed
+Experiment Sample Description | The experimental description of the sample, as updated by the user
+External Container ID | If the sample has a secondary ID
+FFPE Block Image | The photo of the FFPE block face
+Ischemia Time | ??
+Material Legal - Regulatory | The legal reference ID to the initial review (MTA, CRA) the sample was brought into the institute under (Inteum AI YYYY-#### format); this will link to the specific sample restrictions associated with the agreement to the samples | AI 2023-0152, AI 2025-0639-5687, AI 2025-0691
+Morphology Image | ??
+Notes | Notes specific to the individual sample | Sample Timepoint diagnostic
+Outbound Shipment Tracking Number | If the sample was sent offsite, the tracking number or reference for the offsite transfer
+Outside Service detail | Free text field to help track what/who sent the sample for what purpose (i.e. AIFI-#### jira ticket ID, etc)
+Preservation Matrix Type | The media or matrix the sample is in | Parafin Embedded
+Sample Category | The sample group: (assay) control, general experimental sample, on-study collaborator sample, project specific sample | On-study samples
+Sample Source | The gross organ the sample was taken from | Intestine
+Section Distance | Thickness of the section
+Serial Section Group | Postions
+Shipment Date | If the sample was sent offsite, the date it was shipped
+Shipment Destination | If the sample was sent offsite, who it was sent to
+Slide Lot Number | The lot number of the slide
+Slide Position
+Slide Preparation Date | Date the slide was prepped
+Tissue Condition Classification | Inflamed, Normal, Tumor Adjacent, N/A | inflamed
+Tissue fixation type | Fixation type used
+Tissue staining method | Stain type used | Unstained
+Tissue sub-type | The type of the tissue sample: FFPE block, FFPE block TMA, OCT block, Tissue - media, Tissue - no media, Microscope slide, 10x Genomics slide | Microscope slide
+Volume
+Located At Column | Sample position | 3
+Located At Row | Sample position | 1
+Location | Location of the sample, for FFPE blocks, this is a FFPE block location that maps the tissue sample on the block
+Cohort |  | SCH2
+Cohort Description |  | Seattle Children's Hospital - IBD study Retrospective bio-banked samples
+Sample Kit Barcode |  | KT12825
+Location Path |  | Workbench/CellDive- In Progress/MS00002022[1,3]
+Cohort Legal Reference ID |  | AI 2022-0539, AI 2023-0152
+Sample transfer to approved vendors allowed? |  | Yes
+Publication restrictions? |  | Yes
+Confidentiality requirements? |  | Yes
+For use in Recipient Scientist lab only |  | Yes
+Data generation restrictions? |  | Yes
+Data generation restrictions? |  | Yes
+Data sharing restrictions? |  | Yes

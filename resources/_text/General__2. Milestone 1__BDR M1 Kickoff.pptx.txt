@@ -1,0 +1,446 @@
+# source: resources/General/2. Milestone 1/BDR M1 Kickoff.pptx
+# original kept: no (too large)
+
+
+## Slide 1
+Allen Institute BioData Registry
+
+M1 Kickoff
+August 24
+
+## Slide 2
+workstreams and horizontals/
+
+2
+
+Workstream | Focus | MEMBERS
+
+Workstream 1 | Backend Architecture | Jon Young, Cameron Bielstein, Nicole Howard, 
+Austin Wang, Autumn Kelsey
+
+Workstream 2 | Metadata Schema & Data Model | Saskia de Vries, Alina Ott, Aishwarya Chander, Nathan Gouwens, Dan Birman, Nathalie Gaudreault
+
+Workstream 3 | Metadata Onboarding & Migration | Doug Ollerenshaw, Tim Dolbeare, Jessica Yu, Ray Sanchez
+
+Workstream 4 | Cloud Services Layer | Matt Aiken, Stark Pister, Aldan Beaubien, 
+Yosef Bedaso
+
+Workstream 5 | Agentic Layer & AI Interaction | Abhe Rajagopal, Peter DiValentin
+
+Workstream 6 | User Experience/User Interface (UX/UI) | Travis Kroeker, Sean Meharry, Jessica Liang, 
+Amelia Espiritusanto, Vitalii Tereshchenko, Sven Otto
+
+Horizontal | Focus | MEMBERs
+
+HORIZONTAL 1 | Program Design & Management | Jess Thomas
+
+HORIZONTAL 2 | Strategy & Execution | David Feng, Paul Meijer
+
+HORIZONTAL 3 | Alignment & Integrations | Shoaib Mufti, Mike Ringenburg, Dan Toloudis, Pete Skene, Ed Jezierski
+
+NOTES: The BioData Registry v-team operates as a set of distinct Workstreams, each led by at least 1 dedicated Workstream owner responsible for delivering specific outcomes and achieving defined milestones. 
+
+While Workstream owners holds accountability for their progress and success criteria, Registry deliverables are interconnected and regularly overlap. This will require ongoing coordination and shared decision-making led by Horizontal owners.
+
+This model emphasizes collaborative execution—Workstreams do not function in isolation. Effective results depend on Workstream owners and Horizontal owners engaging across boundaries to ensure alignment and seamless progress toward the v-team’s collective goals.
+
+## Slide 3
+agenda/
+
+3
+
+2:00–2:05 | Welcome
+
+2:05–2:10 | Review of Overall Goals
+
+2:10–2:20 | M0 Review
+
+2:20–2:50 | M1 Milestone
+
+2:50–3:00 | Next Steps, Q & A
+
+## Slide 4
+Milestone 0
+
+Where we stand
+
+4
+
+## Slide 5
+m0 Gate DDM/
+
+5
+
+Success Criteria:
+
+Workstream Owners identified
+Blocking questions resolved
+Use cases are validated  based on real customer feedback/behavior
+Consensus that architectural proposal is stable enough for MVP development
+All schema gaps, conflicts, and unmappable fields are documented for all 3 datasets.
+
+DDM Gate Decision Prompt
+
+“Do we have clarity on what we are building and why?”
+“Are cross-workstream dependencies sufficiently defined?”
+”Are there blocking questions remaining?”
+
+Alignment, Scope & Success Definition 
+
+Purpose: Establish shared understanding of BioData Registry’s Use Cases, Architecture, and Schema
+
+## Slide 6
+m0 tasks/
+
+6
+
+Track |  |  |  | 
+
+A · Use Cases
+
+Workstreams 5 & 6 | Task 1: Identify Workstream owners |  | Task 4: consolidated draft of use cases across all users/customers | 
+
+ | Task 2: Answer M0 relevant questions, Document new questions |  | Task 5: Prioritization applied with draft acceptance criteria | 
+
+ | Task 3: User/customer set confirmed complete |  | Task 6: each agent cast has human-in-the-loop boundaries + agent guardrail defined | 
+
+B · Architecture & Investments
+
+Workstreams 1 & 4 | Task 1: Identify Workstream owners |  | Task 4: Draft of metadata register/discover/publish flows | 
+
+ | Task 2: Answer M0 relevant questions, Document new questions |  | Task 5: Build-vs-rent matrix drafted | 
+
+ | Task 3: Draft end-to-end architecture skeleton across all layers |  | Task 6: ADRs documented | 
+
+C · Schema & Datasets
+
+Workstreams 2 & 3 | Task 1: Identify Workstream owners |  | Task 4: Each dataset mapped to core schemas+ extension; | 
+
+ | Task 2: Answer M0 relevant questions, Document new questions |  | Task 5: Each dataset’s gaps, conflicts, unmappable fields are captured and categorized. | 
+
+ | Task 3: Identify and source 3 PoC datasets |  |  | 
+
+## Slide 7
+Milestone 1
+
+7
+
+## Slide 8
+milestone 1/
+
+8
+
+Key Deliverables:
+
+Track A- A reviewed set of ingest and pre-registration workflows and requirements for both human users and agents, covering in-scope use cases. 
+Track B- A ratified set of architecture requirements and backend ADRs for data storage, search, and database access models. 
+Track C- Extend the gap analysis to 2 additional datasets (cell science and seahub) cataloging every gap, conflict and unmappable field.
+
+Success Criteria:
+
+Workstream Owners identified
+Blocking architecture questions are resolved
+Prototyping work on Ingest + Pre-Registration is unblocked 
+Schema extensibility and evolution work is unblocked
+
+DDM Gate Decision Prompts:
+Are the ADRs ratified and stable enough to build against in M2?
+Do we understand the schema gaps well enough to begin suggested schema updates in M2?
+Are the ingest and pre-registration workflows for users and agents clear and agreed, with the human-in-the-loop boundary defined?
+
+Ingest Workflows, Schema Gap Analysis & Architecture Alignment
+Target Delivery: Sep 11 
+
+Purpose: Design ingest and pre-registration workflows, extend schema gap analysis, and ratifying backend architecture decisions.
+
+## Slide 9
+milestone 1/
+
+9
+
+Track | WEEK 1: Align & Plan | WEEK 2: Decide & Build | WEEK 3: Integrate & Gate
+
+ | August 24-28 | August 31-Sept 4 | Sept 7-11
+
+A · Ingest & Pre-Registration Workflows & Requirements
+
+Workstreams 5 & 6 | Task 1: Identify Workstream owners
+
+Task 2: Confirm the in-scope Use Case set and split into human and agent responsibilities
+
+Task 3: Define the workflow set for ingest + pre-registration ( ingest, harmonization & proposal, pre-registration validation, curator review) | Task 4: Confirm ingest and pre-registration architecture requirements with Track B
+
+Task 5: Drafts of each ingest + pre-registration workflow in the workflow set | Key Deliverables: A reviewed set of ingest and pre-registration workflows and requirements for both human users and agents, covering in-scope use cases.
+
+B · Architecture Review
+
+Workstreams 1, 3, 4 | Task 1: Identify Workstream owners
+
+Task 2: Align on the architecture requirements for ingest and pre-registration 
+
+Task 3: Finalize and document persistence/data storage component | Task 4: Finalize and document search component
+
+Task 5: Finalize and document the database access model for each human and agentic user type. 
+
+Task 6: Update existing metadata register/discover/publish flows and the build vs buy matrix | Key Deliverables: A ratified set of architecture requirements and backend ADRs for data storage, search, and database access models.
+
+C · Schema & Datasets
+
+Workstream 2 | Task 1: Identify Workstream owners
+
+Task 2: Identify and source 1 cs microscopy dataset and 1 representative seahub dataset
+
+Task 3: Consolidate previous M0 gap analysis documents into a single re-usable template | Task 4: Each dataset mapped to core schemas+ extension; 
+
+Task 5: Each dataset’s gaps, conflicts, unmappable fields are captured and categorized. | Key Deliverables: A templatized gap analysis diagnostic report applying the current biodata-schema to 2 additional datasets ( cs and seahub)
+
+## Slide 10
+high level timeline/
+
+10
+
+ | July |  |  |  | August |  |  |  | September |  |  |  | October |  |  |  | November |  |  |  | December |  |  | 
+
+Alignment, Scope & Success Definition |  |  |  | Milestone 0 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+
+Ingest and Pre-Registration, and Continued Alignment |  |  |  |  |  |  |  | Milestone 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+
+ |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+
+ |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+
+ |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+
+ |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+
+ |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+
+* Agile Updating
+
+## Slide 11
+11
+
+rhythm of business/
+
+11
+
+Aug
+
+Oct
+
+Cadence | Purpose | Days/Times | Proposed Dates
+
+Milestone Kickoff | Align on milestone purpose, key deliverables, success criteria, and metrics | First Monday
+1 hour | Aug 24 (normally Monday)
+
+Workstream Connect | Dedicated time to connect with workstream members and track members | Wednesdays
+1 hour | Aug 19, 26; Sept 2,9
+
+DDM Milestone Review | Formal review of milestone deliverables. Go/No Go meeting. | End of 3 Week Sprint Fridays | Sep 11th
+
+Async Updates | Majority of work |  | As Needed Via Teams
+
+Aug 5
+
+M1
+Aug 24
+
+We are here
+
+24
+
+28
+
+3
+
+10
+
+17
+
+Aug 12
+
+Aug 19
+
+Aug 26
+
+Sep 2
+
+Sep 9
+
+Aug 19
+
+Aug 26
+
+Gate
+Sep 11
+
+7
+
+14
+
+21
+
+## Slide 12
+resources/
+
+12
+
+Teams Channel | General | BioData Registry V-Team
+
+Documentation | BioData Registry Documentation
+
+Roadmap/Task Board | Roadmap & Task Figma Board
+
+Open Question Board | Open Questions Figma Board
+
+Architecture Diagram | Architecture Diagram Figma Board
+
+Use Cases Board | Use Cases Figma Board
+
+Schema Board | Schema Figma Board
+
+## Slide 14
+m1 tasks/
+
+Track |  |  |  | 
+
+A · Ingest & Pre-Registration Workflows & Requirements
+
+Workstreams 5 & 6 | Task 1: Identify Workstream owners |  |  | 
+
+ | Task 2: Confirm the in-scope Use Case set and split into human and agent responsibilities |  |  | 
+
+ | Task 3: Define the workflow set for ingest + pre-registration ( ingest, harmonization & proposal, pre-registration validation, curator review) |  |  | 
+
+B · Architecture Review 
+
+Workstreams 1, 3, 4 | Task 1: Identify Workstream owners |  | Task 4: Finalize and document search component | 
+
+ | Task 2: Align on the architecture requirements for ingestion and pre-registration |  | Task 5: Finalize and document the database access model for each human and agentic user type. | 
+
+ | Task 3: Finalize and document persistence/data component |  | Task 6: Update existing metadata register/discover/publish flows and the build vs buy matrix | 
+
+C · Schema & Datasets
+
+Workstreams 2 | Task 1: Identify Workstream owners |  | Task 4: Each new dataset mapped to core schemas+ extension; | 
+
+ | Task 2: Identify and source 1 cs microscopy dataset and 1 representative seahub dataset |  | Task 5: Each new dataset’s gaps, conflicts, unmappable fields are captured and categorized. | 
+
+ | Task 3: Consolidate previous M0 gap analysis documents into a single re-usable template |  |  | 
+
+## Slide 15
+Appendix
+
+15
+
+## Slide 16
+one institute v-team/
+
+16
+
+program design & management
+
+alignment & integrations
+
+strategy & execution
+
+## Slide 17
+workstream 1: backend architecture/
+
+17
+
+Scope: Design and deliver the core backend architecture that powers the metadata registry, including the system of record, search infrastructure, APIs, and supporting platform services.
+
+Key responsibilities
+Design and maintain the system of record for registry metadata, including the relational database, core entity model, and referential integrity.
+Deliver the read and search architecture by enabling structured reads and supporting discovery, faceted search, and semantic search across metadata.
+Build data synchronization pipelines that propagate changes from the system of record into read and search layers.
+Provide the API layer through documented services that support registry access, integration, and client generation.
+
+## Slide 18
+workstream 2: schema and data model/
+
+18
+
+Scope: Define and evolve the unified metadata schema and core data model, ensuring it enables consistent representation of metadata across the registry. Drive schema extensibility decisions and interoperability across data modalities. 
+
+Key responsibilities
+Define the unified metadata schema by establishing the canonical structure used across the registry, including core and optional elements.
+Design the normalized data model by translating the schema into tables, relationships, and extensible structures that support implementation.
+Support schema extensibility and interoperability so the model can evolve across modalities while remaining consistent and reusable.
+Govern schema evolution with Workstream 3 by coordinating versioning, compatibility, deprecation, and revalidation as the registry expands.
+
+## Slide 19
+workstream 3: onboarding & migration/
+
+19
+
+Scope: Design and execute the onboarding and migration of metadata from existing systems into the BioData Registry, ensuring metadata is mapped to the unified schema, validated, and structured for cross-modal discovery. Drive a prioritized, modality-based migration strategy in coordination with Workstream 2. 
+
+Key responsibilities
+Inventory and prioritize metadata sources by identifying existing systems, assessing metadata structure and quality, and organizing migration by data modality. 
+Define mapping and transformation to the canonical schema by translating source metadata into the unified data model in alignment with Workstream 2. 
+Ingest and migrate metadata into the registry through repeatable ingestion patterns that preserve relationships, provenance, and schema compatibility. 
+Align, normalize, and deduplicate metadata to ensure consistency with shared entities and establish a single source of truth across datasets. 
+Validate metadata quality and readiness by applying validation workflows that surface errors and ensure metadata supports accurate discovery and downstream use.
+
+## Slide 20
+workstream 4: cloud services layer/
+
+20
+
+Scope: Design and deliver the cloud services layer that provides centralized governance, identity, and security across the BioData Registry. This workstream defines how access to cloud storage, permissions, and policies are enforced across APIs, the UI, and agents, enabling secure multi-tenant operation, controlled sharing, and compliance. 
+
+Key responsibilities
+Define governance and access controls to cloud storage by establishing roles, permissions, and data-sharing rules across organizations and workflows.
+Manage identity and authentication services to provide secure access through SSO and consistent identity management.
+Enforce security, audit, and compliance controls by governing sensitive cloud data access, tracking changes, and ensuring activity is traceable.
+Provide integration surfaces for external systems and agents through API-first access and agent-compatible services.
+
+## Slide 21
+workstream 5:  ai integrations & applications/
+
+21
+
+Scope: Design and deliver agentic integrations and AI applications to enable intelligent curation, discovery, and analysis of metadata. This workstream includes agentic workflows specific to registry operations and metadata curation, as well as AI-enabled applications that help scientists reason across registered datasets and perform deeper data analysis. 
+Key Responsibilities
+Define registry-specific agentic workflows that support metadata creation, enrichment, validation, linking, search, and lifecycle actions through natural language and task-based interactions.
+Integrate agents with registry APIs and services by working with backend, schema, cloud, and UX workstreams to provide secure, governed, auditable access to registry capabilities through API and MCP-compatible interfaces.
+Enable AI-assisted metadata curation through agent-driven suggestions for quality improvement, normalization, deduplication, error correction, and completeness, while preserving human approval, provenance, and version tracking.
+Develop AI applications for deeper data analysis by creating intelligent tools that use registry metadata, schemas, ontologies, and dataset relationships to support cross-modal exploration, hypothesis generation, dataset comparison, and analysis planning
+
+## Slide 22
+workstream 6: user experience & interaction/
+
+22
+
+Scope: Design and deliver the API-first product experience ensuring the web application, user workflows, and interaction patterns built on documented registry APIs. This workstream translates core registry capabilities—search, curation, validation, organization, sharing, and publishing—into usable experiences for scientists and data administrators while preserving the API as the primary product surface for clients, integrations, and agents.
+
+Key responsibilities
+Design API-backed user experiences by ensuring every major UI workflow maps to documented registry APIs, shared service contracts, and reusable interaction patterns.
+Build and maintain the front-end application as a reference client for public and authenticated access to the registry, demonstrating how APIs support search, browse, curation, and publishing workflows.
+Validate API usability through product workflows by partnering with backend, schema, cloud, and agentic workstreams to confirm that registry APIs support real user needs, clear error states, validation feedback, and quality signals.
+Provide sharing and publishing workflows that align user actions with API-enforced governance, validation, lifecycle, and permission rules.
+
+## Slide 23
+north star/
+
+23
+
+The BioData Registry will make all biological data collected by the Allen Institute findable and accessible by our human scientists and agentic tooling.
+
+Through a balanced approach of standardization and governance, the BioData Registry will enable cross‑modal data discovery to empower scientists to find relevant datasets for their analysis and model training, independent of where underlying data are stored. 
+
+The registry will be an API‑first platform supporting metadata registration, validation, curation, schema governance, auditability, and collection‑level publishing. Agentic workflows will be considered across all layers of the registry and integrated where appropriate with careful consideration for human-in-the-loop oversight and interpretation.
+
+## Slide 24
+core features/
+
+Unified Metadata Architecture & Access: Normalized architecture for registering and managing biological metadata, exposed through APIs, developer clients, and agentic interfaces to support programmatic and AI-driven workflows.
+Metadata Discovery & Data Access: Search and discover datasets through structured, semantic, and natural language queries for consistent access across registered data.
+Metadata Quality & Lifecycle Management: Validation, versioning, and audit history to support quality, continuous curation, and lifecycle management from draft to published.
+AI-Assisted Metadata Workflows: AI agents that generate, enrich, and correct metadata through natural language interactions, with human validation.
+Governance, Sharing & Publishing: Role-based access control, sensitive metadata handling, and tools to organize, share, and publish datasets and collections.
+Clean User Experience: An intuitive user experience/user interaction (UX/UI) for searching, curating, and managing metadata, including natural language interaction and collection workflows built on an API-first backend.
+
+24

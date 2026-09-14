@@ -1,0 +1,449 @@
+# source: resources/Workstream 2 - Schema and Data Model/Immunology_BioData_Registry_Gap_Analysis.docx
+# original kept: yes
+
+**Gap Analysis**
+
+**BioData Registry Schema (aind-data-schema) vs. Immunology Metadata
+Model**
+
+Comparison of the Immunology team\'s *Registry Spec* and *Metadata
+Ingest Spec* against the canonical BioData Registry schema, with
+proposed field mappings and recommended schema adjustments.
+
+**Status:** Draft for review
+
+**Prepared:** July 24, 2026
+
+**Reference schema:** aind-data-schema (latest) ---
+https://aind-data-schema.readthedocs.io/en/latest/
+
+**Source documents:** BioData Registry (overview), BioData Registry
+Workstreams (charter), Registry Spec, Metadata Ingest Spec.
+
+**Contents**
+
+**1. Purpose and Scope**
+
+This document compares how the Immunology team represents biological
+data and metadata---as captured in the *Registry Spec* and *Metadata
+Ingest Spec*---with the canonical BioData Registry schema. Throughout
+this document, the **"BioData Registry schema" is treated as synonymous
+with aind-data-schema**; every Immunology construct is mapped against
+it. The goal is to surface structural and field-level mismatches,
+propose mappings where a correspondence exists, and recommend
+adjustments to the BioData Registry schema so it can accommodate the
+Immunology use cases.
+
+**Note on layers.** aind-data-schema is a metadata *standard* (a set of
+JSON document schemas), whereas the Immunology Registry Spec describes a
+*service and persistence model* (MongoDB documents, endpoints, search
+views). Some Immunology fields therefore belong to the registry
+*platform* rather than to the metadata schema itself. Where that
+distinction matters, it is called out, because several gaps are best
+resolved at the platform layer (Workstream 1/4) rather than by changing
+the schema (Workstream 2).
+
+**2. Executive Summary of Key Gaps**
+
+At a high level, the two models were designed for different domains and
+around different storage philosophies. The most consequential
+differences are summarized below and expanded in later sections.
+
+  -------- --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------------------------------------------
+  **\#**   **Gap**                                                                                                                                                                     **Impact**
+  **1**    Storage philosophy: file-based JSON sidecars (aind) vs. database documents plus search views (Immunology).                                                                  High -- shapes every downstream mapping and the migration approach.
+  **2**    Asset--to--biology cardinality: one aind data asset = one acquisition of one subject; one Immunology DataAsset can reference many samples/subjects.                         High -- the core structural mismatch.
+  **3**    No first-class Cohort/Study grouping in aind (only free-text tags).                                                                                                         High -- Immunology studies are cohort-organized.
+  **4**    Sample/Specimen semantics: aind Specimen = neuro tissue post-perfusion; Immunology Sample = biospecimen (blood/PBMC) with longitudinal visits.                              High -- different domain concepts share a name.
+  **5**    Procedure semantics: aind = histology/staining/sectioning; Immunology = flow cytometry panels, cell counts, batch IDs.                                                      Medium -- no wet-lab cytometry vocabulary in aind.
+  **6**    Human subject richness and HIPAA: aind HumanSubject is minimal; Immunology needs demographics, CBC, EMR, surveys, and 90+ age handling.                                     High -- human clinical metadata has no home in the aind core.
+  **7**    Extensibility model: aind uses a rigid controlled vocabulary extended by schema change; Immunology uses per-account, data-steward-managed dictionaries (MetadataSchemes).   High -- philosophical divergence on how flexibility is achieved.
+  **8**    Platform concerns embedded in Immunology entities: accountGuid, visibility, soft-delete/cascade, revisionHistory/auditInfo.                                                 Medium -- map to the Registry platform layer, not the JSON schema.
+  -------- --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------------------------------------------
+
+**3. Terminology Reconciliation**
+
+The two models reuse the same words for different concepts. The table
+below establishes a shared vocabulary used in the rest of this analysis.
+
+  ------------------------------------ -------------------------------------------------------------- ----------------------------------------------------------------------------------------
+  **Immunology term**                  **Closest BioData Registry (aind) concept**                    **Caveat**
+  **DataAsset**                        metadata.json record + data\_description.json (a data asset)   Immunology models a single file/Zarr unit; aind models an acquisition session.
+  **Cohort**                           DataDescription.tags / (platform) Collection                   aind has no persistent Cohort object with its own ID.
+  **Subject**                          Subject (subject.json) + subject\_details subtype              Direct concept; field sets differ sharply for humans.
+  **Sample / Specimen**                Specimen (via Procedures.specimen\_id) + SpecimenProcedure     aind specimen = tissue derived from a subject; Immunology sample = a biospecimen draw.
+  **SampleProcedure**                  SpecimenProcedure                                              aind = histology; Immunology = cytometry/wet-lab.
+  **MetadataScheme / dictionary**      (no analog) -- aind core schema + registries                   aind embeds controlled vocab in the schema; Immunology externalizes it per account.
+  **metadata\[\] (embedded struct)**   (no analog) -- fields are first-class in aind core files       aind does not have a generic key/value metadata bag.
+  **FileType / fileTypeName**          DataDescription.modalities + DataLevel                         Overlapping but not identical concepts.
+  ------------------------------------ -------------------------------------------------------------- ----------------------------------------------------------------------------------------
+
+**4. High-Level and Architectural Differences**
+
+**4.1 Storage and representation paradigm**
+
+The BioData Registry schema is deliberately **file-based**. Metadata
+lives in human- and machine-readable JSON sidecar files
+(data\_description.json, subject.json, procedures.json, instrument.json,
+acquisition.json, processing.json, quality\_control.json, model.json)
+that are gathered into a single metadata.json stored alongside the data
+in cloud storage. The aind philosophy explicitly argues against
+databases as the source of truth, on grounds of interpretability,
+reproducibility, and durability.
+
+The Immunology Registry Spec is, by contrast, **database-based**:
+MongoDB documents on a Registry Data Service, with MongoDB materialized
+views forming a flattened search plane. Metadata is not a sidecar file;
+it is embedded directly in Subject and Sample documents and validated
+against dictionaries held in a separate service (AMDS).
+
+**Reconciliation note.** The BioData Registry overview document is
+closer to the Immunology view than the pure aind standard is: it
+describes a normalized relational system-of-record (PostgreSQL),
+search/index layers, RBAC, and an API. In practice the BioData Registry
+is expected to be a *service that persists aind-schema-conformant
+metadata*. The gap is therefore less "file vs. database" in the final
+product and more about which fields are part of the *portable schema*
+versus the *service.*
+
+**4.2 How files and data assets are represented**
+
+This is the single largest structural gap and deserves careful
+treatment.
+
+  -------------------------- --------------------------------------------------------------------------------------------- ------------------------------------------------------------------------------------------------------------
+  **Dimension**              **BioData Registry (aind)**                                                                   **Immunology**
+  **Unit of registration**   A data asset: the output of one acquisition session from one subject.                         A DataAsset: one file "unit" on disk (a single file, or a Zarr collection unified by a manifest).
+  **Identity**               DataDescription.name = subject\_id + creation\_time (session end). Derived, human-readable.   \_id (uuid) plus storageUri; checksum (MD5) for integrity.
+  **Subject cardinality**    One subject per asset (subject\_id is scalar).                                                Many: DataAsset.sampleNames\[\] and sampleProcedureIds\[\] can reference multiple samples across subjects.
+  **File format opinion**    Not opinionated about constituent file formats; asset = folder/collection.                    Tracks fileTypeName (e.g. Olink, scRNA-seq, tar); immutable file, mutable descriptor.
+  **Location tracking**      metadata.location (single string) + other\_identifiers.                                       storageUri + bucket + previousBuckets\[\] (ordered move history).
+  **Derived data**           data\_description.source\_data\[\] (source asset names) + processing.json (provenance).       Handled via fileTypeName categorization + revisionHistory; provenance model less explicit.
+  **Mutability**             Metadata versioned via schema\_version; asset content immutable by convention.                Data immutable (no file overwrite); descriptor mutable; revisionHistory captures changes.
+  -------------------------- --------------------------------------------------------------------------------------------- ------------------------------------------------------------------------------------------------------------
+
+**Consequence.** aind assumes a clean 1:1:1 chain (asset ↔ acquisition ↔
+subject), with specimens as subject-derived tissue. Immunology routinely
+produces one file covering many samples (e.g. a multiplexed cytometry
+run or a pooled sequencing library), and organizes those samples under
+subjects and cohorts. A faithful mapping requires either (a) decomposing
+an Immunology DataAsset into multiple aind data assets, or (b) extending
+the schema to express one asset referencing multiple subjects/specimens.
+See Recommendation R2.
+
+**4.3 Entity model comparison**
+
+The two models overlap on Subject but diverge in how everything else is
+grouped and linked.
+
+  ----------------------------- --------------------------------------------------------- ---------------------------------------------------------------
+  **Concern**                   **BioData Registry (aind)**                               **Immunology**
+  **Grouping of subjects**      Free-text DataDescription.tags; (platform) Collections.   First-class Cohort entity with cohortGuid, name, description.
+  **Subject → sample link**     Implicit: specimen\_id derived from subject\_id.          Explicit FK: Sample.subjectID.
+  **Sample → procedure link**   Nested inside Procedures.specimen\_procedures.            Explicit FK: SampleProcedure.sampleId (1:many per sample).
+  **Asset → sample link**       Asset is per-acquisition; sample is upstream tissue.      DataAsset.sampleNames\[\] and sampleProcedureIds\[\].
+  **Referential integrity**     By naming convention within the JSON files.               By uuid FKs across MongoDB documents; cascade soft-delete.
+  ----------------------------- --------------------------------------------------------- ---------------------------------------------------------------
+
+**5. Field-Level Mapping by Entity**
+
+The tables below propose a field mapping wherever a defensible
+correspondence exists. "**--- (no analog)**" marks Immunology fields
+with no home in the current BioData Registry schema; these drive the
+recommendations in Section 7. Platform/audit fields common to every
+Immunology endpoint (\_id, accountGuid, auditInfo.\*, isDeleted,
+revisionHistory) are mapped once in Section 6 rather than repeated per
+entity.
+
+**5.1 DataAsset → metadata.json + data\_description.json**
+
+  ------------------------------------------- -------------------------------------------------------------- -------------------------------------------------------------------------------
+  **Immunology DataAsset field**              **BioData Registry (aind) target**                             **Notes**
+  **storageUri**                              metadata.location                                              Single current location string.
+  **bucket, previousBuckets\[\]**             --- (no analog)                                                aind location is a single value; move history is not modeled. Platform-level.
+  **checksum**                                --- (no analog in core)                                        No checksum field in metadata core; add or hold at platform.
+  **fileTypeName**                            data\_description.modalities + data\_description.data\_level   Partial: modality captures assay class; DataLevel captures raw/derived.
+  **sampleNames\[\]**                         (maps to) subject/specimen identifiers                         Cardinality mismatch -- see R2. aind expects one subject per asset.
+  **sampleProcedureIds\[\]**                  procedures.specimen\_procedures                                Referenced inline in aind rather than by id.
+  **availability (available/deleted)**        --- (platform) publish/archive state                           Maps to Registry lifecycle (draft/registered/published/archived), not schema.
+  **visibility (public/private/protected)**   --- (platform) sharing/sensitivity flag                        Maps to Registry RBAC + "sensitive" flag, not schema.
+  **revisionHistory\[\]**                     --- (platform) metadata version history                        aind versions whole files; platform tracks revisions.
+  ------------------------------------------- -------------------------------------------------------------- -------------------------------------------------------------------------------
+
+**5.2 Cohort → (no first-class analog)**
+
+aind has no Cohort object. The nearest constructs are
+**DataDescription.tags** (shared free-text strings across assets in an
+experiment) and, at the platform level, **Collections**. Neither carries
+a stable identifier, name, and description the way Immunology\'s Cohort
+does.
+
+  ----------------------------- -------------------------------------------------------- -------------------------------------------
+  **Immunology Cohort field**   **BioData Registry (aind) target**                       **Notes**
+  **cohortGuid (unique)**       --- (no analog)                                          No persistent cohort identifier exists.
+  **name**                      data\_description.tags\[\] (approx.) / Collection name   Lossy: a tag is not a named entity.
+  **description**               --- (no analog) / Collection description                 Only exists at platform Collection level.
+  ----------------------------- -------------------------------------------------------- -------------------------------------------
+
+**5.3 Subject → Subject (subject.json)**
+
+Subject is the strongest point of alignment structurally, but the aind
+**HumanSubject** detail type is minimal (species, sex, year\_of\_birth,
+source) and cannot hold the demographic, clinical, or longitudinal
+metadata Immunology requires.
+
+  ------------------------------------------------- ------------------------------------------------------------- -------------------------------------------------------------------
+  **Immunology Subject field**                      **BioData Registry (aind) target**                            **Notes**
+  **name (de-identified, unique per account)**      subject.subject\_id                                           Direct.
+  **species**                                       subject\_details.species (Species registry / NCBI Taxonomy)   aind uses a controlled vocabulary; Immunology uses a free string.
+  **cohortId**                                      --- (no analog)                                               Depends on introducing a cohort concept (R1).
+  **metadata\[\] → demographics (biologicalSex)**   HumanSubject.sex                                              Direct for humans.
+  **metadata\[\] → birthYear**                      HumanSubject.year\_of\_birth                                  Direct (int).
+  **metadata\[\] → race, ethnicity**                --- (no analog)                                               Not present in HumanSubject. See R3.
+  **metadata\[\] → ageAtEnrollment ("90+")**        --- (no analog)                                               Requires HIPAA-aware string handling. See R3 / R7.
+  **metadata\[\] → droppedOut**                     --- (no analog)                                               Study-participation status has no home. See R3.
+  ------------------------------------------------- ------------------------------------------------------------- -------------------------------------------------------------------
+
+**5.4 Sample → Specimen (aind Procedures.specimen)**
+
+The Immunology Sample is a **biospecimen (a blood draw / PBMC / plasma
+vial at a visit)**, carrying longitudinal-trial context. The aind
+Specimen is **tissue extracted from a subject after perfusion/death**,
+identified by specimen\_id (= subject\_id, or a suffixed derivative when
+sectioned). The concepts share a name but not a domain.
+
+  -------------------------------------------------- ---------------------------------------------- -------------------------------------------------------------------------
+  **Immunology Sample field**                        **BioData Registry (aind) target**             **Notes**
+  **subjectID**                                      specimen\_id derived from subject\_id          aind ties specimen identity to the subject id.
+  **name (LIMS barcode / name)**                     specimen\_id (suffix convention)               Partial; aind has no LIMS barcode concept.
+  **collectionDate (month/year for humans)**         --- (nearest: SpecimenProcedure.start\_date)   aind uses full dates; HIPAA month/year granularity not modeled. See R7.
+  **sampleType (pbmc, plasma, bone marrow)**         --- (no analog)                                No biospecimen-type vocabulary. See R4.
+  **timeToProcessingOnset**                          --- (no analog)                                Pre-analytical variable; no field. See R4.
+  **visitName, visitDetails, daysSinceFirstVisit**   --- (no analog)                                No longitudinal-visit model. See R4.
+  **sampleKitName**                                  --- (no analog)                                No collection-kit concept.
+  **status (LIMS: stored/destroyed/not viable)**     --- (no analog)                                No specimen lifecycle status in schema.
+  -------------------------------------------------- ---------------------------------------------- -------------------------------------------------------------------------
+
+**5.5 SampleProcedure → SpecimenProcedure**
+
+aind\'s SpecimenProcedure is oriented to histology (staining, HCR/mFISH,
+planar sectioning, brain-atlas targeting), whereas the Immunology
+SampleProcedure captures **flow-cytometry and wet-lab** details. Both
+are 1:many against their parent, but the detail vocabularies do not
+overlap.
+
+  -------------------------------------- ------------------------------------------------------ ------------------------------------------
+  **Immunology SampleProcedure field**   **BioData Registry (aind) target**                     **Notes**
+  **sampleId**                           SpecimenProcedure.specimen\_id                         Direct (link to specimen).
+  **name (aliquot)**                     SpecimenProcedure.procedure\_name                      Approximate.
+  **processingDate**                     SpecimenProcedure.start\_date / end\_date              Direct-ish.
+  **batchId**                            SpecimenProcedure.protocol\_parameters (kv) or notes   No first-class batch field. See R5.
+  **panelId (flow cytometry)**           --- (no analog)                                        No cytometry-panel concept. See R5.
+  **totalViableCellCount**               --- (no analog)                                        No cell-count measurement field. See R5.
+  **processingDetails (JSON)**           SpecimenProcedure.protocol\_parameters                 Free key/value approximates it.
+  -------------------------------------- ------------------------------------------------------ ------------------------------------------
+
+**5.6 MetadataScheme / dictionary → (no analog)**
+
+This is a philosophical gap rather than a field mapping. Immunology
+externalizes its controlled vocabulary into **MetadataSchemes**
+(per-account, per-species, per-entity, per-type dictionaries with
+templates for demographics, CBC, EMR, survey, and a generic fallback),
+and stores validated values in a flexible **metadata\[\]** bag on
+Subject/Sample. aind takes the opposite approach: the vocabulary is
+*baked into the schema* and its registries (NCBI, ROR, ORCID, RRID,
+Addgene, MGI), and is extended by proposing changes to the schema
+itself. There is no generic key/value metadata field in the aind core,
+and no notion of a per-account dictionary. Reconciling these two
+extensibility models is the central schema-governance question and is
+addressed in R6.
+
+**6. Cross-Cutting Concerns**
+
+**6.1 Governance, identity, and multi-tenancy**
+
+Every Immunology endpoint carries accountGuid (tenant), visibility
+(public/private/protected), availability/isDeleted (soft delete with
+cascade), and full auditInfo (added, addedByUser, lastModified,
+lastModifiedByUser, version) plus a revisionHistory JSON array. The aind
+*schema* carries almost none of this; it relies on file-level
+schema\_version and expects governance to live in the surrounding
+platform. The BioData Registry overview and charter confirm this: RBAC
+is organized as Organizations → Spaces → Users, with sensitive-data
+flagging and a draft→registered→published→archived lifecycle. These
+Immunology fields should therefore map to the **Registry platform
+(Workstream 1/4)**, not into aind JSON files.
+
+  ------------------------------------------ ------------------------------------------ --------------------------------
+  **Immunology (per-entity) field**          **Maps to**                                **Layer**
+  **accountGuid / accountGuids**             Organization / Space ownership             Platform (RBAC)
+  **visibility**                             Sensitive flag + share scope               Platform
+  **availability / isDeleted (+ cascade)**   Lifecycle state (archived) + soft delete   Platform
+  **auditInfo.\***                           Change audit / event log                   Platform
+  **revisionHistory\[\]**                    Versioned metadata history                 Platform (aind versions files)
+  ------------------------------------------ ------------------------------------------ --------------------------------
+
+**6.2 Human data and HIPAA**
+
+Immunology\'s human-subject requirements are substantially richer and
+are constrained by HIPAA: age is capped and expressed as "90+" rather
+than a number; dates of birth for humans are reduced to month/year (or
+year). The aind HumanSubject type has none of the demographic (race,
+ethnicity), clinical (CBC), record (EMR), or survey structures
+Immunology relies on, and its date fields assume full-precision dates.
+HIPAA-aware date/age handling and a place for clinical/demographic
+metadata are prerequisites for onboarding human immunology data. See R3
+and R7.
+
+**6.3 Provenance and derived data**
+
+aind models derivation explicitly: data\_description.data\_level (raw
+vs. derived), data\_description.source\_data\[\] (names of source
+assets), and a dedicated processing.json capturing software, parameters,
+and steps. Immunology tracks lineage more implicitly via fileTypeName
+categorization, bucket move history, and revisionHistory. When mapping
+Immunology derived files into the Registry, provenance should be
+re-expressed in the richer aind provenance fields rather than left
+implicit.
+
+**7. Proposed Adjustments to the BioData Registry Schema**
+
+The following recommendations address the mismatches above. They are
+ordered roughly by structural depth. Each notes whether it is best
+resolved in the portable schema or at the platform layer.
+
+**R1 -- Introduce a first-class Cohort / Study grouping**
+
+Add a persistent, identified grouping entity (Cohort or Study) with its
+own id, name, and description, and allow subjects and data assets to
+reference it. This preserves Immunology\'s cohort organization without
+overloading free-text tags. If a schema-level change is undesirable,
+formalize platform Collections with stable IDs and treat Cohort as a
+typed Collection.
+
+**R2 -- Resolve the asset-to-biology cardinality mismatch**
+
+Decide, and document, how one physical file that spans many
+samples/subjects is represented. Two viable paths: (a) keep aind\'s
+one-asset-per-acquisition rule and provide a deterministic
+decomposition/aggregation convention during onboarding (Workstream 3);
+or (b) extend the schema so a data asset can reference a list of
+subjects/specimens (e.g. a subjects\[\] / specimens\[\] linkage) for
+multiplexed and pooled assays. Path (b) is the larger change but
+reflects how immunology data is actually produced.
+
+**R3 -- Extend the human subject model**
+
+Enrich HumanSubject (or add a HumanSubjectDetails / clinical component)
+to carry race, ethnicity, age-at-enrollment, and study-participation
+status (e.g. droppedOut). Values for race/ethnicity should map to a
+controlled vocabulary consistent with the aind registry philosophy. This
+gives demographic metadata a first-class home instead of a generic bag.
+
+**R4 -- Add a biospecimen specimen subtype and longitudinal context**
+
+Introduce a biospecimen-oriented specimen type (or fields) covering
+sample\_type (PBMC, plasma, bone marrow, ... as a controlled
+vocabulary), collection date, pre-analytical time-to-processing,
+collection-kit identity, and specimen lifecycle status. Add a
+longitudinal/visit construct (visit name, visit details,
+days-since-first-visit) so repeated draws from one subject over a trial
+are representable. This closes most of the Section 5.4 gaps.
+
+**R5 -- Add wet-lab / cytometry procedure details**
+
+Add specimen-procedure detail types for flow cytometry and related
+wet-lab work: cytometry panel, total viable cell count (as a measurement
+with units), and batch identifier. These slot into
+SpecimenProcedure.procedure\_details alongside the existing histology
+types, extending rather than replacing the current vocabulary.
+
+**R6 -- Reconcile the extensibility models**
+
+Define how project-specific metadata that is not (yet) in the core
+schema is captured. Options, not mutually exclusive: (i) a governed
+"extension" mechanism that lets a data-steward-managed dictionary (the
+Immunology MetadataScheme analog) validate additional fields against a
+named schema, recorded with a reference to that schema; (ii) promotion
+of stable, widely used dictionary fields into the core schema over time
+via the schema-governance process (Workstream 2/3). The aim is to keep
+aind\'s rigor for shared concepts while giving Immunology a sanctioned
+path for CBC, EMR, and survey data that does not require a core schema
+change for every project.
+
+**R7 -- Make HIPAA-aware dates and ages a first-class schema concern**
+
+Support reduced-precision dates (year, or month/year) and a capped-age
+representation (numeric up to 89, "90+" above) as recognized types or
+field-level annotations, so that de-identification requirements are
+enforced by the schema/validator rather than by convention. This is
+needed wherever human data is registered, independent of the other
+recommendations.
+
+**R8 -- Keep platform concerns out of the portable schema**
+
+Confirm that tenancy (accountGuid), visibility/sensitivity, soft-delete
+and cascade, audit trail, and revision history are implemented in the
+Registry service (Organizations → Spaces → Users, lifecycle states) and
+are not added to the aind JSON files. Provide an explicit crosswalk
+(Section 6.1) so Immunology\'s existing fields have a clear destination
+during migration.
+
+**R9 -- Add integrity and location-history affordances**
+
+Consider a checksum field and, if location changes must be auditable, a
+location-history mechanism at the platform layer to absorb Immunology\'s
+checksum, bucket, and previousBuckets\[\]. aind currently models only a
+single current location and no checksum.
+
+**8. Open Questions**
+
+-   Will the Registry enforce aind\'s one-asset-per-acquisition rule (R2
+    path a), or extend the schema for multi-subject assets (R2 path b)?
+    This decision gates most of the sample-side mapping.
+
+-   Should CBC/EMR/survey metadata be promoted into the core schema, or
+    held via a governed extension/dictionary mechanism (R6)? Who owns
+    that dictionary -- the Data Stewards collective, as in the
+    Immunology model?
+
+-   How are the Immunology MetadataScheme dictionaries and the aind
+    registries (controlled vocabularies) reconciled -- merged, mapped,
+    or kept as parallel layers?
+
+-   Where does specimen/sample lifecycle status (stored, destroyed, not
+    viable) belong -- schema or platform?
+
+-   What is the canonical HIPAA date/age representation the validator
+    will enforce (R7)?
+
+-   For non-owned (third-party) registered data, how much of this schema
+    is expected to be populated versus left sparse?
+
+**9. Sources and Method**
+
+This analysis compared the four Immunology / BioData documents provided
+(Registry Spec, Metadata Ingest Spec, BioData Registry overview, BioData
+Registry Workstreams charter) against the current aind-data-schema
+documentation, treating the latter as the canonical BioData Registry
+schema per the analysis request.
+
+-   aind-data-schema -- index, metadata, data\_description, subject,
+    components/subjects, procedures, components/specimen\_procedures,
+    and "Metadata in general" philosophy pages
+    (https://aind-data-schema.readthedocs.io/en/latest/).
+
+-   Immunology Registry Spec (DataAssets, Cohorts, Subjects, Samples,
+    SampleProcedures; search plane).
+
+-   Immunology Metadata Ingest Spec (MetadataSchemes, dictionary
+    templates, ingest/validation).
+
+-   BioData Registry overview (core features, design goals, scope) and
+    BioData Registry Workstreams charter (workstreams, milestones).
+
+*Prepared as a draft for the Schema & Data Model workstream (Workstream
+2) and Metadata Onboarding & Migration workstream (Workstream 3). Field
+details for the reference schema reflect the "latest" aind-data-schema
+documentation as of preparation and should be re-verified against the
+pinned schema version used by the Registry.*

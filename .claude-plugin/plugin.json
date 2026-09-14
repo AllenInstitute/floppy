@@ -1,0 +1,7 @@
+{
+  "name": "floppy",
+  "description": "Allen Institute BioData Registry project assistant. /floppy-ask answers project and aind-data-schema questions from the bundled corpus; /floppy-gaps writes schema gap analyses in the project's compact Milestone-0 format, and can seed an analysis JSON from an existing metadata export.",
+  "version": "0.2.0",
+  "author": { "name": "Aishwarya Chander", "email": "aishwarya.chander@alleninstitute.org" },
+  "keywords": ["biodata-registry", "bdr", "aind-data-schema", "metadata", "gap-analysis", "allen-institute"]
+}

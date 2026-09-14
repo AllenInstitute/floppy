@@ -1,0 +1,200 @@
+{
+ "Figma Boards/BDR- Use Cases.pdf": {
+  "bytes": 148674366,
+  "mtime": null,
+  "original_bundled": false,
+  "source": "Figma Boards/BDR- Use Cases.pdf",
+  "text": "Figma Boards__BDR- Use Cases.pdf.txt"
+ },
+ "Figma Boards/BDR-Open Questions.pdf": {
+  "bytes": 27731436,
+  "mtime": null,
+  "original_bundled": false,
+  "source": "Figma Boards/BDR-Open Questions.pdf",
+  "text": "Figma Boards__BDR-Open Questions.pdf.txt"
+ },
+ "General/0. Documentation/BioData Registry Project Overview.docx": {
+  "bytes": 128092,
+  "mtime": 1787880180.0,
+  "original_bundled": true,
+  "source": "General/0. Documentation/BioData Registry Project Overview.docx",
+  "text": "General__0. Documentation__BioData Registry Project Overview.docx.txt"
+ },
+ "General/0. Documentation/HISE Reference/HISE Ledger Database Diagram.pdf": {
+  "bytes": 203944,
+  "mtime": 1787880180.0,
+  "original_bundled": true,
+  "source": "General/0. Documentation/HISE Reference/HISE Ledger Database Diagram.pdf",
+  "text": "General__0. Documentation__HISE Reference__HISE Ledger Database Diagram.pdf.txt"
+ },
+ "General/1. Milestone 0/BioData Registry Kick Off Meeting.pptx": {
+  "bytes": 12182261,
+  "mtime": null,
+  "original_bundled": false,
+  "source": "General/1. Milestone 0/BioData Registry Kick Off Meeting.pptx",
+  "text": "General__1. Milestone 0__BioData Registry Kick Off Meeting.pptx.txt"
+ },
+ "General/1. Milestone 0/Key Deliverables/BDR M0 Gate.pptx": {
+  "bytes": 14281618,
+  "mtime": null,
+  "original_bundled": false,
+  "source": "General/1. Milestone 0/Key Deliverables/BDR M0 Gate.pptx",
+  "text": "General__1. Milestone 0__Key Deliverables__BDR M0 Gate.pptx.txt"
+ },
+ "General/1. Milestone 0/Key Deliverables/M0 DDM_BDR - Track A - Use Cases - 08_13_2026 snapshot.docx": {
+  "bytes": 96349,
+  "mtime": 1787880180.0,
+  "original_bundled": true,
+  "source": "General/1. Milestone 0/Key Deliverables/M0 DDM_BDR - Track A - Use Cases - 08_13_2026 snapshot.docx",
+  "text": "General__1. Milestone 0__Key Deliverables__M0 DDM_BDR - Track A - Use Cases - 08_13_2026 snapshot.docx.txt"
+ },
+ "General/2. Milestone 1/BDR M1 Kickoff.pptx": {
+  "bytes": 12182841,
+  "mtime": null,
+  "original_bundled": false,
+  "source": "General/2. Milestone 1/BDR M1 Kickoff.pptx",
+  "text": "General__2. Milestone 1__BDR M1 Kickoff.pptx.txt"
+ },
+ "Workstream 2 - Schema and Data Model/AICS_AIND_Data_Schema_Gap_Analysis.docx": {
+  "bytes": 51116,
+  "mtime": 1787880180.0,
+  "original_bundled": true,
+  "source": "Workstream 2 - Schema and Data Model/AICS_AIND_Data_Schema_Gap_Analysis.docx",
+  "text": "Workstream 2 - Schema and Data Model__AICS_AIND_Data_Schema_Gap_Analysis.docx.txt"
+ },
+ "Workstream 2 - Schema and Data Model/Cell Science Metadata/AICS_AIND_Data_Schema_Field_Crosswalk.xlsx": {
+  "bytes": 57646,
+  "mtime": 1787880180.0,
+  "original_bundled": true,
+  "source": "Workstream 2 - Schema and Data Model/Cell Science Metadata/AICS_AIND_Data_Schema_Field_Crosswalk.xlsx",
+  "text": "Workstream 2 - Schema and Data Model__Cell Science Metadata__AICS_AIND_Data_Schema_Field_Crosswalk.xlsx.txt"
+ },
+ "Workstream 2 - Schema and Data Model/Immunology metadata/2026-07-23 Tissue - Tissue Block - Tissue Section fields.xlsx": {
+  "bytes": 282180,
+  "mtime": 1787880180.0,
+  "original_bundled": true,
+  "source": "Workstream 2 - Schema and Data Model/Immunology metadata/2026-07-23 Tissue - Tissue Block - Tissue Section fields.xlsx",
+  "text": "Workstream 2 - Schema and Data Model__Immunology metadata__2026-07-23 Tissue - Tissue Block - Tissue Section fields.xlsx.txt"
+ },
+ "Workstream 2 - Schema and Data Model/Immunology metadata/Cell DIVE EXP-01367 Biomarkers to ND.xlsx": {
+  "bytes": 16153,
+  "mtime": 1787880180.0,
+  "original_bundled": true,
+  "source": "Workstream 2 - Schema and Data Model/Immunology metadata/Cell DIVE EXP-01367 Biomarkers to ND.xlsx",
+  "text": "Workstream 2 - Schema and Data Model__Immunology metadata__Cell DIVE EXP-01367 Biomarkers to ND.xlsx.txt"
+ },
+ "Workstream 2 - Schema and Data Model/Immunology metadata/Clinical Lab and Survey Data - HISE.pdf": {
+  "bytes": 456162,
+  "mtime": 1787880240.0,
+  "original_bundled": true,
+  "source": "Workstream 2 - Schema and Data Model/Immunology metadata/Clinical Lab and Survey Data - HISE.pdf",
+  "text": "Workstream 2 - Schema and Data Model__Immunology metadata__Clinical Lab and Survey Data - HISE.pdf.txt"
+ },
+ "Workstream 2 - Schema and Data Model/Immunology metadata/HISE Ledger Database Diagram.pdf": {
+  "bytes": 203944,
+  "extracted": "2026-08-27",
+  "mtime": 1787880240.0,
+  "original_bundled": true,
+  "source": "Workstream 2 - Schema and Data Model/Immunology metadata/HISE Ledger Database Diagram.pdf",
+  "text": "Workstream 2 - Schema and Data Model__Immunology metadata__HISE Ledger Database Diagram.pdf.txt"
+ },
+ "Workstream 2 - Schema and Data Model/Immunology metadata/mIF Example - Remap/remap gaps details.docx": {
+  "bytes": 24348,
+  "mtime": 1787880180.0,
+  "original_bundled": true,
+  "source": "Workstream 2 - Schema and Data Model/Immunology metadata/mIF Example - Remap/remap gaps details.docx",
+  "text": "Workstream 2 - Schema and Data Model__Immunology metadata__mIF Example - Remap__remap gaps details.docx.txt"
+ },
+ "Workstream 2 - Schema and Data Model/Immunology metadata/mIF Example/gap_summary_from_comments.docx": {
+  "bytes": 32948,
+  "mtime": 1787880180.0,
+  "original_bundled": true,
+  "source": "Workstream 2 - Schema and Data Model/Immunology metadata/mIF Example/gap_summary_from_comments.docx",
+  "text": "Workstream 2 - Schema and Data Model__Immunology metadata__mIF Example__gap_summary_from_comments.docx.txt"
+ },
+ "Workstream 2 - Schema and Data Model/Immunology_BioData_Registry_Gap_Analysis.docx": {
+  "bytes": 39941,
+  "mtime": 1787880240.0,
+  "original_bundled": true,
+  "source": "Workstream 2 - Schema and Data Model/Immunology_BioData_Registry_Gap_Analysis.docx",
+  "text": "Workstream 2 - Schema and Data Model__Immunology_BioData_Registry_Gap_Analysis.docx.txt"
+ },
+ "Workstream 2 - Schema and Data Model/Milestone 0 Report_ Mapping Accelerator-Specific Datasets to biodata-schema.pdf": {
+  "bytes": 678916,
+  "mtime": 1787854752.4842172,
+  "original_bundled": true,
+  "source": "Workstream 2 - Schema and Data Model/Milestone 0 Report_ Mapping Accelerator-Specific Datasets to biodata-schema.pdf",
+  "text": "Workstream 2 - Schema and Data Model__Milestone 0 Report_ Mapping Accelerator-Specific Datasets to biodata-schema.pdf.txt"
+ },
+ "Workstream 2 - Schema and Data Model/Patch-seq metadata example/mapping observations.docx": {
+  "bytes": 28703,
+  "mtime": 1787880240.0,
+  "original_bundled": true,
+  "source": "Workstream 2 - Schema and Data Model/Patch-seq metadata example/mapping observations.docx",
+  "text": "Workstream 2 - Schema and Data Model__Patch-seq metadata example__mapping observations.docx.txt"
+ },
+ "Workstream 2 - Schema and Data Model/workstream_2_doc.pdf": {
+  "bytes": 823307,
+  "mtime": 1787854573.9036088,
+  "original_bundled": true,
+  "source": "Workstream 2 - Schema and Data Model/workstream_2_doc.pdf",
+  "text": "Workstream 2 - Schema and Data Model__workstream_2_doc.pdf.txt"
+ },
+ "Workstream 3 - Onboarding and Migration/BioData_Registry_Gap_Analysis_Template.docx": {
+  "bytes": 27316,
+  "mtime": 1787880240.0,
+  "original_bundled": true,
+  "source": "Workstream 3 - Onboarding and Migration/BioData_Registry_Gap_Analysis_Template.docx",
+  "text": "Workstream 3 - Onboarding and Migration__BioData_Registry_Gap_Analysis_Template.docx.txt"
+ },
+ "Workstream 3 - Onboarding and Migration/M1 - tasks.docx": {
+  "bytes": 27417,
+  "extracted": "2026-08-27",
+  "mtime": 1787857430.3250008,
+  "original_bundled": true,
+  "source": "Workstream 3 - Onboarding and Migration/M1 - tasks.docx",
+  "text": "Workstream 3 - Onboarding and Migration__M1 - tasks.docx.txt"
+ },
+ "Workstream 3 - Onboarding and Migration/PatchSeq_Gap_Analysis_Filled.docx": {
+  "bytes": 41248,
+  "mtime": 1787880240.0,
+  "original_bundled": true,
+  "source": "Workstream 3 - Onboarding and Migration/PatchSeq_Gap_Analysis_Filled.docx",
+  "text": "Workstream 3 - Onboarding and Migration__PatchSeq_Gap_Analysis_Filled.docx.txt"
+ },
+ "Workstream 4 - Cloud Services Layer/BioData Registry Architecture Decision Tracker.xlsx": {
+  "bytes": 112083,
+  "mtime": 1787880240.0,
+  "original_bundled": true,
+  "source": "Workstream 4 - Cloud Services Layer/BioData Registry Architecture Decision Tracker.xlsx",
+  "text": "Workstream 4 - Cloud Services Layer__BioData Registry Architecture Decision Tracker.xlsx.txt"
+ },
+ "Workstream 5 - Agentic Layer and AI Interaction/BDR - Use Cases - 08_13_2026 snapshot.pdf": {
+  "bytes": 531614,
+  "mtime": 1787855213.9926693,
+  "original_bundled": true,
+  "source": "Workstream 5 - Agentic Layer and AI Interaction/BDR - Use Cases - 08_13_2026 snapshot.pdf",
+  "text": "Workstream 5 - Agentic Layer and AI Interaction__BDR - Use Cases - 08_13_2026 snapshot.pdf.txt"
+ },
+ "Workstream 6 - UX and UI/BDR - Use Cases - 08_13_2026 snapshot.docx": {
+  "bytes": 126135,
+  "mtime": 1787880240.0,
+  "original_bundled": true,
+  "source": "Workstream 6 - UX and UI/BDR - Use Cases - 08_13_2026 snapshot.docx",
+  "text": "Workstream 6 - UX and UI__BDR - Use Cases - 08_13_2026 snapshot.docx.txt"
+ },
+ "Workstream 6 - UX and UI/BDR - Use Cases - working doc.docx": {
+  "bytes": 92383,
+  "mtime": 1787880240.0,
+  "original_bundled": true,
+  "source": "Workstream 6 - UX and UI/BDR - Use Cases - working doc.docx",
+  "text": "Workstream 6 - UX and UI__BDR - Use Cases - working doc.docx.txt"
+ },
+ "Workstream 6 - UX and UI/Workstream 6 - OOO.xlsx": {
+  "bytes": 13724,
+  "mtime": 1787880240.0,
+  "original_bundled": true,
+  "source": "Workstream 6 - UX and UI/Workstream 6 - OOO.xlsx",
+  "text": "Workstream 6 - UX and UI__Workstream 6 - OOO.xlsx.txt"
+ }
+}

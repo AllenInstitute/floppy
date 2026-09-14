@@ -1,0 +1,2 @@
+1cb494afd94cf5cd42dddf9d9a0f6ac98809bbd0 Thu Jun 25 11:09:38 2026 -0700 approve schema (#1581)
+tag: v6.0.0-66-g1cb494a

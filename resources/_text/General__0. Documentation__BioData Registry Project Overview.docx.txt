@@ -1,0 +1,642 @@
+# source: resources/General/0. Documentation/BioData Registry Project Overview.docx
+# original kept: yes
+
+**Allen Institute BioData Registry**
+
+Project Charter
+
+***DRAFT v1***
+
+***NOTES: This is a draft. It will be updated and adapted over time as
+project progresses. Use this to understand the current state of
+thinking, it is not prescriptive.***
+
+***This is an inform doc only. Please do not edit or use for
+comments/opinions. Those are saved for collaborative group
+discussion.***
+
+**Project Overview**
+
+The **BioData (Metadata) Registry** will make all biological data
+collected by the Allen Institute **findable and accessible** by our
+human scientists and agentic tooling.
+
+Through a balanced approach of standardization and governance, the
+BioData Registry will enable cross‑modal data discovery to empower
+scientists to find relevant datasets for their analysis and model
+training, independent of where underlying data are stored.
+
+The registry will be an API‑first platform supporting metadata
+registration, validation, curation, schema governance, auditability, and
+collection‑level publishing. Agentic workflows will be considered across
+all layers of the registry and integrated where appropriate with careful
+consideration for human-in-the-loop oversight and interpretation.
+
+**Core Features**
+
+**1. Unified Metadata Architecture & Access**: A normalized architecture
+for registering and managing biological metadata, exposed through APIs,
+developer clients, and agentic interfaces to support programmatic and
+AI-driven workflows.
+
+**2. Metadata Quality & Lifecycle Management**: Validation, versioning,
+and audit history to support quality, continuous curation, and lifecycle
+management from draft to published.
+
+**3. Metadata Discovery & Data Access**: Search and discover datasets
+through structured, semantic, and natural language queries for
+consistent access across registered data.
+
+**4. AI-Assisted Metadata Workflows:** AI agents that generate, enrich,
+and correct metadata through natural language interactions, with human
+validation.
+
+**5. Governance, Sharing & Publishing**: Role-based access control,
+sensitive metadata handling, and tools to organize, share, and publish
+datasets and collections.
+
+**6. User Experience:** An intuitive user experience/user interaction
+(UX/UI) for searching, curating, and managing metadata, including
+natural language interaction and collection workflows.
+
+**Operating Model**
+
+The BioData Registry v-team operates as a set of distinct Workstreams,
+each led by a dedicated Workstream owner responsible for delivering
+specific outcomes and achieving defined milestones.
+
+While each Workstream owner holds accountability for their progress and
+success criteria, Registry deliverables are interconnected and regularly
+overlap. This will require ongoing coordination and shared
+decision-making led by Horizontal owners.
+
+This model emphasizes collaborative execution---Workstreams do not
+function in isolation. Effective results depend on Workstream owners and
+Horizontal owners engaging across boundaries to ensure alignment and
+seamless progress toward the v-team's collective goals**.**
+
+**Decision Making**
+
+A Deliberative Decision Making (DDM) meeting is a structured Milestone
+review process where Workstream and Horizontal leaders collectively
+assess progress against defined success criteria, surface
+cross-functional perspectives, and decide whether to advance, refine, or
+revisit the Milestone.
+
+Designed to ensure transparency, shared accountability, and informed
+consensus, the framework integrates technical, governance, and user
+experience considerations across inherently interdependent workstreams.
+
+This approach is well-suited to the v-team model and reinforces
+collaboration across accelerator teams. It leverages both Workstream
+owners and Horizontal leaders to ensure alignment toward a unified
+outcome beneficial to scientists and technologists across the Institute.
+
+At each Milestone gate there is a DDM meeting:
+
+-   Structured input from Workstreams + Horizontals
+
+-   Transparent evaluation against predefined success criteria and Gate
+    Decision prompts.
+
+-   Decision outcomes:
+
+    -   ✅ Pass
+
+    -   ⚠️ Conditional pass (with actions)
+
+    -   ❌ Rework required
+
+By grounding decisions in quality and FAIR principles, DDM enables
+consistent, collective progress toward a scalable, trusted
+registry---supporting a true "One Institute" approach to building and
+governing shared metadata infrastructure.
+
+**Team Structure**
+
+The v-team consists of both focused scope Workstreams and strategic
+level Horizontals.
+
+  **Horizontal**     **Focus**
+  ------------------ ----------------------------------
+  **HORIZONTAL 1**   Design Spec & Program Management
+  **HORIZONTAL 2**   Strategy & Execution
+  **HORIZONTAL 3**   Integrations
+
+  **Workstream**     **Focus**
+  ------------------ ----------------------------------------
+  **Workstream 1**   Backend Architecture
+  **Workstream 2**   Metadata Schema & Data Model
+  **Workstream 3**   Metadata Onboarding & Migration
+  **Workstream 4**   Cloud Services Layer
+  **Workstream 5**   Agentic Layer & AI Interaction
+  **Workstream 6**   User Experience/User Interface (UX/UI)
+
+**\
+Workstream 1. Backend Architecture**
+
+**Scope:** Design and deliver the **core backend architecture** that
+powers the metadata registry, including the system of record, search
+infrastructure, APIs, and supporting platform services.
+
+**Key responsibilities**
+
+-   **Design and maintain the system of record** for registry metadata,
+    including the relational database, core entity model, and
+    referential integrity.
+
+-   **Deliver the read and search architecture** by enabling structured
+    reads and supporting discovery, faceted search, and semantic search
+    across metadata.
+
+-   **Build data synchronization pipelines** that propagate changes from
+    the system of record into read and search layers.
+
+-   **Provide the API layer** through documented services that support
+    registry access, integration, and client generation.
+
+**Workstream 2: Schema & Data Model**
+
+**Scope:** Define and evolve the **unified metadata schema and core data
+model**, ensuring it enables consistent representation of metadata
+across the registry. Drive schema extensibility decisions and
+interoperability across data modalities.
+
+**Key responsibilities**
+
+-   **Define the unified metadata schema** by establishing the canonical
+    > structure used across the registry, including core and optional
+    > elements.
+
+-   **Design the normalized data model** by translating the schema into
+    > tables, relationships, and extensible structures that support
+    > implementation.
+
+-   **Support schema extensibility and interoperability** so the model
+    > can evolve across modalities while remaining consistent and
+    > reusable.
+
+-   **Govern schema evolution with Workstream 3** by coordinating
+    > versioning, compatibility, deprecation, and revalidation as the
+    > registry expands.
+
+**Workstream 3: Metadata Onboarding & Migration**
+
+**Scope: Design and execute the onboarding and migration of metadata
+from existing systems into the BioData Registry,** ensuring metadata is
+mapped to the unified schema, validated, and structured for cross-modal
+discovery. Drive a prioritized, modality-based migration strategy in
+coordination with Workstream 2.
+
+**Key Responsibilities**
+
+-   **Inventory and prioritize metadata sources** by identifying
+    existing systems, assessing metadata structure and quality, and
+    organizing migration by data modality.
+
+```{=html}
+<!-- -->
+```
+-   **Define mapping and transformation to the canonical schema** by
+    translating source metadata into the unified data model in alignment
+    with Workstream 2.
+
+-   **Ingest and migrate metadata into the registry** through repeatable
+    ingestion patterns that preserve relationships, provenance, and
+    schema compatibility.
+
+```{=html}
+<!-- -->
+```
+-   **Align, normalize, and deduplicate metadata** to ensure consistency
+    with shared entities and establish a single source of truth across
+    datasets.
+
+-   **Validate metadata quality and readiness** by applying validation
+    workflows that surface errors and ensure metadata supports accurate
+    discovery and downstream use.
+
+**Workstream 4: Cloud Services Layer**
+
+**Scope:** Design and deliver the **cloud services layer** that provides
+centralized governance, identity, and security across the BioData
+Registry. This workstream defines how access to cloud storage,
+permissions, and policies are enforced across APIs, the UI, and agents,
+enabling secure multi-tenant operation, controlled sharing, and
+compliance.
+
+**Key Responsibilities**
+
+-   **Define governance and access controls to cloud storage** by
+    establishing roles, permissions, and data-sharing rules across
+    organizations and workflows.
+
+-   **Manage identity and authentication services** to provide secure
+    access through SSO and consistent identity management.
+
+-   **Enforce security, audit, and compliance controls** by governing
+    sensitive cloud data access, tracking changes, and ensuring activity
+    is traceable.
+
+-   **Provide integration surfaces for external systems and agents**
+    through API-first access and agent-compatible services.
+
+**Workstream 5: Agentic Integration & AI Applications**
+
+**Scope: Design and deliver agentic integrations and AI applications**
+to enable intelligent curation, discovery, and analysis of metadata.
+This workstream includes agentic workflows specific to registry
+operations and metadata curation, as well as AI-enabled applications
+that help scientists reason across registered datasets and perform
+deeper data analysis.
+
+**Key Responsibilities**
+
+-   **Define registry-specific agentic workflows** that support metadata
+    creation, enrichment, validation, linking, search, and lifecycle
+    actions through natural language and task-based interactions.
+
+-   **Integrate agents with registry APIs and services** by working with
+    backend, schema, cloud, and UX workstreams to provide secure,
+    governed, auditable access to registry capabilities through API and
+    MCP-compatible interfaces.
+
+-   **Enable AI-assisted metadata curation** through agent-driven
+    suggestions for quality improvement, normalization, deduplication,
+    error correction, and completeness, while preserving human approval,
+    provenance, and version tracking.
+
+-   **Develop AI applications for deeper data analysis** by creating
+    intelligent tools that use registry metadata, schemas, ontologies,
+    and dataset relationships to support cross-modal exploration,
+    hypothesis generation, dataset comparison, and analysis planning.
+
+**Workstream 6: User Experience & Interaction**
+
+**Scope:** Design and deliver the **API-first product experience** for
+the BioData Registry, ensuring the web application, user workflows, and
+interaction patterns are built on documented registry APIs rather than
+bespoke UI logic. This workstream translates core registry
+capabilities---search, curation, validation, organization, sharing, and
+publishing---into usable experiences for scientists and data
+administrators while preserving the API as the primary product surface
+for clients, integrations, and agents.
+
+**Key Responsibilities**
+
+-   **Design API-backed user experiences** by ensuring every major UI
+    workflow maps to documented registry APIs, shared service contracts,
+    and reusable interaction patterns.
+
+-   **Build and maintain the front-end application** as a reference
+    client for public and authenticated access to the registry,
+    demonstrating how APIs support search, browse, curation, and
+    publishing workflows.
+
+-   **Validate API usability through product workflows** by partnering
+    with backend, schema, cloud, and agentic workstreams to confirm that
+    registry APIs support real user needs, clear error states,
+    validation feedback, and quality signals.
+
+-   **Provide sharing and publishing workflows** that align user actions
+    with API-enforced governance, validation, lifecycle, and permission
+    rules.
+
+**\
+**
+
+**Milestones**
+
+**Milestone 0 --- Alignment, Scope & Success Definition**
+
+**Target Delivery: Aug 14th**
+
+**Purpose:** Establish shared understanding of BioData Registry's Use
+Cases, Architecture, and Schema
+
+**Key Deliverables**
+
+-   **Track A-** Complete and prioritized list of use cases across all
+    users/customers.
+
+-   **Track B-** E2E architecture proposal with build-vs-rent
+    considerations included.
+
+-   **Track C-** A diagnostic report applying the current biodata-schema
+    to 3 datasets cataloging every gap, conflict and unmappable field.
+
+**Success Criteria**
+
+-   Workstream Owners identified
+
+-   Blocking questions resolved
+
+-   Use cases are validated based on real customer feedback/behavior
+
+-   Consensus that architectural proposal is stable enough for MVP
+    development
+
+-   All schema gaps, conflicts, and unmappable fields are documented for
+    all 3 datasets.
+
+**Metrics**
+
+-   6/6 Workstreams with owners
+
+-   \% of answered questions from initial open question list
+
+-   \% of prioritized use cases with testable acceptance criteria per
+    user
+
+-   \% of P0 architectural decisions answered and documented.
+
+-   \% of fields examined and classified per dataset
+    (mapped/gap/conflict/unmappable)
+
+**DDM Gate Decision Prompt**
+
+-   ""Do we have clarity on *what we are building and why*?"
+
+-   "Are cross-workstream dependencies sufficiently defined?"
+
+-   "Are there blocking questions remaining?"
+
+**Milestone 1 --- Foundation: Unified Metadata Architecture & System of
+Record**
+
+**Target Delivery: Sept 4th**
+
+**Purpose:** Deliver core registry backbone enabling schema-driven
+metadata management.
+
+**Key Deliverables**
+
+-   Relational system-of-record for normalized metadata entities
+
+-   Unified metadata schema + data model (extensible across modalities)
+
+-   API specification, including CRUD and search endpoints (OpenAPI)
+
+-   Initial metadata ingestion + validation pipeline
+
+**Cross-Workstream Contributions**
+
+-   WS1 Backend + WS2 Schema tightly coupled
+
+-   WS3 ensures ingestion aligns to canonical model
+
+-   WS4 ensures governance hooks (auth, identity)
+
+**Success Criteria**
+
+-   Registry can store, validate, and retrieve metadata entities (across
+    3 biological data types)
+
+-   Schema supports core entity relationships and extensibility
+
+-   APIs enable programmatic CRUD
+
+**Metrics**
+
+-   \% of core entities modeled and operational
+
+-   Validation pass rate on ingested metadata
+
+-   API success rate / error rate
+
+-   Time to register new metadata entity
+
+**DDM Gate Decision Prompt**
+
+-   "Is the architecture sufficiently stable to scale dependent
+    workstreams?"
+
+-   "Does the schema support interoperability and extensibility?"
+
+**Milestone 2 --- Metadata Quality, Lifecycle & Governance**
+
+**Target Delivery: Sept 30th**
+
+**Purpose**: Ensure trust, auditability, and controlled access.
+
+**Key Deliverables**
+
+-   Validation engine + schema enforcement
+
+-   Versioning + audit trail for metadata changes
+
+-   RBAC-based governance model (Org → Space → User)
+
+-   Lifecycle state machine (draft → registered → published → archived)
+
+**Cross-Workstream Contributions**
+
+-   WS2 + WS3 → validation & schema enforcement
+
+-   WS4 → governance + security
+
+-   WS5 → AI-assisted metadata quality workflows
+
+**Success Criteria**
+
+-   Metadata is traceable, versioned, and auditable
+
+-   Sensitive data is appropriately governed
+
+-   Validation workflows prevent low-quality metadata publication
+
+**Metrics**
+
+-   \% metadata meeting schema validation thresholds
+
+-   \% entities with complete provenance metadata
+
+-   of audit events captured per change
+
+-   \% of datasets progressing successfully through lifecycle stages
+
+**DDM Gate Decision Prompt**
+
+-   "Can users trust the metadata?"
+
+-   "Do governance and audit controls meet organizational expectations?"
+
+**Milestone 3 --- Discovery, Search & Access Experience**
+
+**Purpose:** Deliver end-user value through findability and usability.
+
+**Key Deliverables**
+
+-   Structured + semantic + natural language search capabilities
+
+-   Cross-modal metadata discovery layer
+
+-   Web UI for search, browse, and curate
+
+-   Public + authenticated access patterns
+
+**Cross-Workstream Contributions**
+
+-   WS1 + WS5 power search + agentic flows
+
+-   WS6 (UX/UI) delivers user experience
+
+-   WS3 ensures discoverability quality via normalized metadata
+
+**Success Criteria**
+
+-   Users can find relevant datasets quickly
+
+-   Discovery works across modalities and organizations
+
+-   Search supports both structured and natural language queries
+
+**Metrics**
+
+-   Search success rate (user finds relevant result)
+
+-   Time-to-find data set (median)
+
+-   \% of metadata indexed and searchable
+
+-   User satisfaction with discovery workflows
+
+**DDM Gate Decision Prompt**
+
+-   "Can scientists reliably find what they need?"
+
+-   "Does discovery unlock cross-accelerator data exploration?"
+
+**Milestone 4 --- AI-Assisted Metadata & Agentic
+Workflows/Applications**
+
+**Purpose:** Scale metadata quality and usability through intelligent
+systems.
+
+**Key Deliverables**
+
+-   AI agent for metadata generation, enrichment, correction
+
+-   Human-in-the-loop workflows for validation
+
+-   Natural language interaction layer
+
+**Cross-Workstream Contributions**
+
+-   WS5 (Agentic Layer) central
+
+-   WS2 ensures schema compatibility
+
+-   WS6 ensures UX integrates AI seamlessly
+
+**Success Criteria**
+
+-   AI improves metadata completeness and quality
+
+-   Human oversight ensures accuracy and trust
+
+-   Agents integrate safely with governance controls
+
+**Metrics**
+
+-   \% metadata enriched via AI
+
+-   Accuracy of AI-generated metadata (validation consistency)
+
+-   Reduction in manual curation effort
+
+-   User adoption of AI workflows
+
+**DDM Gate Decision Prompt**
+
+-   "Is AI meaningfully improving metadata quality and efficiency?"
+
+-   "Are controls sufficient to ensure safe and trustworthy outputs?"
+
+**Milestone 5 --- Scale, Performance & Cross-Org Sharing**
+
+**Purpose:** Ensure system durability and enterprise readiness.
+
+**Key Deliverables**
+
+-   Scalable infrastructure supporting 100M+ data assets
+    [\[](https://alleninstitute-my.sharepoint.com/personal/david_feng_alleninstitute_org/_layouts/15/Doc.aspx?sourcedoc=%7BFC98F17E-00BE-4C82-9F60-13B490250613%7D&file=BioData%20Registry%20Overview.pptx&action=edit&mobileredirect=true&DefaultItemOpen=1)
+
+-   Cross-org sharing + publishing workflows
+
+-   Performance tuning (indexing, caching, search latency)
+
+**Cross-Workstream Contributions**
+
+-   WS1 + WS4 → infrastructure + governance at scale
+
+-   WS3 → large-scale ingestion + normalization
+
+-   All workstreams → performance validation
+
+**Success Criteria**
+
+-   Registry performs under high volume, velocity, and variety
+
+-   Data sharing between orgs is secure and seamless
+
+-   Search and API performance meet expectations
+
+**Metrics**
+
+-   Query latency (search + API)
+
+-   Throughput (metadata ingest rate)
+
+-   of cross-org data shares / collections
+
+-   System uptime and reliability
+
+**DDM Gate Decision Prompt**
+
+-   "Is the registry production-ready at scale?"
+
+-   "Can it support long-term growth and cross-org collaboration?"
+
+**Milestone 6 --- Productization & Continuous Improvement**
+
+**Purpose**: Transition from system to sustainable product.
+
+**Key Deliverables**
+
+-   Observability dashboards (metadata quality, usage, growth)
+
+-   Feedback loops and roadmap iteration
+
+-   Documentation, onboarding, and support model
+
+**Success Criteria**
+
+-   Registry is widely adopted by scientists and teams
+
+-   Continuous improvement loop is operational
+
+-   Product metrics drive prioritization decisions
+
+**Metrics**
+
+-   of active users / teams onboarded
+
+-   Metadata completeness trends over time
+
+-   Feature adoption rates
+
+-   Support tickets / friction metrics
+
+**DDM Gate Decision Prompts**
+
+-   "Is the product delivering sustained value?"
+
+-   "Do we have mechanisms to continuously improve?"
+
+**Projected Timeline**
+
+\*This is theoretical. Subject to change
+
+![](media/image1.png){width="7.374118547681539in"
+height="3.4877580927384075in"}

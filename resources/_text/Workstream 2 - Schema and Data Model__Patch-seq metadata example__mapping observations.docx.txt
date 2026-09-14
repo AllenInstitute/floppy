@@ -1,0 +1,71 @@
+# source: resources/Workstream 2 - Schema and Data Model/Patch-seq metadata example/mapping observations.docx
+# original kept: yes
+
+**Patch-seq data model mapping observations**
+
+**Representing patch-clamping as a SpecimenProcedure?**
+
+-   Not explicitly modeled as such in the current example, since it
+    initially seemed redundant with the Acquisition of electrophysiology
+    data, but it might make sense to model it as a procedure that
+    produces the individual cell as an output specimen
+
+-   It seems like it could be recorded as a manipulation since it is so
+    closely tied to an Acquisition, but then I'm not sure how it gets
+    recorded in other metadata as part of the provenance chain (like for
+    images taken of the cell afterwards)
+
+**Singular location for data (Metadata.location)**
+
+-   Morphological reconstruction generates a few related files (SWC
+    file, marker file) but these are currently stored in a directory
+    that contains other (not directly related) files.
+
+-   There are also aspects of morphological reconstruction (image
+    annotations) that are currently saved directly into a database -- I
+    didn't include those in the example, but I'm not sure how to track
+    data recorded that way. We've also had conversations with scientists
+    who want to track e.g. clinical characteristics in a database -- how
+    does that get referred to by the registry?
+
+-   The raw transcriptomic data for a Patch-seq cell is a pair of fastq
+    files, but those are in a directory with fastq files from many other
+    cells
+
+-   The 63X image stack has individual layers spread across multiple
+    directories (which are not in one unifying parent directory)
+
+**Coordinate systems**
+
+-   An Instrument requires a CoordinateSystem, but it may not be
+    appropriate in all cases (I'm not sure what the coordinate system
+    for a sequencing machine would be)
+
+-   It wasn't clear to me how to specify a coordinate system for
+    recording in a slice. We keep track of the cell's depth in the
+    slice, for example.
+
+-   I'm not sure the current coordinate system + PlanarSectioning fields
+    can exactly capture how slicing is done for some experiments in
+    practice (like if they move in semi-arbitrary bigger distances that
+    aren't precisely tracked until they see particular landmarks). Also
+    not sure if the orientation is exactly known for pieces of
+    neurosurgical tissue that get sliced.
+
+**Procedure/processing types and names**
+
+-   Ended up using "OTHER" in several places for procedure types --
+    these could be added to the controlled vocabulary but we'd have to
+    figure out the right set of terms for them.
+
+-   Similarly, I wasn't sure about what convention to use for naming
+    things when it wasn't a controlled vocabulary (procedures,
+    acquisitions, instrument) and whether it was more important to be
+    consistent with names within the metadata for a given data asset vs
+    being consistent across data assets.
+
+**Other information I wasn't sure where to put**
+
+-   We want to know if a recorded cell was positive for a fluorescent
+    reporter -- maybe could be part of a PatchClamping specimen
+    procedure?

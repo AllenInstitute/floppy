@@ -1,0 +1,757 @@
+# source: resources/Figma Boards/BDR- Use Cases.pdf
+# original kept: no (too large)
+
+GENERAL DATA INGESTION PROCESS IN HISE
+In order for human
+UI + API
+metadata to be accepted
+Human metadata is made
+by the pipeline, it must  NO
+available for finding and
+follow a specific format for
+searching
+ingest.
+GENERAL DATA INGESTION PROCESS IN HISE  METADATA PIPELINE
+METADATA PIPELINE
+Were there
+YES  Locate corresponding data  Create human metadata  Process and validate data  ingest
+dictionary/data schema  record  according to data schema  errors?
+PUB/SUB
+DECORATOR PIPELINE SERVICE
+UI
+INGEST AGENT SERVICE
+Is the data  Human metadata is not made
+INGEST DATA SERVICE
+LEDGER DATA SERVICE
+handles  Depending on file type and  YES  Errors are returned to
+File type is assigned based on file  human  available for finding and
+File is received  Metadata record is created  queue of  source, initiate corresponding  user in the UI
+type match  metadata?  searching
+tasks  pipeline process
+PUB/SUB  DECORATOR PIPELINE SERVICE
+MANUAL STEP
+handles  Additional metadata is assigned  If accepted, data will become
+Drop data into a watch  NO  Depending on pipeline process,  Scientists can search for the
+queue of  according to corresponding  findable and searchable
+folder  possible manual QC step  data using the UI and API
+Raw data lives in various storages through this process.
+WO K  R ING DOC
+I
+B ODATA  REGISTRY USE CASES BOARD
+Could we start
+more names on
+Scientist/Researcher  Data Curator  Administrator  AI Agent  External Partners  User Testers  paper?  Datasets  What DIDN'T work  What worked REALLY well  M1 use cases: Ingest & pre-validation
+M1 user flows: Ingest & pre-validation
+Datasets  What DIDN’t work  What worked REALLY well
+Scientist/Researcher
+Consumes published or privately shared data from outside the owning Organization,
+Consumes the Registry to find, evaluate, and access data for analysis and model  Registers, validates, corrects, versions, and publishes metadata. The primary
+Acts through the MCP surface with scoped, auditable credentials. Every write is a proposal a  programmatically or through the web app.
+training. Rarely writes metadata; cares most about discovery, fitness, provenance, and  writer into the Registry and the main beneficiary of AI assistance  Governs who can see and do what, organizes and shares data across Spaces and  Search that’s based on  Requiring users to be  Being okay with a high  Get data in quick without  Provenance UI
+Server-Driven UI
+Toolbar  Stickies
+Add text
+getting to the bytes.  Organizations, gates sensitive publishing, and monitors the health of the holdings.  human accepts; the agent never becomes the authority. These cases exist to define the human-  Accelerator  Individuals  recollection (knowing the
+exact specimen ID format
+aware of data model and
+how data was stored/
+friction solution instead of
+no solution.
+validation and clean up
+later.
+Users need a straightforward way to track a file’s
+source and lineage - (e.g. its pipeline run, batch
+In HISE, using a server-driven UI for Advanced
+Search gave us incredible flexibility. Because the
+CUR-0
+CUR-2
+ADM-2
+AGT-1
+AGT-2
+It’s at the bottom of your  in-the-loop and guardrail behavior, not only the happy path.  (Pre-ingest)  Correct and  Flag and govern  Discover the  Metadata query,
+Press “S” to quickly add a sticky  and which field to search  registered to search  ID, cohort, and related samples). The UI should  UI only knew how to render data - not what
+screen, with stickies,
+stamps, and anything  to the canvas.  in).
+effectively.
+Users will not adopt high  Instead: Data should only  make it easy to drill down into parent or sibling  specific metadata (files, samples, subjects) it was  metadata  enrich metadata  sensitive data.  Registry's  filtering, and  Central BDR schema
+Use Cases  Core:
+Brain science
+P0
+you need.  Use Cases  Use Cases  Use Cases  friction solutions unless  flow once validation and  assets (e.g., viewing other files from the same  showing - it handled diverse columns and
+Use Cases  Steph Seeman - Scientists, Curator - (NHP, spatial TX)
+validation  schema,  processing.
+P0  P0  P0
+Instead:  Lead with  Instead: Abstract this  the use case is business  connections meet core  pipeline run) without relying on overly complex,  complex features effortlessly. Since our new
+discovery (seeing an  away as much as possible.  critical. Even then, they  requirements. Otherwise  cluttered graphs that intimidate users (depends  platform will store wildly different data formats  vocabularies,
+S  Brian Long - Scientist,Curator - (Human, spatial TX)
+available list of available  may build their own  end user value will be  on the use case though).  with sometimes zero overlap, adopting this
+Cindy van Velthoven - Scientist,Curator - (Mouse, MolBio & proteomics)
+facets and options within).
+Sven Otto
+solution instead.
+significantly diminished  decoupled architecture early will keep our
+Sven Otto  Sven Otto  Sven Otto
+and capabilities.  Sven Otto
+Vitalii Tereshchenko
+and the chasing & cleanup  frontend scalable and agnostic to future data
+Aaron Oster - Curator - (Mouse, MolGen & Imaging)
+Instead: Focus on key use  never stops.  types.
+cases and ease of use.
+Sven Otto  Vitalii Tereshchenko
+SCI-1
+SCI-4
+SCI-5
+Ch elsea Pagan - Admin (SciPM)
+controls are in the top right  Stamps  Structured, faceted search.  Evaluate DataAsset fitness before  Locate & access underlying files
+CUR-4
+ADM-0
+ADM-1
+corner.
+Leave your mark on the canvas
+use  (Pre-ingest) metadata  Correct and enrich metadata
+Manage change history & roll  Manage organizing units, users,  Data sharing
+Flag and govern sensitive data.
+Discover the Registry's schema,  Metadata query, filtering, and  Additional if needed:
+CUR-9a
+CUR-3
+AGT-5
+AGT-6
+with a stamp. Make sure you  validation
+backs
+and roles.  vocabularies, and capabilities.
+processing.
+Madeleine Hewitt - Scientists - (NHP, spatial TX)
+Access Glossary  Ensure  Machine-  Orchestrate
+Spacebar  setup an avatar in your user
+settings. This enables you to
+NOTE:  This is due to us focusing MVP of BDR on  Meghan Turner - Scientist - (Human, spatial TX)
+provenance  assisted  multi-step plans.
+Zizhen Yao - Scientist - Mouse, MolBio, taxonomy builders)
+internal use cases first. Once BDR is also used as a
+stamp your avatar.  Sven Otto  Sven Otto
+linkage  ingestion,
+User Interviews / Need finding + Participatory  Frequent Design Reviews (every two weeks
+Sven Otto  Sven Otto  Sven Otto  Jess Thomas  Jess Thomas
+Changkyu Lee - Scientist - Mouse, MolBio, taxonomy builders)
+design methods for information hierarchy
+minimum, ideally once a week) - even if the  curation, and
+publication platform with external sharing &
+Providing only high level  Having multiple places to  Too strict of ontology
+Avoid Unnecessary Frontend Microservices
+E  (toggle)  Yoav Ben-Simon - Scientist - (Mouse,MolGen & Imaging)
+data availability statuses.
+check for and access  Insights / Observations:
+design is not finished. - Share what you have.
+Sven Otto  Sven Otto
+harmonization.  Sven Otto
+Issue: Scientists will log  Glossary
+Work with your  Share
+browsing at scale, many of the P2s below will
+Sam Hastings - Curator, Admin - (Cross-species, Imaging)
+Issue: Scientists did not
+data.
+data elsewhere that isn’t
+In HISE, we attempted to split our project into
+logical units wrapped as NPM libraries and
+Crazy 8’s ideation sessions with users helped
+development team see how users organize
+Insights / Observations:
+Keeps everyone in the loop so there are no
+Bargavi Thyagarajan - Admin (SciPM)
+team  know who to talk to if  Issue: Scientists did not  tracked within the system
+and eventually gets lost
+separate frontend apps. Time proved that for a  and prioritize information while visually seeing  surprises and can give feedback early
+increase in relative priority.  Anish Chakka - Curator - (MolBio BI Core)
+there was data missing  know where and when to  team of our size, this only created friction.
+Sven Otto  Sven Otto  Sven Otto  and know if data was  use each place/tool in  Managing versioning, opening multiple PRs across
+how they would potentially layout the UI at a  Catches potential technical limitations and
+Click the Share button above  coming down the line,  order to find the correct  Instead: Automatically  different repositories, and dealing with CI/CD
+high-level
+things to coordinate for later
+CUR-1
+CUR-7
+to invite your team.  causing (1) circular  data set.
+grab as much metadata as  overhead for a single feature simply wasn't worth  Register entities  Review queue  Access Glossary
+Neural dynamics
+helped immunology dev team understand pain
+conversations with PMs  possible while also  it.
+points within HISE and suggest solutions and
+amelia espiritusanto
+Chat with others in the file by  and collaborators, (2)  Instead:
+creating a flexible system  Takeaway for the new platform: Abstracting small  (single and bulk)
+website examples.  In scope for M1 or looking too far ahead?
+pressing “/” or by accessing  CUR-9a
+https:​​/​/docs​.google​.com​/document​/d​  different ways to check if  Consolidate and have  to input metadata. Does  parts of the app into their own libraries is almost  Sven Otto
+/1BKi5HZgz8zvsWO1rb4kXliNuOFHhnfKRYXoEzxju4eU​  data is accurate, and (3)  clear definitions/  require having to restrict,  never worth the tax. Unless there's a specific,  amelia espiritusanto
+Core:
+the top toolbar.
+Love this idea!!!  Trace up & downstream
+Access Glossary
+Brain health  Nelson Johansen - Scientist,Curator - (cross-species, MolBio, taxonomy
+/edit​?tab​=​t​....  loss of confidence in the
+data is reflected
+responsibility for each
+place/tool. Reduce
+harmonize, or convert
+metadata to some degree
+proven need - like consuming the shared Allen
+Institute component design library - we should  Sven Otto  Sven Otto
+SCI-10
+SCI-11
+Sven Otto  builders)
+accurately.
+double-dipping  to avoid total chaos.  keep our frontend architecture unified to protect
+/  our velocity.
+Choose to lock all content in the section or
+Lock all
+Lock background only
+Documentation & User Support  Sharing selections of DataAssets  Jeremy Miller - Scientist,Curator - (cross-species, swiss army knife)
+Instead: Provide
+amelia espiritusanto  Sean M
+only the background to allow content  and metadata quickly  Eitan Kaplan - Admin (SciPM)
+supplementary
+interactions while preventing sections from  amelia espiritusanto  information for traceability
+being moved or deleted.
+Shinya Ito, Beatriz Herrera, Elena Westeinde - Science, Curator
+and point of contact to  CUR-6
+CUR-9b
+allow for a standardized  Maintain Glossary
+way for users to
+Consolidate
+NOTE: another dataset from Cell
+Vitalii Tereshchenko  Sean M
+when section selected  Additional if needed:
+triangulate data.  entity duplicates
+Celebrate wins with others by  Lauren Kruse - Admin (SciPM)
+high-fiving. Simply press and
+hold the “H” key and wave your
+Data Apps Team
+Science will be added  Sven Otto  amelia espiritusanto
+Immunology
+cursor around.
+Lucas Graybuck - Scientist, Data Curator
+(Hold)  H  Garth Kong / Christian La France - Scientist
+Compbio Team - Mice centric participant, human centric participant:
+Amelia Dayton, Upaasana Krishnan, Max Heeg - Scientist
+P1  P1  P1  P1  P1
+Lauren Okada, Annika Laberage - Scientist
+Christy Adams (?) - Admin, Data Curator, Scientist
+Need more entry-level participants
+Quickly access the emoji wheel
+to add live reactions when
+collaborating with others.
+CUR-10
+Ensure provenance linkage
+ADM-3
+ADM-5
+PRT-4
+Receive a private cross-org
+Cell Science  Validation UI  Ingest UI  General BDR UI
+E  (toggle)  SCI-0
+SCI-2
+SCI-8
+AGT-3
+AGT-4
+Maintain Glossary
+Archive or retract.
+Monitor holdings and quality.
+Configurable Workspace  share.
+Natural-language querying and  Assemble a reproducible dataset
+Studio D3
+Meaningful front doors
+Natural-language cross-modal  “At a glance” Data Summary
+Machine-assisted ingestion,
+Personalization
+discovery
+model-backed reasoning over  for a computational experiment  curation, and harmonization.
+results.
+Jess Thomas
+amelia espiritusanto  amelia espiritusanto  Jess Thomas
+amelia espiritusanto  amelia espiritusanto  Synthetic biology  AGT-1
+CUR-6
+Discover the
+Registry's  Metadata query,
+Consolidate  Correct and
+entity duplicates  enrich metadata  schema,  filtering, and
+Sven Otto  vocabularies,
+and capabilities.
+CUR-5
+Publish (manuscript)  Register entities (single and  Orchestrate multi-step plans.
+AI agent post ingest
+User  Data  Validation feedback  User  Okay to proceed  Ingest confirmation  User
+Collections  bulk)
+curation
+UX/UI Questions  AGT-5
+Register entities
+Ensure
+Machine-  AGT-6
+assisted  Orchestrate
+Review queue
+(single and bulk)  provenance
+linkage
+(single and bulk)
+ingestion,  multi-step plans.
+Jess Thomas  curation, and
+harmonization.
+Discover the  AGT-2
+Registry's  Metadata query,  Registry's  Metadata query,
+Sven Otto  Sven Otto  schema,  filtering, and  schema,  filtering, and
+vocabularies,  processing.  vocabularies,  processing.
+and capabilities.  and capabilities.
+Pre-ingest/Validation  Sven Otto
+???
+Storage
+Validation Endpoint  Storage
+Validation AI Agent  Ingest endpoint  Ingest AI agent
+General BDR API  CRUD endpoint  Review queue  User Review  Change confirmation
+Sven Otto  (“production”)  (“production”)
+(“staging”)  AGT-5
+??? AGT-6
+Machine-  Machine-
+(Pre-ingest)  Orchestrate  Flag and govern  Orchestrate  CUR-7
+assisted  assisted
+metadata  multi-step plans.  sensitive data.  multi-step plans.  Review queue
+ingestion,  ingestion,
+validation  curation, and  curation, and
+harmonization.  harmonization.
+Sven Otto  Sven Otto  Sven Otto  Sven Otto
+entity duplicates  enrich metadata
+user post ingest
+P2  P2
+P2  P2  P2
+provenance
+SCI-7
+SCI-9
+Related data recommendations
+Reporting and viewing  PRT-8
+PRT-7
+PRT-6
+inaccuracies  CUR-6
+CUR-8
+ADM-4
+Ask for data
+Validate data in published  Collaborators contribute to  CUR-6
+Consolidate entity duplicates
+Submission feed
+AI cost monitoring  dataset
+BioData Registry
+entity duplicates
+Correct and
+enrich metadata
+amelia espiritusanto  Sven Otto  Sven Otto
+Sean M
+Sean M  Sven Otto
+Sven Otto  Data wrangling  Hard blockers
+PRT-3
+PRT-5
+Consume metadata  Interoperate with external  Sven Otto
+Sven Otto  Sven Otto  programmatically.
+archives.
+Jess Thomas  Jess Thomas
+PRT-1
+Discover and access published  PRT-2
+data without an account.
+Cite and resolve a Collection by
+DOI
+Scratchpad
+Amelia is using this to help
+Main Tasks  Sub-tasks denoted with dashed outline
+her understand where  KEY:
+things connect :)
+Data Curator Task  Data Curator Task
+Mostly focusing on the
+user facing things to help
+us with wireframes later.  Agent Task  Agent Task
+Admin Task  Admin Task
+System
+Workflow Sets:
+Pre-Reg - Happy Path, Troubleshooting (Self-Recovery +
+System Errors)
+Pre-Reg Validation (ui,automated - ) - Happy Path,
+Troubleshooting (Self-Recovery + System Errors)
+Pre-Reg Validation (Agent) - Happy Path,  (Pre-ingest)
+Troubleshooting(Self-Recovery + System Errors)
+Pre-registration  metadata  Validation  Ingest  Confirmation
+validation
+Ingest - Happy Path, Troubleshooting(Self-Recovery + System
+Errors)
+Confirmation
+Misc:
+M2+
+No
+Entrypoint?
+Data Curator checks for
+discrepancies, etc. within  Central BDR
+the DataAsset(s) through  schema
+Flag and govern  the UI
+sensitive data.  Error States:
+Do Data Curators get their  Does the  Data Curator gets  Access Glossary
+Do edits  Data Curator makes edits /
+own queue or is it shared?
+DataAsset  confirmation that the
+need to  Yes  accepts feedback from  Yes  [some ingest stuff]  Errors?  No
+Data Curator pre-registers  look okay  DataAssets have been
+be made?  Agent
+For pre-reg + validation  Sven Otto
+should admins be able to  DataAsset(s)  for ingest?  digested.  Sven Otto
+steps, I feel like that curator  intervene ingest process if
+should be in charge of  sensitive data is present?
+those specific DataAssets  Correct and  Ensure  Databases
+The Agent provides
+DataAssets reflected in UI  Glossary
+until ingest.
+When can admins see the  Register entities
+feedback on the  Data Curator reviews feedback
+enrich metadata  provenance
+linkage  and becomes searchable?  (Staging + Production)
+new DataAssets? When  (single and bulk)
+When do the new  DataAssets
+can they start flagging?  Sven Otto  Sven Otto
+proposals hit the queue for
+Sven Otto  Discover the
+other Data Curators? After  CUR-6
+Registry's
+Ingest?  Error States:
+[technical stuff: validation  CUR-3
+Consolidate  Access Glossary  schema,
+Ensure  Access Glossary  AGT-2
+vocabularies,
+Unable to register
+endpoint]  entity duplicates
+Metadata query,
+Invalid File type
+provenance  and capabilities.
+[some system thing]  linkage  filtering, and
+[Specific actions / sub-
+Sven Otto  Sven Otto  processing.
+workflows here]
+Error States:
+Register entities  Sven Otto
+System:
+Unable to push changes
+API  AI Agent  AGT-5
+Machine-
+filtering, and  workflows here]  Sven Otto  AGT-6
+Orchestrate
+assisted
+ingestion,
+processing.  AGT-1
+multi-step plans.  curation, and
+Discover the Registry's  Machine-assisted  harmonization.
+schema, vocabularies,  ingestion, curation, and
+and capabilities.  harmonization.  Sven Otto  Sven Otto
+Included for processing?
+Orchestrate multi-step
+plans.
+Needed if we need to allow  No  Automated data  Is valid  User updates metadata  User views ingested
+for new vocab words /  User reviews feedback  User confirms
+pickup  enough?  (if necessary)  data
+allow agent suggestions.
+--> Assuming yes. No
+update needed on word
+smithing for CUR-9b.
+Correct and  Flag and govern
+enrich metadata  sensitive data.
+Data submitted via UI  entity duplicates  Sven Otto  Sven Otto
+(Pre-ingest)
+metadata
+Ensure  Sven Otto
+Workflow Scratchpad - Working - Feel free to edit, make copy
+Key  Pre-Registration  Pre-Validation  Ingest  Confirmation
+Agent Task  Agent Task
+System  System
+Pre-Reg Validation (ui,automated) - Happy Path,
+Pre-Reg Validation (Agent) - Happy Path,
+Do the  Data Curator gets
+(HIGH-LEVEL) Identifying touchpoints outside of workflow  Data Curator pre-registers  Do edits
+Data Curator checks for discrepancies, etc.  DataAsset(s)  confirmation that the
+sets above  DataAsset(s)  need to  Yes  Data Curator makes edits/corrections  Yes  [some ingest stuff]  Errors?  No
+within the DataAsset(s)  look okay for  DataAssets have been
+be made?
+ingest?  digested.
+During this step, a Data
+Curator can:  During this step, Data Curator can:  During this step, Data Curator can:
+Use Case Set list:  DataAssets reflected in UI
+display warning message /  and becomes searchable?
+View flagged validation errors  Single or Bulk Edit Entries
+Single and bulk pre-reg  acknowledgment of optional
+(Pre-ingest) metadata  Correct and enrich  Flag and govern sensitive  Discover the Registry's  Metadata query, filtering,
+validation  metadata  data.  schema, vocabularies,  and processing.  fields not corrected
+Can access Glossary  See previous versioning (?) - CUR-2
+Sven Otto  Sven Otto  Sven Otto  Sven Otto  Sven Otto
+See provenance linkage??? - does
+View flagged optional fields
+this apply to just analysis artifacts
+Access Glossary  Ensure provenance  Machine-assisted  Orchestrate multi-step  Error States:
+linkage  ingestion, curation, and  plans.  Unable to register
+or both the publication and
+analysis artifacts.
+[some system thing]
+Can access Glossary
+Register entities (single  Review queue
+and bulk)
+Update Glossary / add new term
+View Agent Feedback
+Consolidate entity
+duplicates
+Sven Otto  amelia espiritusanto
+Note to self: check ADM-3 for post ingest?, ADM-5 - workflows
+per accelerator - touchpoints?
+ARCHIVE - Jess' starter cards  Pre WS5 rewite
+Claude: Overall theme clouds  Claude: Overall dependency diagram
+Scientist/Researcher  Data Curator  Administrator  AI Agent  External Partners
+Scientist/Researcher  Data Curator  Administrator  AI Agent  External Partner
+Consumes the Registry to find, evaluate, and access data for analysis and model  Registers, validates, corrects, versions, and publishes metadata. The primary  Consumes published or privately shared data from outside the owning Organization,
+training. Rarely writes metadata; cares most about discovery, fitness, provenance, and  writer into the Registry and the main beneficiary of AI assistance  Governs who can see and do what, organizes and shares data across Spaces and  Acts through the MCP surface with scoped, auditable credentials. Every write is a proposal a  programmatically or through the web app.
+human accepts; the agent never becomes the authority. These cases exist to define the human-
+Search & Discovery
+getting to the bytes.  Organizations, gates sensitive publishing, and monitors the health of the holdings.
+Fitness, Provenance & Lineage  Review, Feeds & Queues  Doesn’t yet include
+in-the-loop and guardrail behavior, not only the happy path.  AI Agent
+Use Cases  Use Cases  Use Cases
+Use Cases  Use Cases
+AI Agent
+Access, Selection & Reproducible Assembly  Write, Validate & Version
+some of the splits
+GT-1
+Acts through the MCP surface with scoped, auditable credentials. Every write is a proposal a
+-1
+A
+Generate draft metadata from sources.
+ADM
+Bulk enrichment on behalf of a curator.
+Natural-language cross-modal  Assemble a reproducible training  Register data assets (single and  Register derived data with  Manage Spaces, users, and roles.
+On a curator's request, an agent extracts candidate metadata from file  A curator asks an agent to "add missing cell-type terms across Space S";
+Discover and access published  Receive a private cross-org  in-the-loop and guardrail behavior, not only the happy path.
+bulk)
+provenance.
+An Organization admin creates Spaces, assigns Space admins and  An admin views dashboards showing the count and size of assets  the agent produces a reviewable batch of suggestions under scoped  data without an account.
+share.
+set
+headers, protocols, or a linked publication and proposes a draft —
+credentials, and its contributions remain identifiable and reversible in
+A scientist asks in plain language behavioral  A curator registers an asset — a folder of files  A curator registers a processing result, linking it to  members, and sets baseline permissions within the Org → Space  under their control over time, plus metadata-quality and  stamped with its sources and confidence — into the normal review path.  A partner researcher browses and searches all  A partner  Organization that has been granted a  Use Cases
+or new relative
+— "  A scientist building a model queries across
+bulk.  published assets, collections, and metadata with  [P0] SCI-9
+scoped to one acquisition, or a derived result —  the primary assets and the processing steps that  hierarchy.  completeness signals, to target curation effort.
+data for mice with genotype , virus Y in ected in
+private share accesses the shared (possibly
+X  j  modalities and exports a versioned manifest of
+no authentication, then reaches the referenced
+area , collected after date W and the Registry
+Z  " —  the matching assets (including any linked model
+wherever it is stored, reusing existing core entities  produced it, so lineage is explicit from the
+data through its listed location.
+unvalidated, possibly sensitive) data under the
+Reporting and viewing
+(Subject, Instrument) rather than duplicating  moment of registration.
+translates it into a structured semantic uery,
+permissions the granting admin set.
++  q  records), so the exact training input is citable and
+them; a pipeline registers thousands of assets in  inaccuracies
+shows the uery it ran, and returns matching  Jess Thomas  Jess Thomas  Jess Thomas
+[P0] CUR-0
+[P0]CUR-4
+q  reproducible.
+one batch job.
+assets across modalities, each with its storage
+location and the caller's access status.  Jess Thomas  Jess Thomas  Jess Thomas  [P0] SCI-1
+[P0] AGT-2
+[P0] SCI-5
+[P0] SCI-11
+priorities
+Jess Thomas  Jess Thomas  Jess Thomas
+[P0] SCI-4
+[P0] SCI-6
+(Pre-ingest) metadata  Manage change history & roll
+Structured, faceted search.
+Metadata query, filtering, and  Locate & access underlying files  Sharing selections of DataAssets  validation
+backs  amelia espiritusanto
+Evaluate dataset fitness before use  Trace up & downstream
+PRT-2
+and metadata quickly
+GT-2
+Cite and resolve a Collection by  Interoperate with external
+ADM-2 · Share data privately across Spaces/  ADM-5
+A  Generate draft metadata from
+Locate and access the  Enrich and correct with review.
+Guardrail and oversight enforcement.
+Validate metadata (including  Review history and roll back.
+Orgs.
+sources.
+[P1] CUR-7
+An agent proposes vocabulary mappings and flags inconsistencies  An agent attempts an action that is sensitive, low-confidence, or outside
+A partner cites a published Collection; the DOI  A partner harvests Registry metadata into their  Sven Otto
+underlying files
+without registering)
+A curator browses the timestamped revision  An admin shares specific datasets with another Space or Organization  An admin archives stale data or retracts a published record; the  resolves to the Registry landing page with its  own system, or the Registry harvests and  On a curator's request, an agent extracts
+history of a core entity and reverts or supersedes  (species/strain mismatch, orphaned references, implausible age); the  its scope; the system refuses to auto-commit, routes it to a human, and
+A scientist narrows results deterministically by  From a result, the scientist retrieves the storage  A curator validates metadata against biodata-  for collaboration — without requiring the metadata to validate, since it  record is hidden from default discovery and flagged, but its history  manifest, contributors, license, and asset  references theirs (DANDI, BIL, NeMO, NIMP,  candidate metadata from file headers, protocols,
+a change, relying on the fact that history is never  curator accepts, edits, or rejects each field, with agent-proposed values  records the attempt — demonstrating that agents inherit the same
+species, modality, assay, brain region, genotype,  location(s) and pulls the data with native tooling  schema (plus any additional schema they supply)  isn't being published.  and the fact of retraction are retained.  references.  OpenNeuro), so the Registry stays a cross-modal  or a linked publication and proposes a draft —
+destroyed.  visually distinguished.  authorization and audit as any client.
+and date, refining facets until the candidate set is  (boto3, gcloud, rclone); the Registry points to the  at registration, and can also validate raw JSON  source of truth rather than a silo.  stamped with its sources and confidence — into
+right  data but does not broker credentials.  through the API without registering anything, to  Jess Thomas
+the normal review path.
+[P1] SCI-2
+[P1] SCI-8
+check conformance early.
+[P1] AGT-4
+Jess Thomas  Natural-language cross-modal  “At a glance” Data summary
+Jess Thomas  [P1] CUR-3
+Assemble a reproducible dataset
+Jess Thomas  Jess Thomas  Jess Thomas  Jess Thomas  Ensure provenance linkage  for a computational experiment
+Consume metadata  [P1] CUR-10
+SCI-3
+SCI-6
+[P0] CUR-2
+programmatically.
+amelia espiritusanto  Archive or retract.
+Evaluate dataset fitness before  Trace provenance of a derived  AGT-3
+Sven Otto  amelia espiritusanto  Correct and enrich metadata
+Correct and enrich metadata
+Assemble and publish a
+A partner's pipeline or agent queries the public  Sven Otto
+use
+result
+A curator fills gaps and fixes errors — for example  Flag and govern sensitive data.
+Conversational discovery and recommendation.  API (or MCP surface) to pull published metadata
+Before committing to a dataset, the scientist  A scientist follows a processed asset back
+mapping free-text "layer 5 pyramidal cells" to the
+Collection
+A scientist asks an agent to find or recommend datasets for a stated  for downstream analysis, with no credentials
+A curator assembles a Collection (which may nest  An admin marks data and/or metadata as sensitive so it is excluded
+analysis or training goal; the agent translates the request to an  required for public data.
+correct controlled-vocabulary term — directly or  [P1] SCI-0
+inspects its metadata completeness (FAIR score),  through its processing steps to the primary
+and span Spaces — e.g., all assets behind a
+[P1] AGT-3
+from search for anyone without a share, and runs the required
+quality-control metrics, and lineage, so they can  acquisitions and the subject/specimen it came
+by accepting a Metadata Agent suggestion; the  explainable query and returns ranked, access-aware results.  Jess Thomas
+manuscript) and publishes it: metadata must  Jess Thomas
+sensitivity review before any human-subject Collection is published.
+change is versioned and audited.
+Natural-language querying and
+judge whether it suits their analysis.  from, to understand and trust the result
+validate, the version is frozen, and a DOI is minted
+Jess Thomas  Jess Thomas  that resolves to the Registry's web-app landing  Sven Otto  [P2] CUR-8
+[P2] CUR-6
+model-backed reasoning over
+page.  Submission feed  Consolidate entity duplicates
+results.  [P1] AGT-5
+Side note: priority inversions to reconcile
+Jess Thomas  Jess Thomas  Machine-assisted ingestion,
+curation, and harmonization.
+Resolve a duplicate / consolidate
+entities
+The Registry flags that two registrations describe
+the same Sub ect or Instrument the curator
+j  ;
+reviews and consolidates them into one canonical
+[P2] SCI-7
+[P1] ADM-5
+Configurable Workspace
+Three ordering tensions surfaced in Step 2 that the roadmap should resolve, all where a
+dependent use case is prioritized ahead of something it needs:
+entity.
+Personalization  Sven Otto  Sven Otto
+[P1] CUR-1
+Sven Otto  Register entities (single and
+P1  1. Fitness/lineage chain (the sharp one).
+Sven Otto  SCI-4 (evaluate fitness) and SCI-6 (trace provenance) are both P0, but they depend on
+CUR-3 (ensure provenance linkage), which is P1. You can't read lineage that was never
+UI chatbot: chat w/ BioData  Summarize search results
+Registry
+written. Either CUR-3 rises to P0, or SCI-4/SCI-6 ship as read-only against whatever lineage
+A scientist asks the agent to summarize their
+T he Bio ata egistry User interface features an
+D  R
+search results so that the scientist can quickly
+integrated chat ot  b  .
+scan and comprehend the contents of their
+search results and determine to dig more.
+An orchestrator distri utes tasks to specialized
+happens to exist and can't guarantee coverage.
+b
+worker agents that capitalize on the  Registry’s  amelia espiritusanto
+and API to access different parts of the dat
+Schema, Vocabulary & Docs
+MCP  a
+Governance, Permissions & Sharing  Monitoring & Cost  Publication & External Consumption  Orchestration
+It s grounded in the users permissions for what
+’
+they can or cannot access  .
+It leads with transparency and ver oseness t  b  o
+walk users through its proces
+(the machine-readable contract)
+s
+2. Register vs. its own scaffolding.
+ensure user confidenc  e
+ena le user scrutiny
+[P2] AGT-6
+CUR-1 (register entities) is P1, but CUR-0 (validation), CUR-2 (edit), and CUR-4 (versioning)
+[P1] CUR-5
+Orchestrate multi-step plans.
+[P1] ADM-3
+Publish (manuscript)
+[P0] ADM-0
+[P0] ADM-1
+Collections
+[P0] AGT-1
+Discover the Registry's schema,
+vocabularies, and capabilities.
+[P0] SCI-10
+Documentation & User Support
+Manage organizing units, users,
+and roles.
+Data sharing  Jess Thomas
+are all P0. The P0 write-path machinery has nothing to operate on until registration lands.
+Jess Thomas  Vitalii Tereshchenko
+CUR-1 likely belongs at P0, or the three should be re-tiered together.
+[P2] ADM-4
+AI cost monitoring
+3. Contract feeds P0s but has a P1 member.
+[P0] CUR-9
+[P1] CUR-9
+[P0] ADM-2
+Access Glossary  Maintain Glossary
+amelia espiritusanto  amelia espiritusanto  Sven Otto
+[P2] PRT-8
+[P2] PRT-7
+[P2] PRT-6
+AGT-1 is P0 and SCI-10/CUR-9 are the same capability, but CUR-9 (glossary) is tagged P1
+— yet AGT-1's vocabulary introspection and SCI-2's free-text-to-controlled-term resolution
+Validate data in published  Collaborators contribute to
+P2  [P1] PRT-4
+Receive a private cross-org  Sean M
+dataset
+Sven Otto  both need the glossary. Worth confirming CUR-9's content is available to AGT-1 at P0 even
+LLM via MCP: Conversational
+discovery and recommendation.
+AGT  -2
+Enrich and correct with review.
+An agent proposes vocabulary mappings and
+flags inconsistencies (species/strain mismatch,
+[P2] PRT-3
+[P2] PRT-5
+if the curator-facing maintenance UI is P1.
+Interoperate with external
+A scientist asks their preferred LLM to find or
+recommend datasets for a stated analysis or
+orphaned references, implausible age); the
+Consume metadata
+curator accepts, edits, or rejects each field, with
+training goal; the agent translates the request to
+agent-proposed values visually distinguished.
+programmatically.  archives.
+an explainable query and returns ranked, access-
+aware results.  Jess Thomas
+[P2] PRT-1
+Discover and access published  [P2] PRT-2
+data without an account.  Cite and resolve a Collection by
+More complete and dense diagram below available here for interactive browsing:
+https://claude.ai/chat/533c4d03-7dc2-4df0-ba17-3dd92dd64dd3?artifactId=bdr_full_dependency_graph.html&versionUuid=d5f8706e-9993-419a-a7ad-96821a0cb902
+If you don’t have enterprise Claude, you can get the HTML from my OneDrive:
+https://alleninstitute-my.sharepoint.com/:u:/g/personal/sven_otto_alleninstitute_org/IQCJHJUyhBxEQ4Ltx-r7UnfCAWOYJFPmvixkFuMoLyFgK7Y?e=wdZVzh

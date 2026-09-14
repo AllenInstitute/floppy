@@ -1,0 +1,68 @@
+# source: resources/Workstream 2 - Schema and Data Model/Immunology metadata/mIF Example - Remap/remap gaps details.docx
+# original kept: yes
+
+**mIF-procedures.json**
+
+**True schema gaps (missing models/fields):**
+
+-   **No cyclic IF series model** --- The schema has HCRSeries for
+    cyclic mFISH rounds but nothing equivalent for antibody-based cyclic
+    IF (Cell DIVE). Each round is a separate SpecimenProcedure as a
+    workaround; a CyclicIFSeries model is needed.
+
+-   **Antibody model is insufficient** --- FluorescentStain/ProteinProbe
+    don\'t support: antibody clone, working concentration in µg/mL
+    (schema uses mass, not concentration), or institutional barcodes
+    (expected/scanned/match). RRID is the only formal identifier. The
+    antibody\_channels structure in protocol\_parameters is a
+    workaround.
+
+-   **No deactivation step model** --- H₂O₂ bleaching between rounds has
+    no structured schema representation. Currently a custom object in
+    protocol\_parameters.
+
+-   **No panel assignment field** --- SpecimenProcedure has no field to
+    record which antibody panel (Panel A vs. Panel B) was applied to
+    which slide within a round. Currently free-text only.
+
+-   **No tissue collection procedure type** --- SpecimenProcedureType
+    has no entry for human donor tissue block acquisition. Would fall
+    under OTHER, losing semantic specificity.
+
+**Structural conflict:**
+
+-   **procedure\_type field mismatch** --- All procedures use
+    procedure\_type: \"SpecimenProcedure\" (the class name) plus a
+    non-existent procedure\_type\_name field. Schema requires
+    procedure\_type to be a SpecimenProcedureType enum value and uses
+    procedure\_name for free-text. Needs correction across all
+    procedures.
+
+-   **protocol\_id format mismatch** --- Field expects a protocols.io
+    DOI; AIFI uses SLIMS IDs. Either AIFI protocols need protocols.io
+    DOIs, or the schema needs to support institutional IDs.
+
+**mIF-acquisition.json**
+
+-   **Round 1.5 has no representation** --- A non-integer staining round
+    (second antibody pass between Rounds 1 and 2) can\'t be cleanly
+    expressed. Options: fold into Round 1, treat as its own acquisition
+    with a non-integer ID, or add a protocol deviation field. Needs
+    discussion.
+
+-   **Cell DIVE imaging parameters unsupported** ---
+    ImagingConfig/DetectorConfig supports per-channel exposure time, but
+    Cell DIVE-specific imaging parameters have no schema representation
+    and would require extension.
+
+**mIF-data\_description.json**
+
+-   **Restrictions field underspecified** --- No guidance on whether
+    legal contract IDs belong here; restriction categories are
+    undefined. Patient consent may overlap with the subject schema.
+
+**mIF-subject.json**
+
+-   **Missing human subject fields** --- No schema support for: multiple
+    diagnoses with time-based updates, ethnicity, race, or consent. Also
+    unresolved: whether cohort belongs at the subject or sample level.

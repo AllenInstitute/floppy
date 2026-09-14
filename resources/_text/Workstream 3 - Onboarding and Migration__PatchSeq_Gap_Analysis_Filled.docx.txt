@@ -1,0 +1,318 @@
+# source: resources/Workstream 3 - Onboarding and Migration/PatchSeq_Gap_Analysis_Filled.docx
+# original kept: yes
+
+**BioData Registry**
+
+**Schema Gap Analysis --- Patch-seq (NHP) Dataset**
+
+  ------------------------- -------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  **Dataset / System**      Patch-seq NHP (Macaca mulatta) --- IVSCC / Allen Institute Cell Types program
+  **Sample Asset**          Specimen 1160166008 (QM22.26.003.14.02.01) from Subject 1160150227 \| 4 modality files: NWB ephys, scRNA-seq fastq, morphological reconstruction, 20x/63x imaging
+  **Source Organization**   Allen Institute for Brain Science --- IVSCC (In Vitro Single Cell Characterization)
+  **Prepared by**           Workstream 2 & 3
+  **Reference Schema**      aind-data-schema v2.7.2 (Metadata) \| https://aind-data-schema.readthedocs.io/en/latest/
+  **Milestone**             Milestone 0 --- Track C \| DDM Gate target: Aug 14, 2026
+  **Status**                Draft
+  **Date**                  2026-08-12
+  **Version**               v0.1
+  ------------------------- -------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+1\. Purpose & Scope
+
+This document applies the BioData Registry schema (aind-data-schema) to
+the Patch-seq NHP dataset from the IVSCC program and catalogs every
+schema gap, conflict, and unmappable field as required by Milestone 0,
+Track C. Patch-seq is a multi-modal single-cell assay that
+simultaneously captures electrophysiology, transcriptomics, and
+morphology from the same cell, making it a high-value stress test of the
+registry schema.
+
+This document was generated using Claude with the source mapping and
+info from WS2 Patch-seq\'s mapping exercise.
+
+**A single Patch-seq cell generates four separately stored assets:**
+
+-   NWB file --- intracellular electrophysiology (patch-clamp recording)
+
+-   fastq files --- single-cell RNA sequencing (SMARTer v4 + Nextera
+    library prep)
+
+-   Morphological reconstruction --- SWC file + marker file + image
+    annotations
+
+-   20x and 63x brightfield/fluorescence images of the patched cell
+
+**Source documents reviewed:**
+
+-   Patch-seq metadata example files: metadata.nd.json (nwb,
+    transcriptomics, reconstruction, image 20x/63x)
+
+-   Patch-seq mapping observations.docx (authored by dataset owner)
+
+-   aind-data-schema documentation --- schema\_version 2.7.2
+
+-   BioData Registry kick-off deck and charter (July 23, 2026)
+
+2\. Executive Summary of Key Gaps
+
+The Patch-seq dataset is already formatted in aind-data-schema and
+represents the most schema-compliant of the three PoC datasets. However,
+several important gaps emerge at the multi-modal, multi-file level: the
+schema has no mechanism to group the four modality assets for a single
+cell into one logical unit, multi-file and multi-directory location
+tracking is not supported, and the majority of Patch-seq-specific
+procedures (patch clamping, RNA amplification, library prep, biocytin
+filling) fall through to the \"Other\" catch-all type with no dedicated
+controlled vocabulary.
+
+  -------------------------- --------------------------------------------------------------------- ------------ ----------------------------------------------------------------------------------------------------------------------------------------------------------- ----------------------
+  **Key Gaps --- Summary**                                                                                                                                                                                                                                                  
+  **\#**                     **Gap / Issue Title**                                                 **Impact**   **Recommended Action**                                                                                                                                      **Workstream Owner**
+  **G1**                     **No single-cell grouping across 4 modality assets**                  **High**     R3: Define a Patch-seq Collection or cell-level grouping linking ephys, transcriptomics, morphology, and imaging assets to one specimen (WS1/WS2).          WS1 + WS2
+  **G2**                     **Multi-file / multi-directory location not representable**           **High**     R10: Define manifest-file or common-parent + glob convention for multi-file assets. Reconstruction and 63x images are split across directories. (WS1/WS2)   WS1 + WS2
+  **G3**                     **Patch-seq procedure types all fall to \"Other\"**                   **High**     R6: Add PatchClamping, RNA amplification, library prep, biocytin filling, DAB detection to procedure\_type vocabulary. (WS2)                                WS2
+  **G4**                     **Database-resident reconstruction annotations not addressable**      **Medium**   R11: Define how database-resident data is registered --- export to file or platform pointer to DB endpoint. (WS1/WS4)                                       WS1 + WS4
+  **G5**                     **fastq files in shared directory --- no cell-level file identity**   **Medium**   R10 (same): Onboarding must define a cell-level file identification convention for shared-directory transcriptomics data. (WS3)                             WS3
+  **G6**                     **Investigator/experimenter fields lack ORCID resolution**            **Medium**   Enrich investigators and experimenters with individual ORCID identifiers during onboarding curation. (WS3)                                                  WS3
+  **G7**                     **Coordinate system required on non-spatial instruments**             **Low**      R8: Make instrument coordinate\_system optional, or define a canonical \"Not applicable\" value. (WS2)                                                      WS2
+  **G8**                     **No field for cell depth in slice or reporter positivity**           **Low**      R7/R9: Add cell\_depth and reporter\_positive fields to procedure details or acquisition (WS2).                                                             WS2
+  -------------------------- --------------------------------------------------------------------- ------------ ----------------------------------------------------------------------------------------------------------------------------------------------------------- ----------------------
+
+3\. Terminology Reconciliation
+
+The Patch-seq dataset uses aind-data-schema natively, so most
+terminology is already aligned. The key distinctions are at the
+specimen/cell level.
+
+  -------------------------------- -------------------------- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- ------------------------------------
+  **Source Term**                  **Closest aind Concept**   **Semantic Divergence**                                                                                                                                                    **Notes**
+  Subject (subject\_id)            subject.subject\_id        The animal (NHP). One subject can yield many Patch-seq cells.                                                                                                              
+  Specimen / Cell (specimen\_id)   acquisition.specimen\_id   The individual patched cell. Pattern: subject\_id + \"\_\" + cell\_id. This is the true unit of interest, but the schema primary key (name) is derived from subject\_id.   Core tension for naming / grouping
+  Modality file                    Metadata (one per file)    Each of the 4 modality assets is a separate metadata.json. There is no schema concept of a \"Patch-seq cell\" that owns all four.                                          Drives G1 / R3
+  procedure\_type \"Other\"        (gap)                      Used for patch clamping, RNA amplification, library prep, biocytin filling, DAB detection --- all critical Patch-seq steps.                                                Drives G3 / R6
+  Location (S3 URI)                metadata.location          Single string. Works for single-file assets; insufficient for multi-file or shared-directory assets.                                                                       Drives G2 / R10
+  -------------------------------- -------------------------- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- ------------------------------------
+
+4\. Classification Legend
+
+All fields in Section 5 are tagged with one of the following
+classifications.
+
+  ------------------------------------------------------- --------------------------------------------------- ----------------------------------------------------------- ------------------------------------------------ ----------------------------------------------------------
+  **Classification Legend**                                                                                                                                                                                                
+  **Mapped**                                              **Gap**                                             **Conflict**                                                **Unmappable**                                   **Needs Review**
+  Maps to existing aind field; may need transformation.   No aind equivalent; schema extension recommended.   Field exists but incompatible semantics/type/cardinality.   Platform/service concern, not portable schema.   Ambiguous; team decision or schema clarification needed.
+  ------------------------------------------------------- --------------------------------------------------- ----------------------------------------------------------- ------------------------------------------------ ----------------------------------------------------------
+
+5\. Field-Level Mapping by Entity
+
+**5.1 Subject**
+
+The Subject entity maps well. The NHP subject type is fully populated
+with species (NCBI-compliant), sex, and year\_of\_birth. Two issues:
+mating\_status has no aind home, and source is populated with
+\"Unknown/UNKNOWN\" rather than a resolvable institution.
+
+  ------------------------------------------------------------------------------ ----------------- ---------------------------------- -------------------- ---------------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------------------------------------------------------------------------------------
+  **Entity: Subject \| Source: aind-data-schema / IVSCC LIMS (NHP Patch-seq)**                                                                                                                                                                                                                                              
+  **Source Field**                                                               **Source Type**   **Target (aind)**                  **Classification**   **Notes / Mismatch**                                                                                                                                             **Recommendation**
+  **subject\_id**                                                                string            subject.subject\_id                **Mapped**           Direct. Used as primary key across all four modality files for this cell.                                                                                        Use as-is.
+  **species (NCBI object)**                                                      object            subject\_details.species           **Mapped**           Already uses NCBI Taxonomy registry identifier (NCBI:txid9544). Full controlled-vocab compliance.                                                                Use as-is; no transformation needed.
+  **sex**                                                                        enum              subject\_details.sex               **Mapped**           Direct.                                                                                                                                                          Use as-is.
+  **year\_of\_birth**                                                            int               subject\_details.year\_of\_birth   **Mapped**           NHP subject; HIPAA age-capping not applicable here. Direct integer field.                                                                                        Use as-is. Flag for review if human subjects are added.
+  **date\_of\_birth**                                                            date \| null      subject\_details.date\_of\_birth   **Mapped**           Present in schema, null in this dataset. Consistent.                                                                                                             No action needed.
+  **mating\_status**                                                             string            --- (no analog)                    **Gap**              Field present in source data (\"Unknown\") but has no counterpart in the current aind NonHumanPrimate subject type.                                              R1: Add mating\_status to NonHumanPrimatSubject type with controlled vocab (WS2).
+  **source (institution)**                                                       object            subject\_details.source            **Conflict**         source is populated with \"Unknown/UNKNOWN\" --- no registry identifier. Schema expects a ROR-registered organization. This data predates the ROR requirement.   During onboarding, attempt to resolve source institution; flag unresolvable records for curator review (WS3).
+  **notes**                                                                      string \| null    subject.notes                      **Mapped**           Null in this dataset. Direct field.                                                                                                                              No action needed.
+  ------------------------------------------------------------------------------ ----------------- ---------------------------------- -------------------- ---------------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------------------------------------------------------------------------------------
+
+**5.2 Data Description**
+
+The data\_description schema is broadly applicable across all four
+modality files, but critical provenance fields (source\_data,
+investigators with ORCID, tags) are null, and the name generation
+pattern creates collision risk for same-subject same-date assets.
+
+  ------------------------------------------------------------------------------------------ ----------------- --------------------------------- -------------------- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  **Entity: Data Description \| Source: aind-data-schema / IVSCC LIMS (4 modality files)**                                                                                                                                                                                                                                                                                                                                                                                                                  
+  **Source Field**                                                                           **Source Type**   **Target (aind)**                 **Classification**   **Notes / Mismatch**                                                                                                                                                                                                                                                                                                                  **Recommendation**
+  **name (auto-generated)**                                                                  string            data\_description.name            **Conflict**         Pattern: subject\_id + creation\_time (date only, no time). Collision risk if two assets for the same subject are generated on the same date. Observed: nwb and transcriptomics have different creation\_time values; reconstruction and 20x image share the same date with different acquisition\_type.                              R2: Confirm name generation uses full datetime not date-only, or add a disambiguating suffix (modality abbreviation). Coordinate with WS1 on uniqueness enforcement.
+  **modalities (per file)**                                                                  object\[\]        data\_description.modalities      **Conflict**         Each of the four modality files carries its own modalities list (icephys, scRNAseq, Brightfield microscopy, One-photon imaging). The Patch-seq assay as a whole is multi-modal, but the registry model registers each file separately with its own modality. There is no single asset that represents \"this is a Patch-seq cell.\"   R3: Define a Patch-seq collection grouping linking the four modality assets to one cell/specimen. Needs WS1/WS2 decision on whether this is a platform Collection or a schema-level grouping.
+  **subject\_id (in data\_description)**                                                     string            data\_description.subject\_id     **Conflict**         subject\_id is the subject (animal), but the meaningful unit for Patch-seq is the cell specimen (specimen\_id = subject\_id + cell\_id suffix). The asset name is keyed to subject\_id, not the cell. Multiple cells from the same animal would collide without a modality/time disambiguator.                                        R3 (same as above): Consider specimen\_id as the primary key for cell-level assets, or ensure name generation incorporates specimen\_id.
+  **project\_name**                                                                          string            data\_description.project\_name   **Mapped**           \"IVSCC\" --- a project code, not a human-readable name. Consistent with current schema usage.                                                                                                                                                                                                                                        No action needed, but flag the guidance question from mapping observations: should this be experiment ID, descriptive name, or both?
+  **investigators**                                                                          object\[\]        data\_description.investigators   **Conflict**         Populated with team/core names (\"Ephys Core\", \"RNA-seq Core\") rather than individual ORCID-resolvable persons. registry\_identifier is null throughout.                                                                                                                                                                           During onboarding, flag records with non-person investigators and null ORCIDs for enrichment. Consider whether team credits are valid in the registry or require named persons (WS2 policy decision).
+  **institution**                                                                            object            data\_description.institution     **Mapped**           Uses ROR identifier \"03cpe7c52\" for Allen Institute. Fully compliant.                                                                                                                                                                                                                                                               Use as-is.
+  **source\_data**                                                                           null              data\_description.source\_data    **Gap**              Null across all four files. For Patch-seq, the NWB ephys file is effectively a source for the transcriptomic and morphology outputs. Provenance is not captured.                                                                                                                                                                      R4: During onboarding, populate source\_data linkages between the four modality assets for the same cell (WS3). Raises question of how source\_data is populated --- manual vs. automated.
+  **tags**                                                                                   null              data\_description.tags            **Gap**              Null across all files. No guidance on controlled vocabulary for tags in current schema.                                                                                                                                                                                                                                               R5: WS2 to define tag vocabulary and governance. Until then, leave null at onboarding.
+  **restrictions**                                                                           null              data\_description.restrictions    **Gap**              Null. Unclear whether restrictions overlap with consent fields or should hold a legal document ID.                                                                                                                                                                                                                                    R5 (same): WS2 to clarify restrictions field semantics and relationship to consent.
+  ------------------------------------------------------------------------------------------ ----------------- --------------------------------- -------------------- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+**5.3 Procedures --- Subject & Specimen**
+
+Perfusion and sectioning (including planar sectioning with coordinates)
+are well-modeled. The core Patch-seq workflow steps --- patch clamping,
+RNA extraction, amplification, library prep, biocytin filling, DAB
+detection --- all fall to procedure\_type=\"Other\" with free-text
+names. This is the largest vocabulary gap in this dataset.
+
+  ---------------------------------------------------------------------------------------- ----------------- -------------------------------------------------------- -------------------- ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  **Entity: Procedures --- Subject & Specimen \| Source: aind-data-schema / IVSCC LIMS**                                                                                                                                                                                                                                                                                                         
+  **Source Field**                                                                         **Source Type**   **Target (aind)**                                        **Classification**   **Notes / Mismatch**                                                                                                                                                                                  **Recommendation**
+  **Surgery \> Perfusion (subject\_procedure)**                                            object            subject\_procedures\[\].Surgery.Perfusion                **Mapped**           Perfusion procedure recorded correctly with output\_specimen\_ids. Direct correspondence.                                                                                                             Use as-is.
+  **Sectioning / Planar sectioning (specimen\_procedure)**                                 object            specimen\_procedures\[\].Sectioning + PlanarSectioning   **Mapped**           Section thickness (350 µm), coordinate system (SLICE\_ROSTRAL\_CAUDAL), and orientation (Coronal) are all present. Planar sectioning coordinates are fully populated. SOP reference in notes field.   Use as-is. Verify SOP PF0344 reference is queryable in the registry.
+  **Nucleated patch extraction (type=Other)**                                              object            specimen\_procedures\[\].Other                           **Conflict**         Patch-clamping / nucleated patch extraction is a critical Patch-seq step but has no dedicated procedure\_type in the aind controlled vocabulary. Uses \"Other\" with a free-text name.                R6: Add \"PatchClamping\" or \"NucleatedPatchExtraction\" to the procedure\_type controlled vocabulary (WS2). This also clarifies whether patch clamping is a SpecimenProcedure or better modeled as a Manipulation inside Acquisition.
+  **SMARTer v4 amplification (type=Other)**                                                object            specimen\_procedures\[\].Other                           **Conflict**         RNA amplification step uses \"Other\" --- no dedicated type. Critical for transcriptomics provenance.                                                                                                 R6 (same): Define molecular biology procedure types (amplification, library prep) in controlled vocabulary.
+  **Nextera library prep (type=Other)**                                                    object            specimen\_procedures\[\].Other                           **Conflict**         Same issue as amplification --- falls back to \"Other\".                                                                                                                                              R6 (same).
+  **Biocytin filling (type=Other)**                                                        object            specimen\_procedures\[\].Other                           **Conflict**         Biocytin filling during patch-clamp recording is a defining step for morphology recovery. No dedicated type.                                                                                          R6 (same): Add staining/dye-filling procedure types.
+  **Post-patch-clamp slice fixation (type=Fixation)**                                      object            specimen\_procedures\[\].Fixation                        **Mapped**           Maps to Fixation procedure type. protocol\_parameters null --- fixation reagent and duration not captured.                                                                                            During onboarding, enrich with fixative details if available from LIMS. Flag null protocol\_parameters for curation (WS3).
+  **DAB detection of biocytin (type=Other)**                                               object            specimen\_procedures\[\].Other                           **Conflict**         DAB staining uses \"Other.\" IHC/DAB detection has no dedicated type despite being common in morphology workflows.                                                                                    R6 (same): Add histochemical staining procedure types.
+  **DAPI labeling (type=Other + FluorescentReagent detail)**                               object            specimen\_procedures\[\].Other + FluorescentReagent      **Mapped**           Uses FluorescentReagent detail with excitation/emission wavelengths and source (Invitrogen ROR). procedure\_type is \"Other\" but the detail structure is well-modeled.                               Add \"Staining\" or \"Immunolabeling\" to procedure\_type vocabulary (R6); the FluorescentReagent detail model itself is sufficient.
+  **fluorescent reporter positivity (not captured)**                                       ---               --- (no analog)                                          **Gap**              Mapping observations note: need to record whether a patched cell was positive for a fluorescent reporter. No field exists anywhere in procedures or acquisition.                                      R7: Add a reporter/marker positivity field to SpecimenProcedure or Acquisition subject\_details for cell-level characterization (WS2).
+  **protocol\_id (null on several procedures)**                                            string \| null    specimen\_procedures\[\].protocol\_id                    **Gap**              Some procedures have protocols.io URLs, others have null. Inconsistent provenance capture within the same dataset.                                                                                    During onboarding, flag null protocol\_ids for curation. Recommend that all procedures have a protocol reference (WS3 policy).
+  ---------------------------------------------------------------------------------------- ----------------- -------------------------------------------------------- -------------------- ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+**5.4 Acquisition**
+
+Acquisition fields are well-populated for ephys and imaging. Key gaps:
+ethics\_review\_id is null for NHP experiments, investigators are team
+names not individuals, and instrument coordinate\_system is used as a
+required placeholder for a sequencing machine where it is meaningless.
+
+  -------------------------------------------------------------------------------- ----------------- ---------------------------------------------- -------------------- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- ----------------------------------------------------------------------------------------------------------------------------------------
+  **Entity: Acquisition \| Source: aind-data-schema / IVSCC (4 modality files)**                                                                                                                                                                                                                                                                                                                                                                    
+  **Source Field**                                                                 **Source Type**   **Target (aind)**                              **Classification**   **Notes / Mismatch**                                                                                                                                                                                                                                                       **Recommendation**
+  **acquisition\_type**                                                            string            acquisition.acquisition\_type                  **Mapped**           Four distinct types across files: \"Patch-seq patch-clamp recording\", \"Patch-seq RNA-seq\", \"Patch-seq 63x imaging\", \"Patch-seq 20x imaging\". Descriptive and consistent.                                                                                            Consider whether acquisition\_type should be a controlled vocabulary rather than free text to support cross-dataset search (WS2).
+  **specimen\_id**                                                                 string            acquisition.specimen\_id                       **Mapped**           Pattern subject\_id + \"\_\" + cell\_id (e.g. \"1160150227\_1160166008\"). Consistent across all modality files. This is the true unit of interest for Patch-seq.                                                                                                          Confirm this pattern is documented as the Patch-seq specimen\_id convention in the registry.
+  **data\_streams (single-modality per file)**                                     object\[\]        acquisition.data\_streams                      **Mapped**           Each file contains a single DataStream matching its modality. No multi-stream complexity in this dataset.                                                                                                                                                                  Use as-is.
+  **ethics\_review\_id**                                                           null              acquisition.ethics\_review\_id                 **Gap**              Null across all files. NHP Patch-seq experiments require IACUC approval. Missing in this dataset.                                                                                                                                                                          During onboarding, populate ethics\_review\_id from LIMS/records where available. Flag as required metadata for NHP data (WS3).
+  **experimenters**                                                                object\[\]        acquisition.experimenters                      **Gap**              Empty list across all four files. Individual experimenters are not recorded; only team credits appear in data\_description.investigators.                                                                                                                                  Same as investigators gap: resolve to named persons with ORCID where possible (WS3 curation).
+  **subject\_details**                                                             null              acquisition.subject\_details                   **Gap**              Null in all files. Mapping observations note that for human tissue experiments, \"subject at acquisition\" should capture clinical context (e.g. smoking history at time of collection). Not applicable for this NHP dataset but a known gap for future human Patch-seq.   Flag for human Patch-seq onboarding. NHP case: no action needed now.
+  **coordinate\_system (instrument)**                                              object            instrument.coordinate\_system                  **Conflict**         Instrument requires a CoordinateSystem, but the Illumina sequencer (transcriptomics) uses a placeholder IMAGE\_XYZ coordinate system --- meaningless for a sequencing machine. The schema enforces a coordinate system even where it is not applicable.                    R8: WS2 to make coordinate\_system optional on Instrument, or define a \"Not applicable\" canonical value for non-spatial instruments.
+  **stimulus\_epochs / manipulations**                                             object\[\]        acquisition.stimulus\_epochs / manipulations   **Unmappable**       Empty arrays across all files. These fields are designed for in-vivo mouse experiments with stimuli; not applicable to fixed-tissue Patch-seq.                                                                                                                             No action needed for this dataset. Note as not applicable for post-mortem/fixed-tissue workflows.
+  **cell depth in slice (not captured)**                                           ---               --- (no analog)                                **Gap**              Mapping observations: depth of the recorded cell within the slice is tracked experimentally but has no field in acquisition or procedures.                                                                                                                                 R9: Add cell\_depth (with unit) to acquisition or PatchClamping procedure details (WS2).
+  -------------------------------------------------------------------------------- ----------------- ---------------------------------------------- -------------------- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- ----------------------------------------------------------------------------------------------------------------------------------------
+
+**5.5 Data Location & File Structure**
+
+The single-location model is the most structurally limiting gap in this
+dataset. Four out of four modality assets have some form of multi-file
+or shared-directory issue that the schema cannot currently express.
+
+  -------------------------------------------------------------------------------------------- ----------------- ------------------- -------------------- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  **Entity: Data Location & File Structure \| Source: aind-data-schema (Metadata.location)**                                                                                                                                                                                                                                                                                                                                                                                              
+  **Source Field**                                                                             **Source Type**   **Target (aind)**   **Classification**   **Notes / Mismatch**                                                                                                                                                                                                                                                                                                            **Recommendation**
+  **location (single S3 URI)**                                                                 string            metadata.location   **Conflict**         Single string; works for NWB and transcriptomics (single files). Reconstruction generates SWC + marker files in a directory also containing unrelated files. 63x image layers are spread across multiple directories with no unifying parent. The single-location model cannot represent this without additional conventions.   R10: Define a convention for multi-file/multi-directory assets: either (a) registry points to a manifest file that enumerates constituent files, or (b) location is the nearest common parent with a glob pattern. WS1/WS2 decision.
+  **fastq files (shared directory)**                                                           ---               metadata.location   **Conflict**         The raw fastq files for this Patch-seq cell live in a directory alongside fastq files from many other cells. location points to the shared directory, not a cell-specific path. There is no way to distinguish this asset from its neighbors without filename conventions.                                                      R10 (same): Registry onboarding for transcriptomics data must define a cell-level file identification convention (WS3). Possibly reference individual file paths or use a manifest.
+  **reconstruction data in database (annotations)**                                            ---               --- (no analog)     **Gap**              Some morphological reconstruction data (image annotations) is stored in a database, not a file. The registry has no mechanism to point to a database record.                                                                                                                                                                    R11: Define how database-resident data assets are referenced in the registry. Options: (a) export/snapshot to file at registration time; (b) platform-level pointer to database endpoint + record ID (WS1/WS4).
+  **checksum**                                                                                 ---               --- (no analog)     **Gap**              No checksum field in the aind metadata core. File integrity cannot be verified from the registry alone.                                                                                                                                                                                                                         R12: Add checksum field (algorithm + value) to core metadata, or hold at platform level (WS1).
+  -------------------------------------------------------------------------------------------- ----------------- ------------------- -------------------- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+6\. Cross-Cutting Concerns
+
+**6.1 Multi-Modal Single-Cell Identity**
+
+The most distinctive structural challenge in Patch-seq is that one
+biological unit of interest (a single cell / specimen) generates four
+separately registered, independently stored data assets. The schema
+provides no way to assert \"these four assets are all from the same
+cell.\" Currently, the only link is the shared specimen\_id embedded in
+each acquisition and the shared subject\_id in data\_description ---
+neither of which is enforced or indexed as a grouping relationship by
+the registry. This gap means that cross-modal search (\"find all
+Patch-seq data for cells in layer 5 of prefrontal cortex\") requires
+reconstructing the cell identity from field values rather than a
+first-class relationship.
+
+**6.2 Provenance & Derived Data**
+
+The four modality files have a logical dependency order: the ephys
+recording (NWB) is the primary acquisition; the RNA-seq is co-collected
+from the same cell; the morphological reconstruction is derived from
+images taken post-recording. None of this is captured in
+source\_data\[\], which is null in all files. During onboarding, WS3
+should populate source\_data linkages to make the derivation chain
+explicit and support the registry provenance model.
+
+**6.3 Controlled Vocabulary Coverage**
+
+This dataset reveals that the aind procedure\_type vocabulary was
+designed around in-vivo mouse workflows (perfusion, sectioning,
+histology). Patch-seq introduces an entirely different set of required
+procedure types from molecular biology (nucleated patch extraction, RNA
+amplification, library prep) and classical histochemistry (DAB
+detection, biocytin filling). These need controlled vocabulary
+additions, not free-text workarounds, in order for Patch-seq procedures
+to be searchable across datasets.
+
+7\. Proposed Schema Adjustments
+
+  ---------- -------------------------- -------------------- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -----------------
+  **Rec.**   **Addresses**              **Layer**            **Description**                                                                                                                                                                                                                                                                                                                 **Workstream**
+  **R1**     G--- (subject)             Schema               Add mating\_status field to NonHumanPrimateSubject type with a controlled vocabulary (Unknown, Intact, Nulliparous, Multiparous, etc.).                                                                                                                                                                                         WS2
+  **R2**     G--- (naming)              Schema / WS1         Confirm name generation uses full datetime (not date-only) to prevent same-subject same-date collisions. Consider incorporating modality abbreviation as a disambiguating suffix.                                                                                                                                               WS1 + WS2
+  **R3**     G1                         Schema or Platform   Introduce a cell-level or Patch-seq collection grouping that links the four modality assets for one specimen. Options: (a) platform Collection with stable cell ID; (b) schema-level specimen grouping entity. Decision needed from WS1/WS2.                                                                                    WS1 + WS2
+  **R4**     G--- (provenance)          WS3 onboarding       During Patch-seq onboarding, populate source\_data\[\] to record inter-asset dependency: reconstruction and imaging depend on the ephys recording session.                                                                                                                                                                      WS3
+  **R5**     G--- (tags/restrictions)   Schema governance    WS2 to define tag controlled vocabulary and clarify restrictions field semantics (legal document ID vs. consent overlap).                                                                                                                                                                                                       WS2
+  **R6**     G3                         Schema               Extend procedure\_type controlled vocabulary with: PatchClamping / NucleatedPatchExtraction, RNAAmplification, LibraryPrep, BiocytinFilling, DABDetection, and related molecular/histochemical types. These are common across neuroscience single-cell workflows beyond just Patch-seq.                                         WS2
+  **R7**     G8                         Schema               Add reporter\_positive (boolean + reporter name) to SpecimenProcedure details or Acquisition for cell-level fluorescent reporter characterization.                                                                                                                                                                              WS2
+  **R8**     G7                         Schema               Make instrument.coordinate\_system optional, or add a canonical \"NotApplicable\" coordinate system value for non-spatial instruments (sequencers, mass spectrometers, etc.).                                                                                                                                                   WS2
+  **R9**     G8                         Schema               Add cell\_depth (float + unit, e.g. micrometers) to PatchClamping procedure details or Acquisition to capture recorded cell depth within the slice.                                                                                                                                                                             WS2
+  **R10**    G2, G5                     Schema / WS1         Define a multi-file location convention: either (a) location points to a manifest file that enumerates constituent files with relative paths; or (b) location is the nearest common parent directory with a glob pattern. Required for reconstruction (SWC + marker in shared dir) and transcriptomics (fastq in shared dir).   WS1 + WS2 + WS3
+  **R11**    G4                         Platform             Define how database-resident data assets (e.g. morphology annotation databases) are referenced in the registry. Options: (a) export/snapshot to a file at registration time; (b) platform-level pointer to a database endpoint + record ID. This is a platform architecture question.                                           WS1 + WS4
+  **R12**    G--- (integrity)           Schema or Platform   Add a checksum field (algorithm + value, e.g. MD5) to core metadata or hold at platform level to enable file integrity verification.                                                                                                                                                                                            WS1
+  ---------- -------------------------- -------------------- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -----------------
+
+8\. Open Questions
+
+  -------------------- ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- --------------- --------------------
+  **Open Questions**                                                                                                                                                                                                                                                                                                                               
+  **\#**               **Question**                                                                                                                                                                                                                                                                                                **Blocking?**   **Owner / Target**
+  **Q1**               How is a Patch-seq cell represented as a single logical entity across its four modality assets? Is this a schema-level grouping (e.g., subjects\[\] or specimen\_group) or a platform Collection? This gates the design of cross-modal search for cell-type data.                                           Yes             WS1 + WS2 · Aug 14
+  **Q2**               For multi-file assets (reconstruction, 63x image layers in separate directories, fastq in shared directories): should location point to a manifest file, a common parent with a glob, or should the registry support a location\[\] array? This affects all multi-file dataset types, not just Patch-seq.   Yes             WS1 + WS2 · Aug 14
+  **Q3**               How should database-resident data (image annotations stored in a DB rather than files) be registered? Does the registry point to a DB endpoint + record ID, or does data need to be exported to a file at registration time?                                                                                Yes             WS1 + WS4 · Aug 14
+  **Q4**               Is patch clamping modeled as a SpecimenProcedure that produces the cell as an output specimen, or as a Manipulation inside Acquisition (since it is so tightly coupled to the ephys recording)? This affects how the cell provenance chain is expressed.                                                    No              WS2 · Sep
+  **Q5**               Should investigators/experimenters in the registry require individual ORCID-resolvable persons, or are team/core credits acceptable? This affects whether existing historical records (pre-ORCID) can be migrated as-is.                                                                                    No              WS2 · Sep
+  **Q6**               How should source\_data\[\] be populated during onboarding --- manual curation by the submitter, automated inference from LIMS provenance, or both? Who is responsible for maintaining this linkage as datasets evolve?                                                                                     No              WS3 · Sep
+  -------------------- ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- --------------- --------------------
+
+9\. Milestone 0 Metrics
+
+Field counts based on analysis of all four modality files (NWB,
+transcriptomics, reconstruction, 20x image) for specimen 1160166008.
+
+  ----------------------------------- -------------- -------------------------------------------------------------------------------------------------------------------------
+  **Metric**                          **Value**      **Notes**
+  Total fields examined               **46**         Across 5 entities: Subject, DataDescription, Procedures, Acquisition, Location
+  Fields classified as Mapped         **18 (39%)**   
+  Fields classified as Gap            **11 (24%)**   Includes source\_data, tags, ethics\_review\_id, cell depth, reporter positivity, checksum, mating\_status
+  Fields classified as Conflict       **14 (30%)**   Includes all 5 procedure\_type=\"Other\" steps, name collision risk, multi-modal identity, instrument coordinate system
+  Fields classified as Unmappable     **2 (4%)**     stimulus\_epochs, manipulations --- not applicable to fixed-tissue Patch-seq; platform layer
+  Fields classified as Needs Review   **1 (2%)**     Investigator/experimenter identity policy
+  Entities covered                    **5**          Subject, DataDescription, Procedures, Acquisition, Location/FileStructure
+  Recommendations raised              **12**         R1--R12; see Section 7
+  Open questions (blocking)           **3**          Q1 (cell grouping), Q2 (multi-file location), Q3 (database-resident data)
+  ----------------------------------- -------------- -------------------------------------------------------------------------------------------------------------------------
+
+10\. Sources & Method
+
+-   Patch-seq metadata example files (4 modality files):
+    nwb/metadata.nd.json, transcriptomics/metadata.nd.json,
+    reconstruction/metadata.nd.json, image/metadata.nd.20x.json ---
+    schema\_version 2.7.2 (Metadata), 2.3.1 (Subject), 2.4.0
+    (DataDescription), 2.2.1 (Procedures), 2.2.5 (Instrument), 2.5.1
+    (Acquisition)
+
+-   Patch-seq mapping observations.docx --- authored by dataset owner,
+    IVSCC team
+
+-   aind-data-schema documentation
+    (https://aind-data-schema.readthedocs.io/en/latest/) --- pinned to
+    schema\_version 2.7.2
+
+-   BioData Registry kick-off presentation and workstream charter (July
+    23, 2026)
+
+Prepared as a draft for Workstream 2 (Schema & Data Model) and
+Workstream 3 (Metadata Onboarding & Migration). Field-level details
+should be re-verified against the pinned schema version before the DDM
+Gate review on August 14, 2026.

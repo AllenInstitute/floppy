@@ -1,0 +1,539 @@
+# source: resources/General/1. Milestone 0/Key Deliverables/BDR M0 Gate.pptx
+# original kept: no (too large)
+
+
+## Slide 1
+Allen Institute BioData Registry
+
+M0 Gate 
+August 14
+
+## Slide 2
+agenda/
+
+2
+
+3:00–3:05 | Welcome
+
+3:05–3:15 | M0 Task Review
+
+3:15–3:45 | M0 Deliverable Review
+
+3:45–3:50 | Gate Decision
+
+3:50–4:00 | Next Steps, Q & A
+
+4:00-5:00 | Happy Hour  
+
+## Slide 3
+north star/
+
+3
+
+The BioData Registry will make all biological data collected by the Allen Institute findable and accessible by our human scientists and agentic tooling.
+
+Through a balanced approach of standardization and governance, the BioData Registry will enable cross‑modal data discovery to empower scientists to find relevant datasets for their analysis and model training, independent of where underlying data are stored. 
+
+The registry will be an API‑first platform supporting metadata registration, validation, curation, schema governance, auditability, and collection‑level publishing. Agentic workflows will be considered across all layers of the registry and integrated where appropriate with careful consideration for human-in-the-loop oversight and interpretation.
+
+## Slide 4
+core features/
+
+Unified Metadata Architecture & Access: Normalized architecture for registering and managing biological metadata, exposed through APIs, developer clients, and agentic interfaces to support programmatic and AI-driven workflows.
+Metadata Discovery & Data Access: Search and discover datasets through structured, semantic, and natural language queries for consistent access across registered data.
+Metadata Quality & Lifecycle Management: Validation, versioning, and audit history to support quality, continuous curation, and lifecycle management from draft to published.
+AI-Assisted Metadata Workflows: AI agents that generate, enrich, and correct metadata through natural language interactions, with human validation.
+Governance, Sharing & Publishing: Role-based access control, sensitive metadata handling, and tools to organize, share, and publish datasets and collections.
+Clean User Experience: An intuitive user experience/user interaction (UX/UI) for searching, curating, and managing metadata, including natural language interaction and collection workflows built on an API-first backend.
+
+4
+
+## Slide 5
+Milestone 0
+
+5
+
+## Slide 6
+how decisions are made/
+
+6
+
+within milestone decisions
+Workstreams  are empowered and strongly encouraged to drive and document decisions that lead to a successful milestone key deliverable. Should a blocker arise during the milestone reach out to the Horizontals early. 
+
+end of milestone decisions
+A Deliberative Decision Making (DDM) meeting is a structured milestone review process designed to ensure transparency, shared accountability, and informed consensus.
+
+DDM Gate Meeting:
+Structured input from Workstreams + Horizontals  
+Transparent evaluation against predefined success criteria and Gate Decision prompts.
+
+Decision outcomes: ✅ Pass, ⚠️ Conditional pass (with actions), ❌ Rework required
+
+Two rules: 
+Nobody builds on a milestone until its gate passes
+Unfinished items become owned carry-overs, not silent slips.
+
+## Slide 7
+milestone 0/
+
+7
+
+Key Deliverables:
+
+Track A- Complete and prioritized list of use cases across all users/customers.
+Track B- E2E architecture proposal with build-vs-rent considerations included.
+Track C- A diagnostic report applying the current biodata-schema to 3 datasets cataloging every gap, conflict and unmappable field.
+
+Success Criteria:
+
+Workstream Owners identified
+Blocking questions resolved
+Use cases are validated  based on real customer feedback/behavior
+Consensus that architectural proposal is stable enough for MVP development
+All schema gaps, conflicts, and unmappable fields are documented for all 3 datasets.
+
+Metrics
+
+6/6 Workstreams with owners
+% of answered questions from initial open question list
+# of prioritized use cases with testable success criteria 
+# of P0 architectural decisions answered and documented.
+% of fields examined and classified per dataset (mapped/gap/conflict/unmappable)
+
+DDM Gate Decision Prompt
+
+“Do we have clarity on what we are building and why?”
+“Are cross-workstream dependencies sufficiently defined?”
+”Are there blocking questions remaining?”
+
+Alignment, Scope & Success Definition 
+Target Delivery: Aug 14th 
+
+Purpose: Establish shared understanding of BioData Registry’s Use Cases, Architecture, and Schema
+
+## Slide 8
+track a: user set/
+
+8
+
+SCI — Scientist / Researcher
+Consumes the Registry to find, evaluate, and access data for analysis and model training. Rarely writes metadata; cares most about discovery, fitness, provenance, and getting to the bytes.
+
+AGT —AI Agent  
+Uses the BioData Registry's APIs to discover, analyze, curate, and orchestrate data workflows on behalf of users while respecting permissions, auditability, and human oversight.
+
+ADM — Organization & Space Administrator 
+Governs who can see and do what, organizes and shares data across Spaces and Organizations, gates sensitive publishing, and monitors the health of the holdings.
+
+CUR — Data Curator 
+Registers, validates, corrects, versions, and publishes metadata. The primary writer into the Registry and the main beneficiary of AI assistance.
+
+PRT — Partner Organization (external consumer) 
+Consumes published or privately shared data from outside the owning Organization, programmatically or through the web app.
+
+Word Doc: Use Cases 
+
+Figma Board: Use Cases 0-1&t=w4nbCTxH70Modnr1-1
+
+## Slide 9
+track a: p0 use cases/
+
+9
+
+ID | Actor | Use case | Priority
+
+SCI-1 | Scientist | Structured, faceted search | P0
+
+SCI-4 | Scientist | Evaluate dataset fitness before use | P0
+
+SCI-5 | Scientist | Locate & access underlying files | P0
+
+SCI-6 | Scientist | Trace up & downstream provenance | P0
+
+SCI-10 | Scientist | Documentation & User Support | P0
+
+SCI-11 | Scientist | Sharing selections of files and metadata quickly | P0
+
+CUR-0 | Curator | Pre-ingest metadata validation | P0
+
+CUR-2 | Curator | Correct and enrich metadata | P0
+
+CUR-4 | Curator | Manage change history & roll backs | P0
+
+ADM-0 | Admin | Manage organizing units, users, and roles | P0
+
+ADM-1 | Admin | Data sharing | P0
+
+ADM-2 | Admin | Flag and govern sensitive data | P0
+
+AGT-1 | AI Agent / any caller | Discover the Registry's schema, vocabularies, and capabilities | P0
+
+## Slide 10
+track b: architecture skeleton/
+
+10
+
+M0 DDM_BDR - Track B - E2E Architecture Skeleton.png
+
+## Slide 11
+track b: build vs buy matrix/
+
+11
+
+Build vs Buy Matrix ng
+
+## Slide 12
+track b: flows/
+
+12
+
+Register
+
+Flows
+
+## Slide 13
+track b: flows/
+
+13
+
+Discover
+
+Publish
+
+## Slide 14
+track c: datasets/
+
+14
+
+Dataset | Location | Accelerator | Type | Metadata Source | Mapping Results | Raw Detailed Analysis
+
+Cell DIVE | AWS/Vast | Immunology | Microscopy | SLIMS, Google Sheets | sharepoint | mIF Example
+
+TEA-seq: scATAC, scRNA and CITE-seq | HISE | Immunology | Multi-omics | SLIMS → HISE, Google Sheets | sharepoint | TEA-seq gap analyses
+
+Patch-seq | Isilon | Brain Science | Single-cell transcriptomics, electrophysiology, single-cell morphology | LIMS2
+Post migration: Dataverse | sharepoint | Patch-seq gap analysis
+
+behavior_844917_2026-06-02_11-08-15_sorted-opto_2026-06-10_11-52-21 | AWS/Vast | Neural Dynamics | Ecephys, behavior, behavior videos | Metadata-service (sharepoint, SLIMS, etc), acquisition data files
+
+Post migration: Dataverse, etc. | s3://aind-open-data/behavior_844917_2026-06-02_11-08-15_sorted-opto_2026-06-10_11-52-21 | 
+
+## Slide 15
+track c: high level gap analysis summary/
+
+15
+
+Gap | Type | Description | Affected Accelerator(s)
+
+Procedure + subject model vs. specimen entity | General | Ongoing discussion about whether a procedure + subject model can fully replace a dedicated specimen entity, or whether certain specimen conditions require a separate concept. | All
+
+Schema field definitions and enumerations | General | Field definitions and enumerations lack sufficient breadth and clarity to apply across all accelerators; resolving these is expected to be the majority of the remaining work. | All
+
+Data access restrictions | General | The schema needs expansion and review to cover data access restrictions such as patient consent terms and contractual constraints. | Brain Science, Immunology
+
+Audit log and update mechanism | General | A method for updating information in the Registry and an associated audit log is needed, but it is unresolved whether this should be modeled within the data schema. | All
+
+Data discovery | Data Description | The schema lacks sufficient structure for data discovery — users cannot determine which files are relevant or how to navigate to the data. The current schema is tightly coupled to neural dynamics data storage conventions and expectations and does not generalize to other data types. | All
+
+Many-to-one subject-to-acquisition mapping | Acquisition | The schema does not support many-to-one mapping of subjects to acquisitions. This is a critical gap for single-cell transcriptomics experiments in which samples from multiple subjects are pooled for sequencing runs, and for upcoming Neural Dynamics projects involving interactive social behavior between multiple animals. | Brain Science, Immunology, Neural Dynamics
+
+Disease state tracking over time | Subject | The schema has no mechanism for recording changes to a subject's disease state over time. | Immunology, Brain Health
+
+HIPAA/PII compliance for human subject metadata | Subject | The schema does not support HIPAA/PII compliance for human subject metadata (e.g., birth year must be aggregated for subjects over age 89). The group agreed that more discussion is needed to clarify requirements and best practices. | Immunology, Brain Health
+
+Human subject fields | Subject | Fields such as diagnosis, ethnicity, race, consent status, and cohort are absent or inadequately defined in the schema. | Immunology, Brain Health, Brain Science
+
+Clinical and survey data | Subject | Human clinical and survey data is highly inconsistent in structure and content across datasets. It is unresolved whether this constitutes data or metadata for schema purposes. | Immunology
+
+Tissue slicing and sectioning | Procedure | Tissue slicing and sectioning information is challenging to work with in its current form. This is characterized as an improvement opportunity rather than a strict gap but requires substantial effort and a comprehensive assessment of how this is currently handled across accelerators. | Brain Science, Immunology, Neural Dynamics
+
+Multi-subject specimen pooling in procedure | Procedure | The schema cannot represent pooling of specimens from multiple subjects within a single procedure. | Brain Science, Immunology
+
+Custom vs. off-the-shelf instrument schema | Instrument | The current schema is oriented toward custom-built instruments and may be unnecessarily complex when applied to off-the-shelf devices. | All
+
+## Slide 16
+m0 deliverables/
+
+16
+
+Track | Key Deliverable
+
+A · Use Cases
+
+Workstreams 5 & 6 | A single consolidated Use-Case Catalog for the Registry, covering all actors, prioritized P0/P1/P2, with acceptance criteria for the P0 set.
+
+B · Architecture & Investments
+
+Workstreams 1 & 4 | An end-to-end architecture proposal, plus a build-vs-buy decision set 
+and recorded as ADRs across every major layer.
+
+C · Schema & Datasets
+
+Workstreams 2 & 3 | A diagnostic report applying the current biodata-schema to 3 one datasets cataloging every gap, conflict and unmappable field each categorized by type and tagged to the dataset(s) it affects.
+
+Milestone 0 Deliverables: Key Deliverables
+
+## Slide 17
+m0 tasks/
+
+17
+
+Track |  |  |  | 
+
+A · Use Cases
+
+Workstreams 5 & 6 | Task 1: Identify Workstream owners |  | Task 4: consolidated draft of use cases across all users/customers | 
+
+ | Task 2: Answer M0 relevant questions, Document new questions |  | Task 5: Prioritization applied with draft acceptance criteria | 
+
+ | Task 3: User/customer set confirmed complete |  | Task 6: each agent cast has human-in-the-loop boundaries + agent guardrail defined | 
+
+B · Architecture & Investments
+
+Workstreams 1 & 4 | Task 1: Identify Workstream owners |  | Task 4: Draft of metadata register/discover/publish flows | 
+
+ | Task 2: Answer M0 relevant questions, Document new questions |  | Task 5: Build-vs-rent matrix drafted | 
+
+ | Task 3: Draft end-to-end architecture skeleton across all layers |  | Task 6: ADRs documented | 
+
+C · Schema & Datasets
+
+Workstreams 2 & 3 | Task 1: Identify Workstream owners |  | Task 4: Each dataset mapped to core schemas+ extension; | 
+
+ | Task 2: Answer M0 relevant questions, Document new questions |  | Task 5: Each dataset’s gaps, conflicts, unmappable fields are captured and categorized. | 
+
+ | Task 3: Identify and source 3 PoC datasets |  |  | 
+
+## Slide 18
+m0 Gate DDM/
+
+18
+
+Success Criteria:
+
+Workstream Owners identified
+Blocking questions resolved
+Use cases are validated  based on real customer feedback/behavior
+Consensus that architectural proposal is stable enough for MVP development
+All schema gaps, conflicts, and unmappable fields are documented for all 3 datasets.
+
+DDM Gate Decision Prompt
+
+“Do we have clarity on what we are building and why?”
+“Are cross-workstream dependencies sufficiently defined?”
+”Are there blocking questions remaining?”
+
+Alignment, Scope & Success Definition 
+
+Purpose: Establish shared understanding of BioData Registry’s Use Cases, Architecture, and Schema
+
+## Slide 19
+m0 Gate DDM/
+
+19
+
+DDM Gate Decision:  ⚠️ Conditional pass
+
+Actions: 
+
+Review M0 Materials: Workstreams need to review the current Milestone 0 Deliverables: Key Deliverables and build cross-workstream understanding. 
+ 
+Answer Blocking Questions: Workstreams need to build consensus and answer Open Questions that block us from moving to Milestone 1. Note Milestone 1 will focus on Pre-Ingestion Validation and Registration of a single dataset to the current  BioData Schema.
+
+Revisit and Refine Deliverables: Return to M0 Key Deliverables and Update/Refine based on input from other Workstreams
+
+Document ADRs and Decisions: Assemble consensus and collect decisions necessary for unblocking Milestone 1.
+
+## Slide 20
+high level timeline/
+
+20
+
+ | July |  |  |  | August |  |  |  | September |  |  |  | October |  |  |  | November |  |  |  | December |  |  | 
+
+Alignment, Scope & Success Definition |  |  |  | Milestone 0 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+
+Ingest and Pre-Register Validation |  |  |  |  |  |  |  | Milestone 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+
+ |  |  |  |  |  |  |  |  |  | Milestone 2 |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+
+ |  |  |  |  |  |  |  |  |  |  |  |  | Milestone 3 |  |  |  |  |  |  |  |  |  |  | 
+
+ |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | Milestone 4 |  |  |  |  |  |  |  | 
+
+ |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | Milestone 5 |  |  |  |  | 
+
+ |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | Milestone 6 |  | 
+
+* Agile Updating
+
+## Slide 21
+21
+
+rhythm of business/
+
+21
+
+Aug
+
+Oct
+
+Cadence | Purpose | Days/Times | Proposed Dates
+
+Milestone Kickoff | Align on milestone purpose, key deliverables, success criteria, and metrics | First Monday
+1 hour | Aug 24 (normally Monday)
+
+Workstream Connect | Dedicated time to connect with workstream members and track members | Wednesdays
+1 hour | Aug 19, 26; Sept 2,9
+
+DDM Milestone Review | Formal review of milestone deliverables. Go/No Go meeting. | End of 3 Week Sprint Fridays | Sep 11th
+
+Async Updates | Majority of work |  | As Needed Via Teams
+
+Gate
+Aug 14
+
+Aug 5
+
+M1
+Aug 24
+
+We are here
+
+24
+
+24
+
+3
+
+10
+
+17
+
+Aug 12
+
+Aug 19
+
+Aug 26
+
+Sep 2
+
+Sep 9
+
+Aug 19
+
+Aug 26
+
+## Slide 22
+resources/
+
+22
+
+Teams Channel | General | BioData Registry V-Team
+
+Documentation | BioData Registry Documentation
+
+Roadmap/Task Board | Roadmap & Task Figma Board
+
+Open Question Board | Open Questions Figma Board
+
+Architecture Diagram | Architecture Diagram Figma Board
+
+Use Cases Board | Use Cases Figma Board
+
+Schema Board | Schema Figma Board
+
+## Slide 24
+Appendix
+
+24
+
+## Slide 25
+one institute v-team/
+
+25
+
+program design & management
+
+alignment & integrations
+
+strategy & execution
+
+## Slide 26
+workstream 1: backend architecture/
+
+26
+
+Scope: Design and deliver the core backend architecture that powers the metadata registry, including the system of record, search infrastructure, APIs, and supporting platform services.
+
+Key responsibilities
+Design and maintain the system of record for registry metadata, including the relational database, core entity model, and referential integrity.
+Deliver the read and search architecture by enabling structured reads and supporting discovery, faceted search, and semantic search across metadata.
+Build data synchronization pipelines that propagate changes from the system of record into read and search layers.
+Provide the API layer through documented services that support registry access, integration, and client generation.
+
+## Slide 27
+workstream 2: schema and data model/
+
+27
+
+Scope: Define and evolve the unified metadata schema and core data model, ensuring it enables consistent representation of metadata across the registry. Drive schema extensibility decisions and interoperability across data modalities. 
+
+Key responsibilities
+Define the unified metadata schema by establishing the canonical structure used across the registry, including core and optional elements.
+Design the normalized data model by translating the schema into tables, relationships, and extensible structures that support implementation.
+Support schema extensibility and interoperability so the model can evolve across modalities while remaining consistent and reusable.
+Govern schema evolution with Workstream 3 by coordinating versioning, compatibility, deprecation, and revalidation as the registry expands.
+
+## Slide 28
+workstream 3: onboarding & migration/
+
+28
+
+Scope: Design and execute the onboarding and migration of metadata from existing systems into the BioData Registry, ensuring metadata is mapped to the unified schema, validated, and structured for cross-modal discovery. Drive a prioritized, modality-based migration strategy in coordination with Workstream 2. 
+
+Key responsibilities
+Inventory and prioritize metadata sources by identifying existing systems, assessing metadata structure and quality, and organizing migration by data modality. 
+Define mapping and transformation to the canonical schema by translating source metadata into the unified data model in alignment with Workstream 2. 
+Ingest and migrate metadata into the registry through repeatable ingestion patterns that preserve relationships, provenance, and schema compatibility. 
+Align, normalize, and deduplicate metadata to ensure consistency with shared entities and establish a single source of truth across datasets. 
+Validate metadata quality and readiness by applying validation workflows that surface errors and ensure metadata supports accurate discovery and downstream use.
+
+## Slide 29
+workstream 4: cloud services layer/
+
+29
+
+Scope: Design and deliver the cloud services layer that provides centralized governance, identity, and security across the BioData Registry. This workstream defines how access to cloud storage, permissions, and policies are enforced across APIs, the UI, and agents, enabling secure multi-tenant operation, controlled sharing, and compliance. 
+
+Key responsibilities
+Define governance and access controls to cloud storage by establishing roles, permissions, and data-sharing rules across organizations and workflows.
+Manage identity and authentication services to provide secure access through SSO and consistent identity management.
+Enforce security, audit, and compliance controls by governing sensitive cloud data access, tracking changes, and ensuring activity is traceable.
+Provide integration surfaces for external systems and agents through API-first access and agent-compatible services.
+
+## Slide 30
+workstream 5:  ai integrations & applications/
+
+30
+
+Scope: Design and deliver agentic integrations and AI applications to enable intelligent curation, discovery, and analysis of metadata. This workstream includes agentic workflows specific to registry operations and metadata curation, as well as AI-enabled applications that help scientists reason across registered datasets and perform deeper data analysis. 
+Key Responsibilities
+Define registry-specific agentic workflows that support metadata creation, enrichment, validation, linking, search, and lifecycle actions through natural language and task-based interactions.
+Integrate agents with registry APIs and services by working with backend, schema, cloud, and UX workstreams to provide secure, governed, auditable access to registry capabilities through API and MCP-compatible interfaces.
+Enable AI-assisted metadata curation through agent-driven suggestions for quality improvement, normalization, deduplication, error correction, and completeness, while preserving human approval, provenance, and version tracking.
+Develop AI applications for deeper data analysis by creating intelligent tools that use registry metadata, schemas, ontologies, and dataset relationships to support cross-modal exploration, hypothesis generation, dataset comparison, and analysis planning
+
+## Slide 31
+workstream 6: user experience & interaction/
+
+31
+
+Scope: Design and deliver the API-first product experience ensuring the web application, user workflows, and interaction patterns built on documented registry APIs. This workstream translates core registry capabilities—search, curation, validation, organization, sharing, and publishing—into usable experiences for scientists and data administrators while preserving the API as the primary product surface for clients, integrations, and agents.
+
+Key responsibilities
+Design API-backed user experiences by ensuring every major UI workflow maps to documented registry APIs, shared service contracts, and reusable interaction patterns.
+Build and maintain the front-end application as a reference client for public and authenticated access to the registry, demonstrating how APIs support search, browse, curation, and publishing workflows.
+Validate API usability through product workflows by partnering with backend, schema, cloud, and agentic workstreams to confirm that registry APIs support real user needs, clear error states, validation feedback, and quality signals.
+Provide sharing and publishing workflows that align user actions with API-enforced governance, validation, lifecycle, and permission rules.

@@ -1,0 +1,1794 @@
+# source: resources/Workstream 2 - Schema and Data Model/Milestone 0 Report_ Mapping Accelerator-Specific Datasets to biodata-schema.pdf
+# original kept: yes
+
+Milestone 0 Report
+Mapping Accelerator-Specific Datasets to
+biodata-schema/ Track C
+Milestone 0: A diagnostic report applying the current biodata-schema to 3 datasets
+cataloging every gap, conflict and unmappable field.​
+
+Workstreams 2 & 3, Track C Members: Alina Ott Saskia de Vries
+Aishwarya Chander Tim Dolbeare Doug Ollerenshaw Mekhla Kapoor
+Daniel Birman Nathan Gouwens Raymond Sanchez
+
+
+Executive Summary
+We applied the existing biodata-schema to four representative datasets across Brain Science,
+Neural Dynamics, and Immunology to produce a diagnostic report of schema gaps. The
+expansion of field definitions and controlled vocabularies is expected to constitute the majority
+of remaining work. In parallel, we addressed 15 open architecture questions covering topics
+such as asset granularity, update and versioning strategy, ETL design, and database
+persistence. Some of these remain unresolved and will shape the registry's design going
+forward. Together, the gap analysis and architecture discussions establish the foundation for
+subsequent workstream efforts to evolve biodata-schema into a shared registry capable of
+supporting all accelerators.
+
+
+Overview of Identified Schema Gaps
+Source Data
+We selected the following representative datasets from Brain Science, Neural Dynamics and
+Immunology for gap analysis. The “Mapping Results” column contains links to the output
+metadata JSONs for each mapped dataset, and more detailed descriptions of schema gaps can
+be found in the “Raw Detailed Analysis” column. The “M0 Gap Analysis” tab contains field-level
+breakdowns of mapping results for each accelerator’s chosen dataset(s).
+
+
+ Dataset      Location     Accelerat    Type              Metadata        Mapping        Raw
+                           or                             Source          Results        Detailed
+                                                                                         Analysis
+
+ Cell DIVE    AWS/Vas      Immunolo     Microscopy        SLIMS,          sharepoint     mIF
+              t            gy                             Google                         Example
+                                                          Sheets
+
+ TEA-seq:     HISE         Immunolo     Multiomics        SLIMS →         sharepoint     TEA-seq
+ scATAC,                   gy                             HISE,                          gap
+ scRNA                                                         Google                          analyses
+ and                                                           Sheets
+ CITE-seq
+
+ Patch-seq       Isilon          Brain       Single-cell       LIMS2           sharepoint      Patch-seq
+                                 Science     transcriptomics   Post                            gap analysis
+                                             ,                 migration:
+                                             electrophysiolo   Dataverse
+                                             gy, single-cell
+                                             morphology
+ behavior_844    AWS/Vas         Neural      Ecephys,          Metadata-ser    s3://aind-op
+ 917_2026-06-                                                                  en-data/beha
+ 02_11-08-15_
+                 t               Dynamics    behavior,         vice            vior_844917_
+ sorted-opto_2                               behavior          (sharepoint,    2026-06-02_1
+                                                                               1-08-15_sort
+ 026-06-10_11                                videos            SLIMS, etc),    ed-opto_2026
+ -52-21                                                        acquisition     -06-10_11-52
+                                                               data files      -21
+
+
+                                                               Post
+                                                               migration:
+                                                               Dataverse,
+                                                               etc.
+
+
+
+Gap Analysis
+We have identified the following critical gaps in the existing biodata-schema.
+
+
+ Gap                      Type       Description                                              Affected
+                                                                                              Accelerator(s)
+
+ Procedure +              General    Ongoing discussion about whether a procedure +          All
+ subject model                       subject model can fully replace a dedicated
+ vs. specimen                        specimen entity, or whether certain specimen
+ entity                              conditions require a separate concept.
+                                        ●​ Identified edge case: no biological subject
+                                             (e.g., cultured cells); additional use cases
+                                             where procedure + subject is insufficient still
+                                             need to be identified.
+                                        ●​ LIMS specimen IDs need to be capturable in
+                                             the schema, though this may not require a
+                                             standalone specimen schema object.
+                                        ●​ Team preference is procedure + subject as
+                                             the primary model, with a defined path for
+                                             exceptions.
+Schema field        General    Field definitions and enumerations lack sufficient        All
+definitions and                breadth and clarity to apply across all accelerators;
+enumerations                   resolving these is expected to be the majority of the
+                               remaining work.
+                                   ●​ Specific gaps: no clear guidance on when
+                                       fields should be constrained by controlled
+                                       vocabularies vs. left as free text with
+                                       best-practice recommendations
+                                   ●​ no defined process for extending controlled
+                                       vocabularies or adding pre-defined field
+                                       values
+                                   ●​ no clear guidance on appropriate class
+                                       specificity (e.g., BloodDraw vs.
+                                       SampleCollection. more generic classes are
+                                       easier to search and compare across
+                                       datasets).
+
+Data access         General    The schema needs expansion and review to cover            Brain Science,
+restrictions                   data access restrictions such as patient consent          Immunology
+                               terms and contractual constraints.
+
+
+
+
+Audit log and       General    A method for updating information in the Registry         All
+update                         and an associated audit log is needed, but it is
+mechanism                      unresolved whether this should be modeled within
+                               the data schema.
+
+
+
+Data discovery      Data       The schema lacks sufficient structure for data            All
+                    Descrip    discovery — users cannot determine which files are
+                    tion       relevant or how to navigate to the data. The current
+                               schema is tightly coupled to neural dynamics data
+                               storage conventions and expectations, and does
+                               not generalize to other data types.
+
+Many-to-one         Acquisit   The schema does not support many-to-one                   Brain Science,
+subject-to-acquis   ion        mapping of subjects to acquisitions. This is a critical   Immunology,
+ition mapping                  gap for single-cell transcriptomics experiments in        Neural
+                               which samples from multiple subjects are pooled for       Dynamics
+                               sequencing runs, and for upcoming Neural
+                               Dynamics projects involving interactive social
+                               behavior between multiple animals.
+Disease state    Subject   The schema has no mechanism for recording                Immunology,
+tracking over              changes to a subject's disease state over time.          Brain Health
+time
+
+
+
+
+HIPAA/PII        Subject   The schema does not support HIPAA/PII                    Immunology,
+compliance for             compliance for human subject metadata (e.g., birth       Brain Health
+human subject              year must be aggregated for subjects over age 89).
+metadata                   The group agreed that more discussion is needed
+                           to clarify requirements and best practices.
+
+Human subject    Subject   Fields such as diagnosis, ethnicity, race, consent       Immunology,
+fields                     status, and cohort are absent or inadequately            Brain Health,
+                           defined in the schema.                                   Brain Science
+
+
+
+
+Clinical and     Subject   Human clinical and survey data is highly                 Immunology
+survey data                inconsistent in structure and content across
+                           datasets. It is unresolved whether this constitutes
+                           data or metadata for schema purposes.
+
+
+
+Tissue slicing   Proced    Tissue slicing and sectioning information is             Brain Science,
+and sectioning   ure       challenging to work with in its current form. This is    Immunology,
+                           characterized as an improvement opportunity rather       Neural
+                           than a strict gap, but requires substantial effort and   Dynamics
+                           a comprehensive assessment of how this is
+                           currently handled across accelerators.
+
+Multi-subject    Proced    The schema cannot represent pooling of specimens Brain Science,
+specimen         ure       from multiple subjects within a single procedure. Immunology
+pooling in
+procedure
+
+
+
+Custom vs.       Instrum   The current schema is oriented toward custom-built       All
+off-the-shelf    ent       instruments and may be unnecessarily complex
+instrument                 when applied to off-the-shelf devices.
+schema
+Draft Architecture Decision Records
+ ●​ The BioData Registry will include both raw assets and derived assets. Derived assets
+    are processed from raw data.
+ ●​ The BioData Registry will register raw assets as acquisitions, or point-in-time collections
+    of data from an instrument.
+ ●​ The BioData Registry will be capturing metadata about data assets but is not about
+    workflow state management (i.e., LIMS).
+ ●​ Everything in the BioData Registry should apply to an existing data asset.
+M0 Gap Analysis
+Detailed Analyses for each Dataset:
+This section documents detailed schema-level and field-level gap analyses for each of the
+selected datasets.
+Patch-Seq Gap Analysis
+Detailed Dataset Analysis: Patch-seq (NHP, Brain
+Science)
+This section provides a field-level breakdown for the Patch-seq NHP dataset. Patch-seq is a
+multi-modal single-cell assay that simultaneously captures electrophysiology, transcriptomics,
+and morphology from the same cell, making it a high-value stress test of the registry schema.
+
+
+A single Patch-seq cell generates four separately stored assets:
+        ●​   NWB file — intracellular electrophysiology (patch-clamp recording)
+        ●​   fastq files — single-cell RNA sequencing (SMARTer v4 + Nextera library prep)
+        ●​   Morphological reconstruction — SWC file + marker file + image annotations
+        ●​   20x and 63x brightfield/fluorescence images of the patched cell
+
+
+Source documents reviewed:
+        ●​ Patch-seq metadata example files: metadata.nd.json (nwb, transcriptomics,
+           reconstruction, image 20x/63x) (Patch-seq gap analysis)
+        ●​ Patch-seq mapping observations.docx
+        ●​ aind-data-schema documentation — schema_version 2.7.2
+
+
+Sample asset:
+   -​   Specimen 1160166008 (QM22.26.003.14.02.01), Subject 1160150227 (Macaca mulatta,
+        Female).
+   -​   Four modality files: NWB ephys | scRNA-seq fastq | Morphological reconstruction |
+        20x/63x brightfield imaging.
+
+
+Gap Summary Overview:
+ Gap                        Schema Layer   Detail
+
+
+ No single-cell grouping    Acquisition​   A Patch-seq cell produces 4 separately registered assets: NWB
+ across 4 modality assets   / Platform     ephys, scRNA-seq fastq, morphological reconstruction, and
+                                           20x/63x images. The schema has no way to assert these belong
+                                           to the same cell. Cross-modal search ("find all Patch-seq cells in
+                                           layer 5") is impossible without a grouping relationship. This maps
+                                           to the cross-dataset "multi-modal single-cell grouping" gap.
+ Multi-file /                 DataDescription      metadata.location is a single string. Reconstruction files (SWC +
+ multi-directory location                          marker) are in a shared directory alongside unrelated files. fastq
+ not representable                                 files for this cell share a directory with many other cells. 63x image
+                                                   layers span multiple disconnected directories. None of these can
+                                                   be faithfully represented. Manifest-file convention or location[]
+                                                   array needed.
+
+
+
+
+ Core Patch-seq               Procedure            Nucleated patch extraction, SMARTer v4 amplification, Nextera
+ procedures all fall to                            library prep, biocytin filling, and DAB detection — all critical
+ procedure_type="Other"                            provenance steps — use the "Other" catch-all. This makes
+                                                   procedure-level search impossible across Patch-seq datasets and
+                                                   maps to the cross-dataset "procedure vocabulary" gap.
+
+
+
+
+ Database-resident            DataDescription​     Some morphological reconstruction data (image annotations) lives
+ reconstruction               / Platform           in a database, not a file. The registry has no concept of a
+ annotations have no                               database record pointer. Options: export to file at registration time,
+ registry pointer                                  or platform-level DB endpoint reference.
+
+
+
+ Investigators /              DataDescription      "Ephys Core" and "RNA-seq Core" appear as investigators with
+ experimenters: team                               null ORCID identifiers. Historical records predate ORCID
+ names, no ORCID                                   requirements. Policy decision needed: are team credits valid, or
+ resolution                                        must individual persons be named?
+
+
+
+ Instrument                   Instrument           The Illumina sequencer uses a placeholder IMAGE_XYZ
+ coordinate_system                                 coordinate system — meaningless for a non-spatial instrument.
+ required on sequencer                             Maps to the cross-dataset "custom vs. off-the-shelf instrument"
+ (non-spatial)                                     gap. Make coordinate_system optional.
+
+
+
+ No field for cell depth in   Acquisition​         Both are experimentally relevant for Patch-seq cells. cell_depth
+ slice or fluorescent         / Procedure          (float + unit) and reporter_positive (boolean + reporter name) have
+ reporter positivity                               no home in the current schema.
+
+
+
+
+Field-Level Mapping:
+These are documenting specific, field-level mappings for the core schemas from the biodata
+schema (subject, data description, procedures, acquisition)
+
+ Subject — NHP (Macaca mulatta), Subject 1160150227
+
+ Source Field       Type      Target (aind)        Classificatio       Cross-Datas          Notes & Recommendation
+                                                   n                   et Gap
+
+ subject_id         string    subject.subject_id       Mapped          —                    Direct. Primary key across all 4
+                                                                                            modality files.
+species (NCBI   object     subject_details.speci      Mapped       —                 NCBI:txid9544 — fully compliant
+object)                    es                                                        with controlled vocabulary.
+
+sex,            enum /     subject_details.sex /      Mapped       —                 Direct. NHP — HIPAA not applicable
+year_of_birth   int        year_of_birth                                             here, but flag for future human
+                                                                                     Patch-seq.
+
+mating_status   string     — (no analog)                Gap        Schema field​     Field in source data ("Unknown") but
+                                                                   definitions       no counterpart in
+                                                                                     NonHumanPrimateSubject type.
+                                                                                     Add with controlled vocab.
+
+source          object     subject_details.sour       Conflict     Schema field​     "Unknown/UNKNOWN" — schema
+(institution)              ce                                      definitions       expects ROR-registered institution.
+                                                                                     Historical pre-ROR data. Flag for
+                                                                                     curation at onboarding.
+
+
+
+
+Data Description — 4 modality files (NWB, transcriptomics, reconstruction, 20x image)
+
+Source Field    Type       Target (aind)           Classificatio   Cross-Datase      Notes & Recommendation
+                                                   n               t Gap
+
+name            string     data_description.na        Conflict     Data discovery    subject_id + date only — collision
+(generated as              me                                                        risk for same-subject same-date
+subject_date)                                                                        assets. Two files observed with
+                                                                                     same date pattern. Use full datetime
+                                                                                     + modality suffix.
+
+
+modalities      object[]   data_description.mo        Conflict     Multi-modal​      Each of 4 files carries its own
+(per file)                 dalities                                grouping          modalities list. No asset represents
+                                                                                     "this is a Patch-seq cell." Drives G1
+                                                                                     — grouping gap.
+
+investigators   object[]   data_description.inv       Conflict     Schema field​     "Ephys Core", "RNA-seq Core" —
+(team names)               estigators                              definitions       not ORCID-resolvable individuals.
+                                                                                     Policy needed: team credits vs.
+                                                                                     named persons.
+
+
+source_data     null       data_description.so          Gap        Data discovery    Null across all 4 files. Logical
+                           urce_data                                                 dependency: ephys →
+                                                                                     transcriptomics → reconstruction.
+                                                                                     Populate at onboarding.
+
+
+tags,           null       data_description.tag         Gap        Data access​      Both null. No guidance on tag
+restrictions               s / restrictions                        restrictions      vocabulary or restrictions
+                                                                                     semantics.
+
+location        string     metadata.location          Conflict     Data discovery​   Single string cannot represent:
+(single URI)                                                       (multi-file)      SWC+marker in shared dir, fastq in
+                                                                                     shared dir, 63x layers in multiple
+                                                                                     dirs. Drives G2. Manifest or
+                                                                                     location[] array needed.
+Procedures — Subject + Specimen procedures across all 4 modality files
+
+Source Field       Type     Target (aind)                Classification   Cross-Da    Notes &
+                                                                          taset Gap   Recommendation
+
+
+Surgery >          object   subject_procedures[].Surge         Mapped     —           Correct. Output
+Perfusion                   ry.Perfusion                                              specimen IDs
+                                                                                      populated.
+
+Sectioning +       object   specimen_procedures[].Se           Mapped     Tissue      Section thickness,
+PlanarSectioning            ctioning                                      slicing     coordinate system,
+                                                                                      orientation all present.
+                                                                                      SOP reference in notes.
+                                                                                      Functional but
+                                                                                      characterization of
+                                                                                      sectioning model
+                                                                                      complexity is ongoing.
+
+Nucleated patch    object   — (no dedicated type)              Conflict   Procedure   Core Patch-seq step;
+extraction                                                                vocab       no dedicated
+(type=Other)                                                                          procedure_type. Add
+                                                                                      PatchClamping /
+                                                                                      NucleatedPatchExtracti
+                                                                                      on to vocabulary. Also:
+                                                                                      is this a
+                                                                                      SpecimenProcedure or
+                                                                                      a Manipulation inside
+                                                                                      Acquisition? Design
+                                                                                      question.
+
+SMARTer v4         object   — (no dedicated type)              Conflict   Procedure   RNA amplification has
+amplification                                                             vocab       no type. Critical for
+(type=Other)                                                                          transcriptomics
+                                                                                      provenance. Add
+                                                                                      molecular biology
+                                                                                      procedure types.
+
+Nextera library    object   — (no dedicated type)              Conflict   Procedure   Same — library prep
+prep                                                                      vocab       falls to "Other." Add to
+(type=Other)                                                                          vocabulary.
+
+Biocytin filling   object   — (no dedicated type)              Conflict   Procedure   Critical for morphology
+(type=Other)                                                              vocab       recovery. No dedicated
+                                                                                      type. Add biocytin filling
+                                                                                      / staining types.
+
+Post-patch         object   Fixation                           Mapped     —           Maps correctly.
+fixation                                                                              protocol_parameters
+(type=Fixation)                                                                       null — fixation
+                                                                                      reagent/duration not
+                                                                                      captured. Enrich at
+                                                                                      onboarding.
+
+DAB detection      object   — (no dedicated type)              Conflict   Procedure   IHC/DAB detection
+(type=Other)                                                              vocab       common in morphology
+                                                                                      workflows; no dedicated
+                                                                                      type. Add histochemical
+                                                                                      staining procedure
+                                                                                      types.
+DAPI labeling +     object    specimen_procedures[].Oth                Mapped          —                FluorescentReagent
+FluorescentReag               er + FluorescentReagent                                                   detail
+ent                                                                                                     (excitation/emission,
+                                                                                                        ROR source) is
+                                                                                                        well-modeled.
+                                                                                                        procedure_type itself
+                                                                                                        still "Other" — add
+                                                                                                        Staining type.
+
+Fluorescent         —         — (no analog)                              Gap           Schema           Whether patched cell
+reporter                                                                               field​           was positive for a
+positivity (not                                                                         definitions     reporter is not captured
+captured)                                                                                               anywhere. Add
+                                                                                                        reporter_positive to
+                                                                                                        procedure or
+                                                                                                        acquisition.
+
+stimulus_epochs     object[   acquisition.stimulus_epoch              Unmappable       —                Empty arrays —
+, manipulations     ]         s                                                                         designed for in-vivo
+                                                                                                        mouse experiments.
+                                                                                                        Not applicable to
+                                                                                                        fixed-tissue Patch-seq.
+
+
+
+
+Acquisition — 4 modality files
+
+Source Field                  Type      Target (aind)                    Classificat   Cross-         Notes &
+                                                                         ion           Dataset        Recommendation
+                                                                                       Gap
+
+acquisition_type (free        string    acquisition.acquisition_typ        Mapped      Schema         "Patch-seq
+text)                                   e                                              field​         patch-clamp
+                                                                                                      recording", "Patch-seq
+                                                                                       definition     RNA-seq", etc.
+                                                                                       s              Descriptive but free
+                                                                                                      text — consider
+                                                                                                      controlled vocabulary
+                                                                                                      for cross-dataset
+                                                                                                      search.
+
+specimen_id (subject_id       string    acquisition.specimen_id            Mapped      —              Pattern
++ cell_id)                                                                                            1160150227_1160166
+                                                                                                      008 consistent across
+                                                                                                      all 4 files. This is the
+                                                                                                      true unit of interest.
+
+ethics_review_id              null      acquisition.ethics_review_i            Gap     Data           Null. NHP experiments
+                                        d                                              access​        require IACUC
+                                                                                                      approval. Populate
+                                                                                       restriction    from LIMS at
+                                                                                       s              onboarding; flag as
+                                                                                                      required for NHP data.
+
+
+
+
+experimenters                 object[   acquisition.experimenters              Gap     Schema         Empty across all 4
+                              ]                                                        field​         files. Individual
+                              (empty                                                                  experimenters not
+                              )
+                                                                            definition   recorded. Same policy
+                                                                            s            gap as investigators.
+
+instrument.coordinate_sy   object   instrument.coordinate_syst   Conflict   Custom       Illumina sequencer
+stem (sequencer)                    em                                      vs.​         uses placeholder
+                                                                                         IMAGE_XYZ
+                                                                            off-the-sh   coordinate system.
+                                                                            elf          Meaningless for
+                                                                                         non-spatial instrument.
+                                                                                         Make optional or add
+                                                                                         "NotApplicable" value.
+
+cell depth in slice (not   —        — (no analog)                 Gap       Schema       Experimentally tracked
+captured)                                                                   field​       but no field in schema.
+                                                                                         Add cell_depth (float +
+                                                                            definition   unit) to procedure or
+                                                                            s            acquisition.
+Cell DIVE mIF Gap Analysis
+Detailed Dataset Analysis: Cell DIVE mIF (Human,
+Immunology)
+This section provides a field-level breakdown for the Cell DIVE multiplexed immunofluorescence
+(mIF) dataset. Cell DIVE is a cyclic immunofluorescence platform: antibody panels are applied
+in sequential rounds (10+), with fluorophore deactivation between rounds via H2O2 bleaching,
+enabling high-plex protein detection on fixed tissue sections.
+
+
+The central structural gap for this dataset is that the aind schema models simultaneous data
+acquisition (DataStream) and has no concept of ordered sequential rounds. Every major
+mIF-specific schema need — cyclic round tracking, antibody panel metadata, deactivation steps
+— flows from this mismatch. Additionally, mIF is the only dataset of the four that involves
+post-mortem human tissue sections rather than live subjects or PBMC, exposing a gap in the
+subject model (no TissueSection type)/
+
+
+Source documents reviewed:
+   ●​ mIF Example files: mIF-acquisition.json, mIF-data_description.json, mIF-subject.json,
+      gap_summary_from_comments.docx
+   ●​ mIF remap gaps details.docx (remap analysis)
+   ●​ aind-data-schema documentation (latest)
+
+
+Sample asset:
+   ●​   Subject AIFI20178 — human donor, post-mortem tissue section
+   ●​   Modality: Multiplexed immunofluorescence (mIF), Cell DIVE platform
+   ●​   Metadata source: SLIMS, Google Sheets
+   ●​   Storage: AWS / Vast
+
+
+
+
+Gap Summary Overview
+
+ Gap                     Schema Layer            Detail
+No cyclic IF                 Acquisition        Cell DIVE is inherently sequential: 10+ staining rounds,
+(CyclicIFSeries) model —                        each with its own operator, date, antibody plan, reagent
+DataStream is                                   lots, deactivation step, and QC flags. The aind DataStream
+simultaneous-only                               models simultaneous data collection and has no concept
+                                                of ordered rounds. A CyclicIFSeries model (analogous to
+                                                HCRSeries for cyclic mFISH) is needed. Currently each
+                                                round is a separate SpecimenProcedure as a workaround,
+                                                which loses the round ordering and cross-round
+                                                relationship. This gap extends to other cyclic/multiplexed
+                                                assays: Xenium gene panels, Flex scRNA, and any
+                                                iterative imaging modality face the same issue.
+
+
+
+mIF / Cell DIVE absent       DataDescription​   Multiplexed immunofluorescence (mIF) is not in the aind
+from modality registry       / Acquisition      modality controlled vocabulary. Cell DIVE is one platform
+                                                for mIF — whether "Cell DIVE" should be its own modality
+                                                or a platform-level detail within an mIF modality requires a
+                                                governance decision. This is a registry gap, not just a
+                                                naming issue: without a modality entry, mIF data cannot be
+                                                correctly classified, discovered, or filtered across datasets.
+                                                The same gap applies to other cyclic imaging platforms not
+                                                currently in the enum.
+
+
+Antibody model               Procedures​        The current FluorescentStain and ProteinProbe models do
+insufficient for mIF panel   / Acquisition      not support: antibody clone identifier, working
+metadata                                        concentration in µg/mL (schema uses mass, not volume
+                                                concentration), or institutional barcode verification
+                                                (expected barcode, scanned barcode, match result). RRID
+                                                is the only formal antibody identifier. The
+                                                antibody_channels structure — channel assignments,
+                                                antibody name, clone, fluorophore, concentration, lot
+                                                number, and barcode verification — has no first-class
+                                                home and is currently stuffed into protocol_parameters as
+                                                a workaround. This gap applies to any antibody-based
+                                                assay (flow cytometry, IHC, CITE-seq ADT panels).
+
+
+
+No deactivation step         Procedures​        H2O2 bleaching between Cell DIVE rounds is a critical
+model between cyclic         / Acquisition      protocol step — it deactivates the fluorophores from the
+rounds                                          previous round before the next antibody panel is applied. It
+                                                has no structured representation in the schema. Currently
+                                                modeled as a custom object in protocol_parameters, losing
+                                                semantic structure. A DeactivationStep model with reagent
+                                                lots, concentration, duration, and QC flag is needed as a
+                                                first-class entity.
+
+
+No TissueSection subject     Subject            All three aind subject detail types (Mouse, Human,
+type — all subject detail                       NonHumanPrimate) describe living subjects at acquisition
+types describe live                             time. mIF uses fixed human tissue sections — the subject
+animals                                         is a post-mortem donor and the experimental unit is a
+                                                tissue block or slide, not a live animal. A TissueSection
+                                                subtype (or HistologicalSpecimen) is needed with fields for:
+                                                tissue/slide ID, fixation method, embedding medium,
+                                                section thickness, and antigen retrieval parameters.
+                                                Without this, the tissue prep provenance chain cannot be
+                                                captured.
+Human subject fields        Subject           Same gap as TEA-seq and Immunology registry analysis.
+absent: diagnosis,                            Fields missing from HumanSubject: diagnosis (multi-value,
+ethnicity, race, consent,                     updatable over time — e.g., primary diagnosis plus
+cohort                                        subsequent staging), ethnicity, race, consent record, and
+                                              cohort assignment. These are cross-institute requirements
+                                              for any human subjects research, not mIF-specific.
+                                              Diagnosis is particularly important for mIF: the tissue
+                                              section context (disease state, treatment history) is
+                                              scientifically central to interpreting the imaging data.
+
+
+
+HIPAA year_of_birth 90+     Subject           Same gap as TEA-seq. year_of_birth is a plain integer with
+cap not enforced;                             no schema-level enforcement of HIPAA aggregation for
+aggregation mechanism                         subjects over 89. Additionally, the aggregation must be
+not defined                                   updateable over time — a subject who is 89 today will
+                                              need their year_of_birth suppressed next year. No
+                                              mechanism for this time-based update exists.
+
+
+
+subject_id as primary key   DataDescription   The auto-generated asset name (subject_id + timestamp)
+breaks down for                               and the primary key assumption fail when an acquisition
+multi-specimen                                covers multiple specimens (e.g., multiple tissue sections
+acquisitions                                  from different donors on one slide) or when the meaningful
+                                              identifier is a sample/slide rather than a subject. Cell DIVE
+                                              can image multiple tissue sections per acquisition run.
+
+
+
+No panel assignment field   Procedures        A Cell DIVE run can apply Panel A to some slides and
+— which panel applied to                      Panel B to others within the same round.
+which slide per round                         SpecimenProcedure has no field to record which antibody
+                                              panel was applied to which slide. Currently free-text only in
+                                              notes, which is not queryable.
+
+
+Round 1.5 — non-integer     Acquisition       A non-integer staining round (a second antibody pass
+staining round has no                         between Rounds 1 and 2, sometimes called Round 1.5)
+representation                                cannot be cleanly expressed in any sequential round
+                                              model. Options: fold into Round 1, treat as its own round
+                                              with a non-integer ID, or add a protocol deviation /
+                                              sub-round field. Needs design discussion.
+
+
+
+protocol_id format: SLIMS   Procedures​       The schema field expects a protocols.io DOI; AIFI uses
+IDs vs. protocols.io DOIs   / Acquisition     SLIMS protocol IDs throughout. Either AIFI protocols need
+                                              to be minted as protocols.io DOIs (recommended,
+                                              cross-institute searchable) or the schema needs to support
+                                              institutional protocol ID formats. Same issue flagged in
+                                              TEA-seq.
+
+
+procedure_type field        Procedures        All procedures in the mIF example use procedure_type:
+structural mismatch                           "SpecimenProcedure" (the class name) plus a non-existent
+across all procedures                         procedure_type_name field. The schema requires
+                                              procedure_type to be a SpecimenProcedureType enum
+                                              value and uses procedure_name for free-text descriptions.
+                                              This is a systematic mapping error that needs correction
+                                              across all mIF procedures at onboarding.
+ Cell DIVE-specific imaging     Acquisition                   ImagingConfig/DetectorConfig supports per-channel
+ parameters unsupported                                       exposure time, but Cell DIVE-specific imaging parameters
+                                                              (laser power per round, tile overlap, autofocus settings,
+                                                              stitching parameters) have no schema representation and
+                                                              would require extension of the imaging configuration
+                                                              model.
+
+
+ stimulus_epochs and            Acquisition                   Empty arrays — designed for in-vivo acquisitions with
+ manipulations not                                            stimuli and behavioral manipulations. Not applicable to
+ applicable to fixed tissue                                   fixed post-mortem tissue imaging. Same as Patch-seq.
+
+
+ restrictions field             DataDescription               No guidance on whether legal contract IDs belong in
+ underspecified for legal                                     restrictions, what restriction categories are valid, or how
+ contract and consent                                         restrictions relate to subject-level consent fields. May
+                                                              overlap with consent in the subject schema. Cross-dataset
+                                                              gap shared with TEA-seq and Patch-seq.
+
+
+
+
+Field-Level Mapping
+These tables document specific field-level mappings for the core schemas from biodata-schema
+(subject, data description, procedures, acquisition).
+
+
+ Subject — Human donor — post-mortem tissue, Cell DIVE mIF
+
+ Source Field      Type       Target (aind)                Classificati    Cross-Data        Notes &
+                                                           on              set Gap           Recommendation
+
+ subject_id        string     subject.subject_id             Mapped        —                 SLIMS barcode (e.g.,
+ (AIFI barcode)                                                                              AIFI20178). Direct. No
+                                                                                             underscore constraint issue
+                                                                                             for AIFI barcodes.
+
+ species           string     subject_details.species        Conflict      Schema field​     Immunology stores species
+                   (free                                                   definitions       as a free string; schema
+                   text)                                                                     expects NCBI Taxonomy
+                                                                                             controlled vocabulary object.
+                                                                                             Redundant with
+                                                                                             HumanSubject type — may
+                                                                                             be droppable for humans.
+                                                                                             Requires normalization at
+                                                                                             onboarding.
+
+ sex               enum       subject_details.sex            Mapped        —                 Direct.
+
+ year_of_birth     int        subject_details.year_of_bi     Conflict      HIPAA/PII​        HIPAA 90+ cap not enforced
+                              rth                                          compliance        by schema. Must be
+                                                                                             suppressible for subjects over
+                                                                                             89, and this suppression
+                                                                                             must be updateable over time
+                                                                                             as subjects age.
+source            string     subject_details.source         Conflict      Schema field​    Field designed for animal
+(collaborator                                                             definitions      vendors/colonies; does not
+site)                                                                                      translate to a human donor
+                                                                                           collaborator site or biobank.
+                                                                                           Same ambiguity as TEA-seq.
+
+TissueSection     —          — (no analog)                   Gap          Procedure +​     No TissueSection subject
+/ slide                                                                   subject model    subtype. Tissue/slide IDs,
+metadata                                                                                   fixation method, embedding
+                                                                                           medium, section thickness,
+                                                                                           and antigen retrieval
+                                                                                           parameters all have no home.
+                                                                                           Required for full mIF
+                                                                                           provenance (G5).
+
+diagnosis         string[]   — (no analog)                   Gap          Human subject​   Primary diagnosis plus
+(multi-value,                                                             fields           subsequent staging updates.
+updatable)                                                                                 MONDO ontology
+                                                                                           recommended. Scientifically
+                                                                                           central for mIF — tissue
+                                                                                           context depends on disease
+                                                                                           state and treatment history.
+
+ethnicity, race   string     — (no analog)                   Gap          Human subject​   Absent from HumanSubject.
+                                                                          fields           Cross-institute gap.
+                                                                                           HANCESTRO recommended
+                                                                                           for ethnicity (CELLxGENE
+                                                                                           interoperability).
+
+consent           string     — (no analog)                   Gap          Data access​     Subject-level consent record.
+                                                                          restrictions     Distinct from asset-level
+                                                                                           restrictions. Same gap as
+                                                                                           TEA-seq.
+
+cohort            string     — (no analog)                   Gap          Human subject​   Unresolved: cohort at subject
+                                                                          fields           level or sample level? No
+                                                                                           Cohort entity in aind
+                                                                                           regardless.
+                                                                                           data_description.tags is not a
+                                                                                           substitute.
+
+
+
+
+Data Description — mIF Cell DIVE asset — mIF-data_description.json
+
+Source Field      Type       Target (aind)                 Classificati    Cross-Data       Notes &
+                                                           on              set Gap          Recommendation
+
+subject_id        string     data_description.subject_id     Conflict      Many-to-one​     Scalar subject_id breaks
+(primary key)                                                              subject          down when acquisition
+                                                                           mapping          covers multiple tissue
+                                                                                            sections from different
+                                                                                            donors, or when the
+                                                                                            meaningful identifier is a
+                                                                                            tissue slide rather than a
+                                                                                            subject.
+name            string   data_description.name              Conflict    Data discovery     Collision risk if two datasets
+(subject_id +                                                                              generated same day. mIF
+timestamp)                                                                                 note: "AIFI20178" alone is
+                                                                                           insufficient when multiple
+                                                                                           slides or staining rounds
+                                                                                           exist for the same subject.
+
+modalities:     string   data_description.modalities          Gap       Schema field​      mIF not in the closed
+mIF / Cell                                                              definitions        modality enum. Cell DIVE is
+DIVE                                                                                       a platform — should it be a
+                                                                                           modality or a platform detail
+                                                                                           within mIF? Governance
+                                                                                           decision needed. This is a
+                                                                                           registry gap, not a naming
+                                                                                           preference.
+
+project_name    string   data_description.project_na         Needs      Schema field​      SLIMS experiment ID used
+(EXP-01367               me                                  Review     definitions        (EXP-01367). Should this be
+vs.                                                                                        a human-readable project
+descriptive)                                                                               name, the experiment ID, or
+                                                                                           both? SLIMS ID may belong
+                                                                                           in other_identifiers (as
+                                                                                           resolved by TEA-seq
+                                                                                           example).
+
+tags            null     data_description.tags                Gap       Data discovery     Null. No controlled
+                                                                                           vocabulary or guidance for
+                                                                                           tag usage. Cross-dataset
+                                                                                           gap.
+
+source_data     null     data_description.source_dat          Gap       Data discovery     Null. No guidance on
+                         a                                                                 manual vs. automated
+                                                                                           population. For derived mIF
+                                                                                           outputs (segmentation
+                                                                                           masks, cell type calls),
+                                                                                           source_data would need to
+                                                                                           reference the raw imaging
+                                                                                           asset.
+
+restrictions    null     data_description.restrictions        Gap       Data access​       Underspecified. No
+                                                                        restrictions       guidance on legal contract
+                                                                                           IDs, restriction categories, or
+                                                                                           relationship to subject-level
+                                                                                           consent. Cross-dataset gap.
+
+group           string   data_description.group              Needs      Schema field​      Same ambiguity as TEA-seq
+(internal vs.                                                Review     definitions        — cannot distinguish
+external)                                                                                  internal group
+                                                                                           (aifimmunology) from
+                                                                                           external collaborator
+                                                                                           (Seattle Children's Hospital).
+                                                                                           Field intent unclear.
+
+
+
+
+Procedures — mIF-procedures.json — Cell DIVE staining rounds
+
+Source Field     Type     Target (aind)                  Classificati   Cross-Da         Notes & Recommendation
+                                                         on             taset Gap
+Tissue block        —        — (no dedicated type)    Gap     Procedure      Human donor tissue block
+acquisition /                                                 vocab          acquisition has no
+collection                                                                   SpecimenProcedureType.
+                                                                             Would fall to "Other", losing
+                                                                             semantic specificity. A tissue
+                                                                             collection / biobank acquisition
+                                                                             type is needed.
+
+Antigen             object   — (no dedicated type)    Gap     Procedure      Standard step in tissue-based
+retrieval                                                     vocab          IF protocols. No dedicated
+                                                                             procedure type. Antigen
+                                                                             retrieval parameters (buffer,
+                                                                             temperature, duration) have no
+                                                                             structured home.
+
+Cyclic IF           object   — (no CyclicIFSeries)    Gap     Procedure      Each round needs: round
+staining round                                                vocab          number, operator, date,
+(×10+)                                                                       antibody panel assignment,
+                                                                             reagent lots, deactivation step.
+                                                                             No CyclicIFSeries model exists
+                                                                             (HCRSeries is the mFISH
+                                                                             analog). Currently each round is
+                                                                             a separate
+                                                                             SpecimenProcedure, losing the
+                                                                             ordered series relationship. G1
+                                                                             drives this.
+
+AntibodyChann       object   — (no analog)            Gap     Schema         Per-channel metadata: antibody
+el (clone, conc.,                                             field​         name, clone, fluorophore,
+barcode)                                                       definitions   concentration (µg/mL —
+                                                                             schema uses mass not
+                                                                             concentration), lot number,
+                                                                             institutional barcode
+                                                                             (expected/scanned/match).
+                                                                             FluorescentStain/ProteinProbe
+                                                                             are insufficient. Currently in
+                                                                             protocol_parameters as a
+                                                                             workaround. G3.
+
+DeactivationSte     object   — (no analog)            Gap     Procedure      H2O2 bleaching between
+p (H2O2                                                       vocab          rounds is a critical protocol
+bleaching)                                                                   step. No structured model.
+                                                                             Currently a custom object in
+                                                                             protocol_parameters. Needs:
+                                                                             reagent lots, concentration,
+                                                                             duration, QC flag. G4.
+
+Panel               string   — (no analog)            Gap     Schema         Which antibody panel (A vs. B)
+assignment per                                                field​         applied to which slide within a
+slide per round                                                definitions   round. No field in
+                                                                             SpecimenProcedure. Free-text
+                                                                             only in notes, not queryable.
+                                                                             G9.
+
+Round 1.5           object   — (no analog)           Needs    Schema         Second antibody pass between
+(non-integer                                         Review   field​         Rounds 1 and 2. Cannot be
+round)                                                         definitions   expressed cleanly in any
+                                                                             sequential round model. Design
+                                                                             decision needed: sub-round
+                                                                             field, protocol deviation flag, or
+                                                                             fold into Round 1. G10.
+procedure_type   enum       SpecimenProcedureType         Conflict     Procedure       Systematic error in mIF
+enum values                                                            vocab           example: procedure_type
+                                                                                       populated with
+                                                                                       "SpecimenProcedure" (class
+                                                                                       name) + non-existent
+                                                                                       procedure_type_name field.
+                                                                                       Schema requires enum value
+                                                                                       (e.g., Immunolabeling, Other) +
+                                                                                       procedure_name for free text.
+                                                                                       Must be corrected across all
+                                                                                       procedures at onboarding. G12.
+
+protocol_id      string     procedures[].protocol_id      Conflict     Schema          Schema expects protocols.io
+(SLIMS ID)                                                             field​          DOI; AIFI uses SLIMS protocol
+                                                                        definitions    IDs. Recommend minting
+                                                                                       protocols.io DOIs for AIFI
+                                                                                       SOPs, or extending schema to
+                                                                                       support institutional ID formats.
+                                                                                       G11.
+
+stimulus_epoc    object[]   acquisition.stimulus_epoc   Unmappable     —               Not applicable to fixed
+hs,                         hs                                                         post-mortem tissue imaging.
+manipulations
+
+
+
+
+Acquisition — mIF-acquisition.json — Cell DIVE imaging run
+
+Source Field     Type       Target (aind)               Classificati   Cross-Dat         Notes &
+                                                        on             aset Gap          Recommendation
+
+DataStream       object     acquisition.data_streams      Conflict     Schema field​     DataStream models
+(sequential                                                            definitions       simultaneous capture; Cell
+rounds)                                                                                  DIVE is inherently sequential
+                                                                                         (10+ ordered rounds). The
+                                                                                         fundamental acquisition
+                                                                                         model mismatch. A
+                                                                                         CyclicIFSeries model is
+                                                                                         needed. G1.
+
+StainingRound    object     — (no analog)                   Gap        Schema field​     Each round needs: round
+per round                                                              definitions       number, operator, date,
+                                                                                         antibody plan, reagent lots,
+                                                                                         deactivation step, imaging
+                                                                                         config, QC flags. No
+                                                                                         StainingRound entity exists.
+                                                                                         G1.
+
+Cell DIVE        object     ImagingConfig /                 Gap        Schema field​     ImagingConfig supports
+imaging                     DetectorConfig                             definitions       per-channel exposure time,
+parameters                                                                               but Cell DIVE-specific
+                                                                                         parameters (laser power per
+                                                                                         round, tile overlap, autofocus,
+                                                                                         stitching) are unsupported.
+                                                                                         G13.
+subject_details     null       acquisition.subject_detail   Conflict   Human           AcquisitionSubjectDetails is
+(clinical/survey)              s                                       subject​        mouse-centric (weight,
+                                                                        fields         platform, reward). For human
+                                                                                       tissue, the relevant "subject at
+                                                                                       acquisition" data is
+                                                                                       clinical/survey context (e.g.,
+                                                                                       smoking history at time of
+                                                                                       collection), which needs to be
+                                                                                       searchable. Mouse-centric
+                                                                                       label is misleading.
+
+ethics_review_i     null       acquisition.ethics_review    Needs      Data access​    Noted in original gap analysis
+d                              _id                          Review     restrictions    as "mouse-schema-specific
+                                                                                       and not applicable for human
+                                                                                       subjects." However, human
+                                                                                       tissue research does require
+                                                                                       IRB/ethics approval — field
+                                                                                       should be populated with
+                                                                                       human research protocol ID,
+                                                                                       not left null.
+
+calibrations,       object[]   acquisition.calibrations     Needs      Schema field​   Questioned as better fits
+maintenance                                                 Review     definitions     under QC than acquisition for
+                                                                                       fixed-tissue imaging. Design
+                                                                                       discussion needed.
+TEA-seq Gap Analysis
+Detailed Dataset Analysis: TEA-seq (Human,
+Immunology)
+This section provides a field-level breakdown for the TEA-seq dataset. TEA-seq
+(Transposase-Accessible Chromatin with RNA and Epitope sequencing) is a three-modality
+single-cell assay that simultaneously captures transcriptome (scRNA-seq), chromatin
+accessibility (scATAC-seq), and cell-surface epitopes (ADT) from permeabilized PBMCs.
+
+
+A key structural feature of TEA-seq is pooled sequencing: multiple donors are combined in one
+sequencing lane and demultiplexed back to per-donor assets using hashtag oligos (HTOs). This
+pooling model has no representation in the current schema and is the central gap for this
+dataset.
+
+
+Source documents reviewed:
+   ●​ TEA-seq metadata example file: teaseq-metadata.nd.json (schema_version 2.7.4)
+   ●​ Initial TEA-seq Gap analysis
+   ●​ aind-data-schema documentation — schema_version 2.7.4
+
+
+Sample asset:
+   ●​ Donor AIFI00042 (Homo sapiens, Female, year_of_birth 1975)
+   ●​ Study: VRd multiple myeloma induction therapy (bortezomib arm, T24 timepoint)
+   ●​ Pool: VRd-T24-Pool-01 (4 donors), demultiplexed via HTO-1
+   ●​ Three simultaneous measurements: scRNA-seq, scATAC-seq, ADT (28-plex surface
+      protein panel)
+   ●​ Source: HISE storage, dbGaP phs003430.v1.p1, GEO GSE236422
+
+
+Gap Summary Overview:
+
+ Gap                     Schema Layer   Detail
+
+
+ Pooled library has no   Acquisition    TEA-seq pools 4 donors per lane for sequencing, then
+ schema representation                  demultiplexes back to per-donor assets. The pooled library
+                                        (VRd-T24-Pool-01) is a real experimental unit that produced the
+                                        data, but is not registered as an asset and has no schema home.
+                                        Pool ID, pool size, multiplexing method (HTO), per-donor sample
+                                        tag, demultiplexing software, and unassigned-cell disposition are
+                                        all unrepresentable.
+Modality closed enum is    DataDescription​   TEA-seq is a 3-modality assay (scRNA-seq + scATAC-seq + ADT
+missing scATACseq and      / Acquisition​     surface protein). Only scRNAseq exists in the closed 21-value
+ADT                        / Instrument​      Modality enum. scATACseq and ADT cannot be expressed
+                           / QC               anywhere in the schema — data_description.modalities,
+                                              acquisition.data_streams, instrument.modalities, and
+                                              QCMetric.modality are all blocked. ExternalDataStream is used
+                                              as a workaround to avoid the instrument_id requirement, but this
+                                              is not a valid long-term solution. The two most important ATAC
+                                              QC metrics (FRIP score, TSS enrichment) cannot be recorded at
+                                              all.
+
+
+
+
+Blood draw                 Procedures         The blood draw that produced the PBMC specimen is a
+(venipuncture) has no                         procedure performed on the subject, but subject_procedures is
+subject_procedure type                        empty — the schema has no SubjectProcedure type for
+                                              venipuncture or blood collection. Pre-analytical variables critical to
+                                              PBMC quality (time to processing onset, collection kit, visit
+                                              context) also have no home. These are not minor metadata —
+                                              time_to_processing_onset directly affects TEA-seq quality and is
+                                              a known confound in multi-site studies.
+
+
+
+
+All specimen preparation   Procedures         PBMC isolation (density gradient centrifugation),
+steps fall to                                 cryopreservation, thaw, ex vivo drug treatment, cell
+procedure_type="Other"                        permeabilization + hashtag oligo staining, and TEA-seq library
+                                              construction — all core steps — use the "Other" catch-all. The
+                                              closed SpecimenProcedureType vocabulary (Sectioning,
+                                              Immunolabeling, Fixation, Clearing, HCR, BARseq, Other) has no
+                                              analog for any cell-preparation or library-construction step. This is
+                                              the same structural gap as Patch-seq G3, but more severe: zero
+                                              of the meaningful procedure steps have a dedicated type.
+
+
+
+
+Human subject fields       Subject            Five fields with no home in aind HumanSubject: self-reported
+absent: ethnicity,                            ethnicity (proposed: HANCESTRO ontology, multi-value, for
+diagnosis, cohort,                            CELLxGENE interoperability), age at enrollment (HIPAA: int <=89
+consent                                       or literal "90+"), diagnosis (MONDO ontology, multi-value,
+                                              updatable), cohort_id (no Cohort entity in aind — tags are not a
+                                              substitute), and consent record ID (subject-level fact, distinct from
+                                              asset-level restrictions). These are not Immunology-specific —
+                                              they are cross-institute requirements for any human subjects
+                                              research.
+
+
+
+HIPAA 90+ age cap not      Subject            year_of_birth is a plain integer with no validator enforcement of
+enforced by schema                            the HIPAA 90+ aggregation requirement. The schema has no
+                                              age_at_enrollment field that supports the int-or-"90+" type.
+                                              Currently relies on convention, not enforcement. Dummy value
+                                              (1975) used in this example since subject is under 90, but the gap
+                                              is real and must be addressed before human subjects data is
+                                              registered.
+specimen_id substring        Acquisition       The schema requires specimen_id to be a substring of subject_id.
+validator conflicts with                       Real SLIMS barcodes (e.g., subject AIFI20178, specimen
+real SLIMS barcodes                            MS00000417) do not follow this pattern — MS00000417 is not a
+                                               substring of AIFI20178. A workaround specimen_id
+                                               (AIFI00042_PBMC01) was constructed for this example. The
+                                               substring rule should be relaxed to an explicit subject-specimen
+                                               FK relationship.
+
+
+
+Instrument is scalar;        Acquisition​      acquisition.instrument_id is a scalar string, but TEA-seq
+TEA-seq requires two         / Instrument      encapsulation (10x Chromium controller) and sequencing
+instruments                                    (Illumina NovaSeq 6000) use two distinct instruments. The
+                                               instrument schema can list both as components, but the
+                                               acquisition can only reference one instrument_id.
+                                               ExternalDataStream is used as a workaround.
+
+
+
+Location is a pointer to a   DataDescription   The per-donor CellRanger multi output is a directory tree
+bucket; per-donor                              (barcodes.tsv.gz, matrix.mtx.gz, features.tsv.gz for RNA;
+directory tree not                             fragments.tsv.gz for ATAC; barcodes.tsv.gz + matrix.mtx.gz for
+described                                      ADT). metadata.location is a single string pointing to a bucket —
+                                               no structure for the directory tree or per-modality file paths. Same
+                                               gap as Patch-seq G2 but manifest structure is well-defined
+                                               (CellRanger multi output format).
+
+
+
+other_identifiers lacks      Metadata          This dataset has 4 relevant identifiers: SLIMS experiment ID
+structure for internal vs.                     (EXPT-004242), HISE file UUIDs (per modality), dbGaP
+external IDs                                   accession (phs003430.v1.p1), and GEO accession (GSE236422).
+                                               other_identifiers is a freeform object with no schema for
+                                               distinguishing internal from external identifiers, or for typing
+                                               identifiers by registry. Needs structured identifier objects (type,
+                                               registry, value).
+
+
+
+Longitudinal visit           Procedures​       The blood draw occurred at a specific visit (Baseline,
+context has no schema        / Subject         days_since_first_visit=0) in a longitudinal study (VRd induction
+home                                           therapy with T4/T24/T72 timepoints). days_since_first_visit is the
+                                               HIPAA-safe way to express longitudinal draws without exposing
+                                               dates. Neither the visit model nor the days-since-first-visit field
+                                               exists in the schema.
+
+
+
+data_description.group       DataDescription   The group field cannot distinguish the internal group
+does not distinguish                           (aifimmunology) from the external collaborator site (University of
+internal team from                             Washington, Seattle Children's Hospital). Clarify field intent; this
+external collaborator                          gap is shared with Cell DIVE.
+
+
+acquisition_type is free     Acquisition       "TEA-seq" is free text — inconsistent capitalization ("TEA-seq" /
+text with no controlled                        "teaseq" / "TEA-Seq") would prevent search. Needs a controlled
+vocabulary                                     vocabulary entry, as flagged for Patch-seq acquisition_type.
+
+
+
+Unassigned cell              Acquisition       Cells not confidently assigned to a donor (doublets, empty
+disposition from                               droplets, ambiguous HTOs) are discarded. This data-loss decision
+demultiplexing is not                          has no field in the schema. CELLxGENE uses donor_id="pooled"
+capturable                                     for ambiguous cells. The disposition policy affects reproducibility
+                                               and downstream analysis.
+Field Level Mappings:
+These tables document specific field-level mappings for the core schemas from biodata-schema
+(subject, data description, procedures, acquisition, quality control).
+
+
+ Subject — Human (Homo sapiens), AIFI00042 — VRd multiple myeloma study
+
+ Source Field              Type      Target (aind)             Classification   Cross-D       Notes &
+                                                                                ataset        Recommendation
+                                                                                Gap
+
+ subject_id                string    subject.subject_id           Mapped        —             Direct. Note: schema
+                                                                                              pattern prohibits
+                                                                                              underscores in subject_id
+                                                                                              — SLIMS barcodes must
+                                                                                              comply.
+
+ species (NCBI)            object    subject_details.species      Mapped        —             NCBI:txid9606 (Homo
+                                                                                              sapiens) — controlled
+                                                                                              vocabulary compliant.
+                                                                                              Immunology currently
+                                                                                              stores as free string;
+                                                                                              conversion needed at
+                                                                                              onboarding.
+
+ sex                       enum      subject_details.sex          Mapped        —             Direct.
+
+ year_of_birth             int       subject_details.year_of      Conflict      HIPAA/PII     Field exists but HIPAA
+                                     _birth                                     complianc     90+ aggregation
+                                                                                e             requirement is not
+                                                                                              enforced by the schema.
+                                                                                              Subjects aged 90+ must
+                                                                                              not have year_of_birth
+                                                                                              populated. Validator
+                                                                                              enforcement needed.
+
+ source (collaborator      object    subject_details.source     Needs Review    Schema        University of Washington
+ site)                                                                          field         with ROR (00cvxb145).
+                                                                                definitions   Field used for
+                                                                                              vendor/colony source in
+                                                                                              animal studies — does a
+                                                                                              collaborator site map to
+                                                                                              source? Clarification
+                                                                                              needed.
+
+ self_reported_ethnicity   string[   — (no analog)                  Gap         Human         Proposed: HANCESTRO
+                           ]                                                    subject       ontology terms,
+                                                                                fields        multi-value. CELLxGENE
+                                                                                              7.1.0 uses
+                                                                                              HANCESTRO:0601/0602
+                                                                                              descendants. Adopt for
+                                                                                              interoperability.
+age_at_enrollment            int |     — (no analog)           Gap         HIPAA/PII     HIPAA-safe age field: int
+                             "90+"                                         complianc     (<=89) or literal "90+".
+                                                                           e             Distinct from year_of_birth
+                                                                                         — needed for direct age
+                                                                                         reporting without exposing
+                                                                                         birth year. Enforce via
+                                                                                         validator.
+
+diagnosis                    string[   — (no analog)           Gap         Human         MONDO:0018048
+                             ]                                             subject       (multiple myeloma).
+                                                                           fields        Multi-valued, updatable
+                                                                                         over time. Not in
+                                                                                         HumanSubject type. Use
+                                                                                         MONDO ontology for
+                                                                                         interoperability.
+
+cohort_id                    string    — (no analog)           Gap         Human         No Cohort entity in aind.
+                                                                           subject       data_description.tags is
+                                                                           fields        not a substitute — no
+                                                                                         stable ID, name, or
+                                                                                         description. Same gap as
+                                                                                         mIF and Immunology
+                                                                                         registry analysis.
+
+consent                      string    — (no analog)           Gap         Data          Subject-level consent
+                                                                           access        record ID. Distinct from
+                                                                           restriction   data_description.restrictio
+                                                                           s             ns (asset-level access
+                                                                                         rule). Both fields are
+                                                                                         needed.
+
+study_participation_st       string    — (no analog)           Gap         Disease       "completed" —
+atus                                                                       state         longitudinal study
+                                                                           tracking      participation status has no
+                                                                                         home. Relates to disease
+                                                                                         state tracking over time
+                                                                                         gap.
+
+
+
+
+Data Description — Per-donor TEA-seq asset, Donor AIFI00042
+
+Source Field        Type         Target (aind)           Classificati   Cross-Dat        Notes &
+                                                         on             aset Gap         Recommendation
+
+name                string       data_description.name     Conflict     Data             subject_id +
+(auto-generated                                                         discovery        creation_time. Collision
+)                                                                                        risk for pooled assays: all
+                                                                                         4 donors in
+                                                                                         VRd-T24-Pool-01 have
+                                                                                         identical creation_times
+                                                                                         after demux. Recommend
+                                                                                         appending pool_id:
+                                                                                         AIFI00042_2024-03-16_V
+                                                                                         Rd-T24-Pool-01.
+location           string     metadata.location               Conflict   Data           CellRanger multi output is
+(bucket pointer)                                                         discovery​     a well-defined directory
+                                                                         (multi-file)   tree (RNA, ATAC, ADT
+                                                                                        subdirs). Single string
+                                                                                        cannot represent
+                                                                                        structure. Manifest
+                                                                                        convention would work
+                                                                                        here since the tree is
+                                                                                        predictable.
+
+other_identifier   object     metadata.other_identifiers      Conflict   Schema field   Freeform object holding 4
+s                                                                        definitions    IDs: SLIMS EXPT-004242,
+                                                                                        HISE UUIDs, dbGaP
+                                                                                        phs003430.v1.p1, GEO
+                                                                                        GSE236422. No schema
+                                                                                        for distinguishing internal
+                                                                                        vs. external or typing by
+                                                                                        registry. Needs structured
+                                                                                        identifier objects.
+
+modalities         object[]   data_description.modalities      Gap       Many-to-one​   SCHEMA GAP. Closed
+(scRNAseq                                                                subject        21-value enum has only
+only)                                                                    mapping        scRNAseq. scATACseq
+                                                                                        and ADT cannot be
+                                                                                        expressed. Three-modality
+                                                                                        assay reduced to one.
+                                                                                        Blocks accurate discovery.
+
+project_name       string     data_description.project_na     Mapped     —              Descriptive name used ("T
+                              me                                                        Cell Drug Response in
+                                                                                        Multiple Myeloma
+                                                                                        Induction Therapy").
+                                                                                        SLIMS EXP- ID correctly
+                                                                                        placed in other_identifiers,
+                                                                                        not here.
+
+investigators      object[]   data_description.investigato    Mapped     —              Named individuals with
+(with ORCID)                  rs                                                        ORCID (Graybuck:
+                                                                                        0000-0002-8860-4315).
+                                                                                        One ORCID still needs
+                                                                                        clarification. Better than
+                                                                                        Patch-seq team-name
+                                                                                        approach.
+
+restrictions       string     data_description.restrictions    Gap       Data access    Human subjects data
+(dbGaP                                                                   restrictions   under NIH Data Access
+controlled                                                                              Committee (dbGaP
+access)                                                                                 phs003430.v1.p1). Field
+                                                                                        exists but no structured
+                                                                                        vocabulary for restriction
+                                                                                        type or DAC reference.
+                                                                                        Clarify whether
+                                                                                        HISE-internal access
+                                                                                        follows same DAC rules.
+
+source_data        null       data_description.source_dat      Gap       Data           Null because pooled
+                              a                                          discovery      library is not a registered
+                                                                                        asset. If pooled library is
+                                                                                        registered (option 2),
+                                                                                        source_data would name
+                                                                                              it. Decision on pool
+                                                                                              registration gates this.
+
+group              null        data_description.group           Gap          Schema field     Cannot distinguish internal
+                                                                             definitions      group (aifimmunology)
+                                                                                              from external collaborator
+                                                                                              (UW, SCH). Same gap as
+                                                                                              Cell DIVE. Clarify field
+                                                                                              intent before populating.
+
+creation_time      datetime    data_description.creation_ti    Needs         Schema field     Per-donor asset does not
+(ambiguous for                 me                              Review        definitions      exist until demux
+demuxed                                                                                       completes (days after
+assets)                                                                                       sequencer run ends).
+                                                                                              Recommend:
+                                                                                              sequencer-run end as
+                                                                                              canonical creation_time
+                                                                                              for raw assets. Needs
+                                                                                              policy decision.
+
+
+
+
+Procedures — Subject + Specimen procedures, Donor AIFI00042
+
+Source Field              Type      Target (aind)             Classificati    Cross-        Notes &
+                                                              on              Datase        Recommendation
+                                                                              t Gap
+
+Blood draw /              —         — (no analog)                 Gap         Procedur      The blood draw that
+venipuncture                                                                  e vocab       produced the PBMC
+(missing)                                                                                   specimen is a subject
+                                                                                            procedure with no
+                                                                                            SubjectProcedureType.
+                                                                                            subject_procedures is empty.
+                                                                                            UBERON:0003688
+                                                                                            (peripheral blood, antecubital
+                                                                                            vein) could anchor the
+                                                                                            collection site.
+
+time_to_processing_o      float +   — (no analog)                 Gap         Procedur      Pre-analytical variable (4h,
+nset                      unit                                                e vocab       dummy). Directly affects
+                                                                                            PBMC viability and TEA-seq
+                                                                                            library quality. No field in
+                                                                                            schema. Critical for multi-site
+                                                                                            study reproducibility.
+
+visit (name +             object    — (no analog)                 Gap         Disease       Baseline visit, day 0 of
+days_since_first_visit)                                                       state​        longitudinal study.
+                                                                               tracking     days_since_first_visit is the
+                                                                                            HIPAA-safe representation.
+                                                                                            No visit model in schema.
+
+PBMC isolation            object    — (no dedicated type)       Conflict      Procedur      Ficoll-Paque density gradient
+(type=Other)                                                                  e vocab       centrifugation. No
+                                                                                            CellIsolation or
+                                                                                            BloodProcessing procedure
+                                                                                            type. "Other" used.
+
+PBMC                      object    — (no dedicated type)       Conflict      Procedur      CryoStor CS10 at -80C then
+cryopreservation                                                              e vocab       LN2. No Cryopreservation
+(type=Other)                                                                                procedure type. "Other" used.
+PBMC thaw               object    — (no dedicated type)         Conflict      Procedur        Rapid thaw from
+(type=Other)                                                                  e vocab         cryopreservation. No Thaw
+                                                                                              procedure type. "Other" used.
+
+Ex vivo drug            object    — (no dedicated type)         Conflict      Procedur        Bortezomib treatment, 24h
+treatment                                                                     e vocab         timepoint. No drug treatment /
+(type=Other)                                                                                  perturbation procedure type
+                                                                                              — fundamental gap for any
+                                                                                              ex vivo or in vitro
+                                                                                              pharmacological experiment.
+
+Permeabilization +      object    — (no dedicated type)         Conflict      Procedur        Cell permeabilization using
+HTO staining                                                                  e vocab         custom Tn5 transposome.
+(type=Other)                                                                                  Hashtag oligo staining for
+                                                                                              pooled demultiplexing.
+                                                                                              suspension_type="permeabili
+                                                                                              zed cell" proposed as new
+                                                                                              field. No dedicated type.
+
+TEA-seq library         object    — (no dedicated type)         Conflict      Procedur        10x Chromium encapsulation
+construction                                                                  e vocab         + 3 library preparations
+(type=Other)                                                                                  (cDNA, ATAC, ADT).
+                                                                                              NovaSeq 6000 sequencing.
+                                                                                              No LibraryConstruction
+                                                                                              procedure type. All detail
+                                                                                              stays behind protocol_id by
+                                                                                              design.
+
+stimulus_epochs,        object[   acquisition.stimulus_epo     Unmappable     —               Empty arrays — designed for
+manipulations           ]         chs                                                         in-vivo acquisitions. Not
+                                                                                              applicable to in vitro PBMC
+                                                                                              assay.
+
+AcquisitionSubjectDet   null      acquisition.subject_detail   Unmappable     —               Null is correct — designed for
+ails                              s                                                           in-vivo animal weight,
+                                                                                              anaesthesia, mouse platform.
+                                                                                              TEA-seq on PBMC is in vitro.
+
+
+
+
+Acquisition — TEA-seq run, Donor AIFI00042, VRd-T24-Pool-01
+
+Source Field            Type      Target (aind)                Classificati    Cross-Da           Notes &
+                                                               on              taset Gap          Recommendation
+
+
+acquisition_type =      string    acquisition.acquisition_ty     Mapped        Schema             Free text. Inconsistent
+"TEA-seq"                         pe                                           field​             capitalization across
+                                                                                definitions       records ("TEA-seq" /
+                                                                                                  "teaseq") would break
+                                                                                                  search. Add to controlled
+                                                                                                  vocabulary.
+
+specimen_id =           string    acquisition.specimen_id        Conflict      Schema             WORKAROUND. Real
+AIFI00042_PBMC01                                                               field​             SLIMS barcode
+                                                                                definitions       (MS00000417) is not a
+                                                                                                  substring of AIFI00042
+                                                                                                  — violates the substring
+                                                                                                  validator. Constructed
+                                                                                                  specimen_id used. Relax
+                                                                                                  to explicit
+                                                                                         subject-specimen FK
+                                                                                         (G7).
+
+ethics_review_id (IRB)   string   acquisition.ethics_review   Mapped     —               IRB protocol ID for VRd
+                                  _id                                                    human subjects study.
+                                                                                         Present (placeholder).
+                                                                                         Correct location for
+                                                                                         human subjects
+                                                                                         approval.
+
+protocol_id              string   acquisition.protocol_id     Mapped     —               Swanson et al. 2021
+(doi:10.7554/eLife.636                                                                   eLife DOI.
+32)                                                                                      Well-specified. Internal
+                                                                                         protocol IDs still needed
+                                                                                         from SLIMS —
+                                                                                         recommend protocols.io
+                                                                                         DOIs as canonical form.
+
+instrument_id (null)     null     acquisition.instrument_id   Conflict   Custom vs.​     Null because
+                                                                                         ExternalDataStream is
+                                                                         off-the-shelf   used as workaround for
+                                                                                         the modality enum gap.
+                                                                                         Instrument metadata IS
+                                                                                         available (10x Chromium
+                                                                                         + NovaSeq) but cannot
+                                                                                         be linked while
+                                                                                         modalities are
+                                                                                         unresolved. Also:
+                                                                                         instrument_id is scalar; 2
+                                                                                         instruments needed
+                                                                                         (G8).
+
+_pooled_library          object   — (no analog)                Gap       Many-to-on      Pool ID
+(pool_id, pool_size,                                                     e​              (VRd-T24-Pool-01), pool
+HTO, demux)                                                              subject         size (4), multiplexing
+                                                                         mapping         method (HTO), sample
+                                                                                         tag (HTO-1), demux
+                                                                                         software (cellranger
+                                                                                         multi), unassigned cell
+                                                                                         disposition — all have no
+                                                                                         schema home. Central
+                                                                                         TEA-seq gap (G1).
+
+ExternalDataStream       object   acquisition.data_streams[   Conflict   Many-to-on      ExternalDataStream
+(workaround)                      ]                                      e​              used to avoid
+                                                                         subject         instrument_id
+                                                                         mapping         requirement while
+                                                                                         modality enum is
+                                                                                         unresolved. Should be
+                                                                                         DataStream with
+                                                                                         active_devices=[Chromiu
+                                                                                         m_controller,
+                                                                                         NovaSeq_sequencer]
+                                                                                         once scATACseq and
+                                                                                         ADT are added to enum.
+data_streams             object[]   data_streams[].modalities       Conflict     Many-to-on    Same closed enum gap
+modalities (scRNAseq                                                             e​            as data_description.
+only)                                                                            subject       scATACseq and ADT
+                                                                                 mapping       blocked. Three-modality
+                                                                                               simultaneous capture
+                                                                                               reduced to one in the
+                                                                                               schema.
+
+
+
+
+Quality Control — TEA-seq QC metrics, Donor AIFI00042
+
+Source Field           Type         Target (aind)    Classificati     Cross-Datas      Notes & Recommendation
+                                                     on               et Gap
+
+cells_per_sample       int          QCMetric            Mapped        —                Number of cells passing QC
+(4821)                                                                                 filters for this donor.
+                                                                                       Well-modeled in QCMetric
+                                                                                       structure.
+
+median_genes_per_      int          QCMetric            Mapped        —                Standard scRNA-seq QC metric.
+cell (1847)                                                                            Well-modeled.
+
+doublet_rate (0.042)   float        QCMetric            Mapped        —                Fraction of barcodes called as
+                                                                                       doublets. Well-modeled with
+                                                                                       Pass/Fail threshold.
+
+label_transfer_score   float        QCMetric            Mapped        —                Azimuth label-transfer prediction
+(0.82)                                                                                 score. Primary TEA-seq quality
+                                                                                       indicator. Well-modeled.
+
+FRIP_score (ATAC)      float        — (blocked by         Gap         Many-to-one​     Fraction of reads in peaks — key
+                                    modality enum)                    subject          ATAC QC metric. Cannot be
+                                                                      mapping          expressed because
+                                                                                       QCMetric.modality requires
+                                                                                       scATACseq which is not in the
+                                                                                       enum. Blocked until G2 resolved.
+
+TSS_enrichment_sc      float        — (blocked by         Gap         Many-to-one​     Standard ENCODE ATAC QC
+ore (ATAC)                          modality enum)                    subject          metric (ratio of fragment density
+                                                                      mapping          at TSS to flanking regions).
+                                                                                       Same blockage as FRIP —
+                                                                                       cannot be recorded until
+                                                                                       scATACseq added to enum.
+M0 Questions & Answers
+1. At what data granularity do we support registration, and how prescriptive
+should we be?
+
+Contributors: Dan, Alina, Nathan, Saskia
+
+Summary: Register at the level of an asset/collection, keep file-level constraints optional and
+modality-defined, and stay flexible enough for internal users to define their own groupings.
+
+The current schema puts almost no constraints on files — metadata describes the data without
+direct links. Per-modality file standards are being developed in neural dynamics, with schema
+infrastructure to support them: a files.json core file storing constraints about what files are
+expected, then validating that they exist.
+
+For search, the useful unit is some kind of collection (e.g., scRNA generated from human blood
+on healthy subjects) rather than an individual file, though defining a collection may depend on
+having information about the individual assets it contains. Users will want both curated data
+(which may depend on modality) and raw data, similar to GEO/dbGaP.
+
+Because the primary audience is internal, users will not only want curated data — they will want
+to find whatever was recently acquired and define their own collections for intermediate
+analyses. The system therefore needs to be granular and flexible. The working position: the
+asset is the unit of registration.
+
+Open: minimum searchable fields have not been agreed upon.
+
+2. What is a data asset?
+
+Contributors: Dan, Alina, Nathan, Aishwarya, Tim
+
+Summary: An asset is the output of a data collection event; "session" is too coupled to one kind
+of collection, and the relationship between experiment and asset is not 1:1.
+
+In neural dynamics, one session creates one raw data asset, which is processed into an initial
+derived asset; users can then group derived data across sessions or subjects. Multi-subject
+support is almost certainly needed to handle data from the other accelerators.
+
+"Session" breaks down across modalities. In Patch-seq, the electrophysiology file is generated
+during the recording session, but imaging happens later after additional procedures, and
+transcriptomics comes from separate procedures — so a single conceptual experiment spans
+multiple collection times. Similarly, it is unclear whether multiomics data is one session or one
+session per component.
+
+The broader framing: the asset is the output of a data collection event, and the metadata
+describes the conditions of that collection. AIBS is generally turning tissue into numbers; AIND
+is turning activity into numbers; immunology appears to do both as part of a single experiment.
+There are many examples with no 1:1 relationship between experiment and asset, further
+complicated by downstream analysis that turns assets into new assets (also not 1:1).
+
+Internally, users would want to search across many fields (disease state, cohort, project, subject
+ID, tissue type, modality); some of these may not be relevant cross-institute (e.g., subject ID).
+
+To do: define a minimally viable "analysis unit" that acts as the foundation for the ontology
+across different experimental conditions.
+
+Open: what the expected output of a search is — e.g., a tally of the amount of data with
+directions on where to find it.
+
+3. How do we handle large external ontologies that don't fit well into Python
+packages?
+
+Contributors: Dan, Alina, Aishwarya, Saskia
+
+Summary: Reference actively supported public ontologies via external APIs rather than
+packaging them; the open problem is ingestion into the metadata.
+
+biodata-schema already holds large external registries (e.g., EMAPA) and accesses them via
+the OLS4 API (https://www.ebi.ac.uk/ols4/). The general pattern works, but it can be made more
+robust, and how a Python user "sees" these registries needs more thought.
+
+CELLxGENE's approach (https://github.com/chanzuckerberg/cellxgene-ontology-guide) is worth
+referencing. The prior question is why the whole ontology needs to fit into a Python package at
+all — a lazily loaded data accessor object holding a snapshot of the complete ontology is a
+candidate alternative.
+
+The requirement is to use public ontologies that are actively supported. The remaining
+challenge is how to ingest the ontology into the metadata accurately without taxing the system.
+
+Note: FMA is under consideration in immunology, which has not previously used ontologies.​
+​
+4. What schema language do we use?
+
+Contributors: Dan, Aishwarya, Alina
+
+Summary: The schema must be human-readable/interpretable; the specific storage format is
+largely inconsequential and easy to convert.
+
+The backend storage format is sort of inconsequential, and conversion between formats is
+straightforward. The one caveat raised: we may still want to decide upfront how the schema is
+stored (YAML/JSON/etc.) rather than leaving it implicit.
+​
+5. Which metadata updates should we prioritize?
+
+Contributors: Dan, Alina, Nathan
+
+Summary: Processing metadata, modality representation, specimen, and disease state are the
+named priorities.
+
+   ●​ Processing metadata (neural dynamics): the processing graph is currently not that
+      useful and not used by many people, the various ways of storing parameters are
+      somewhat redundant, and the mapping of input data/files into processes is confusing.
+   ●​ Specimen: determine whether "specimen" is relevant to this effort and how it should be
+      defined.
+   ●​ Modality: a documented lesson learned is that modality was not captured in a way users
+      would want to search.
+   ●​ Disease state: Brain Health has requested tracking of disease characteristics for human
+      subjects/donors, and it is not clear how to fit that within the metadata schema.
+
+​
+6. How much provenance does the Registry hold?
+
+Contributors: Alina, Aishwarya, Saskia
+
+Summary: Not yet specified — the question needs to be made more concrete before it can be
+answered.
+
+Open sub-questions: whether provenance (code, environment, input data) is captured in the
+data schema at all, and whether it is only relevant for derived assets.
+
+For ontology provenance specifically, one proposal is to include pinned ontology versions with
+backwards compatibility, so versions can be traced and diffed to see how the ontology evolves
+over time.
+
+7. Immunology Registry — AI-highlighted gaps (reviewed by Alina)
+
+Contributors: Alina
+
+Summary: Mapping gaps between the immunology registry and the current schema, for
+follow-up.
+
+   ●​   Specimen mapping
+   ●​   File type (Immunology) → modality(ish)
+   ●​   Human subject information
+   ●​   Unit of registration (one acquisition session vs one file)
+   ●​   Identity (DataDescription.name vs uuid)
+   ●​ Subject mapping → one asset to many subjects in Immunology
+   ●​ Grouping of subjects (i.e., cohort)
+
+(The source document contains a more detailed field mapping comparison.)
+
+8. Open Workstream 2 questions
+
+Contributors: Alina
+
+   ●​ What is the expected output of a search of the biodata registry?
+
+​
+9. What is the versioning / registration strategy? (continuous registration
+vs noise)
+
+Contributors: Ray, Doug
+
+Summary: There is a tension is between a high bar for registration and the searchability cost of
+leaving assets unregistered.
+
+The bar for adding downstream analysis artifacts should be high. Intermediate analysis artifacts
+should live in Code Ocean or another scratch workspace, and data should only be registered
+when it needs to be shared for further analysis, annotation, or publication. This will likely vary by
+integration/user. Two important points:
+
+   ●​ There should be a clear distinction that makes it obvious to scientists that their
+      intermediate asset is not registered (internal only) so no one assumes that data is visible
+      to others when it’s not
+   ●​ We need to ensure that individual scientists are capable of registering intermediate
+      assets when needed.
+
+The counter-argument: artifacts that are not registered are not easily searchable. AIND already
+sees the current docb going out of sync with Code Ocean, which makes searching difficult, and
+deliberately not registering assets would make that worse.
+
+​
+10. How do we store updates?
+
+Contributors: Doug, Mekhla
+
+Summary: Schema versioning is settled (semver); record-level update history is contested
+between "purely additive, no history" and "immutable records with a revision chain."
+
+Schema updates: standard semantic versioning is already established, with major/minor/patch
+updates as necessary.
+Record updates — position A: we may not need to store updates. There will undoubtedly be
+fixes to data (e.g., mouse weight recorded incorrectly), and there is little value in keeping the old
+data — with the possible exception of an update log for rare audit cases. Other updates should
+be purely additive (e.g., adding a procedure to a subject's procedures record).
+
+Record updates — position B: update history matters, especially for publications, since a
+paper would cite a dataset and its metadata as it was at the time of publication. A possible
+design: immutable records with a revision chain — each update creates a new record version,
+the old one is flagged and given a forward pointer, and the current version is the head of the
+chain.
+
+11. Relational DB or document store?
+
+Contributors: Mekhla, Ray, Tim, Doug
+
+Summary: Emerging consensus around an API-first view, with non-duplication of data as a
+shared constraint. The persistence choice (relational vs. document store) is likely not ours to
+make and matters less than getting the API contract right.
+
+The API-first view (consolidating position): What matters is how the API functions at the
+boundary between ingest and the persistence layer. Functional requirements include being able
+to CRUD individual entities of the data model, and preferably CRUD a complete instance of the
+model containing all its component entities, with assurance of referential integrity across entities
+within a submission and between submissions where applicable. If that is supported, the
+underlying infrastructure is not a concern — the infra choice should follow expected usage
+patterns.
+
+Shared constraint: Information should not be duplicated. There should be one record for a
+given subject, updated in a single location.
+
+
+
+
+12. Which storage systems must the Registry support?
+
+Contributors: Ray, Doug
+
+Summary: Pointing users to the storage location is sufficient, so an arbitrary number of storage
+systems can be supported.
+
+The Registry should point users to data but need not broker access to it — giving people a file
+path should be sufficient. On that basis, arbitrary numbers of storage systems can be supported.
+A single cloud storage provider (AWS) would certainly make things simpler, but that may be
+Workstream 4's decision to make.
+13. What is the expectation for ETL into the Registry, given different
+persistence layers across accelerators?
+
+Contributors: Mekhla, Ray, Doug, Tim
+
+Summary: Assume multiple accelerator-specific sources in the near term, and draw the
+boundary at a per-submitter schema contract rather than reaching into each source system.
+
+This is a critical question with broader implications for how each accelerator collaborates with
+the new Central Scientific Computing department. The near-term assumption is that there will be
+multiple accelerator-specific data sources that need to be ETL'd to / synced with the Registry.
+
+The proposed boundary: the shared registry should not extend into everybody's LIMS, Airtables,
+and Smartsheets. Instead, draw the line at a contract developed with each data submitter
+agreeing on a schema for data we will accept. It is the submitters' responsibility to push their
+data to the registry in that agreed-upon shape; our responsibility is to provide endpoints shaped
+per those contracts and then do the "TL" part of ETL into the single shared registry. Negotiating
+those contracts is where the work of harmonizing all the data lives — we will need a
+transformation from each submitter's data model into the shape of our shared data model.
+
+Open: how to make the ETL process easier given multiple data sources.
+
+14. How are updates and deletions handled?
+
+Contributors: Tim
+
+Summary: Corrections need a managed path, not silent overwrite — likely either in-model
+change tracking or an external audit/provenance log.
+
+If the registry is the source of truth and keeper of provenance, we need a policy for changing
+data. Assertions may be made about data based on its properties and propagated downstream
+into publications, so we probably cannot just change data after the fact.
+
+Two broad paths:
+
+   1.​ Build change tracking into the model (e.g., a "superseded" status with a pointer to the
+       new record). Simpler, but requires readers of the data to be aware of that status.
+   2.​ Create an external audit / provenance log.
+
+(Related to the revision-chain proposal in Q10.)
+
+15. Does the data we're ingesting ever include controlled-access data?
+
+Contributors: Tim
+Summary: Probably not, since the registry holds metadata rather than raw data — but
+metadata can sometimes make raw data identifiable, so a policy is needed.
+
+If controlled-access-adjacent metadata must be part of what the registry manages, our ingest
+logging, audit trails, and error messages become more complicated and probably less useful.
+
+Open: what our policy will be for holding this kind of metadata in the registry.
+

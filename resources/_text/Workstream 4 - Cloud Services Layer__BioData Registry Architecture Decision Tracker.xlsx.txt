@@ -1,0 +1,101 @@
+# source: resources/Workstream 4 - Cloud Services Layer/BioData Registry Architecture Decision Tracker.xlsx
+# original kept: yes
+
+
+### sheet: Sprint Dashboard
+
+BioData Registry Architecture Decision Tracker
+Scorecard
+Total Components | 6
+Approved | 0
+Contested | 0
+Pending | 6
+Component | Status | Owner | Last Updated | Matrix Link
+Auth | Pending |  |  | Go to Matrix
+Data | Pending |  |  | Go to Matrix
+Search | Pending |  |  | Go to Matrix
+Compute | Pending |  |  | Go to Matrix
+ML Support | Pending |  |  | Go to Matrix
+Other | Pending |  |  | Go to Matrix
+
+### sheet: MatrixAuth
+
+component evaluation/auth
+Option | Type | Purpose | 3-yr TCO | FTE | Contention | Recommendation | Status
+AWS Verified Permissions | Serverless |  | ~$5k | 0.1 | Unfortunately, struggles to handle permission-filtered search. |  | Pending
+SpiceDB | User-managed | Robust authorization checks for individual records and files. | ~$25k | 0.3 | A second store to keep in sync. | If we're aiming for a search index that respects access control, this would be the front-runner. Might be heavy handed if we're using Postgres. | Pending
+OpenFGA | User-managed | Zanzibar-style ReBAC engine (alternative to SpiceDB) | ~$25k | 0.3 | A second store to keep in sync. | Listed for completeness alongside SpiceDB. Same architectural objection as SpiceDB: a second store to keep in sync with Aurora. Prefer Postgres-native unless the sharing graph outgrows recursive CTEs. | Pending
+Postgres-native Authz | User-managed | Authorization model: roles, sharing graph, permission checks | 0 | 0.4 | We'd have to own the traversal and RLS logic. With the fine-grained permissions expected, this might not be the right path. | If we're going to roll our own model, we can always hand the keys off to another system if things get too complex. | Pending
+B2C (Cognito) | Serverless | Consumer Identity and Access Management (CIAM) for individuals without institutional membership. | ~$3k | 0.2 | Depends on the expectations of C-level |  | Pending
+B2B (Entra External ID) | Serverless | Business-to-Business (B2B) collaboration for external partners and groups with institutional membership. | 0 | 0.1 | Depends on the expectations of C-level |  | Pending |  | ≠––≠–
+EntraID | Vendor-managed | Workforce identity (authentication) | 0 | 1 |  | We already use it, and we're invested as an institute. Would be the source of truth for internal authentication. Anything we do choose to use will need to integrate back to entra anyway. | Approved
+Oso | Vendor-managed |  | Unsourced | 0.15 | The vendor lock-in is real |  | Pending
+
+### sheet: MatrixData
+
+component evaluation/data
+Option | Type | Purpose | 3-yr TCO | FTE | Contention | Recommendation | Status
+Mongo DB | User-managed | Metadata DB | $28k | 1.1 | Only standing problem is losing referential integrity, which would have to move into application logic. | Simple when working with a single instance. Complexity rises as we add replicas. While FTE requirements on this are minimal, they spike sharply when something does go wrong. | Pending
+PostgreSQL | User-managed | Metadata DB | $28k | 1
+Mongo DB Atlas (price includes Atlas Search and Atlas Vector Search) | Fully-managed | Metadata DB | $104k | 0.3 | Only standing problem is losing referential integrity, which would have to move into application logic. | If Mongo is the direction, Atlas is the suggested destination. Handling all of the scaling and replication behind the scenes, Atlas is hard to argue against. If we pull in Atlas Search and Atlas Vector Search, we could collapse the DB, search and vector stack into one model.  | Contested
+Aurora PostgreSQL | Fully-managed | Metadata DB | $37k | 0.25 |  |  | Contested
+Aurora MySql | Fully-managed | Metadata DB | $37k | 0.25 | Major problem might be handling unstructured data, or working with custom metadata fields. | Aurora seems like a strong option for fast to spin up and low maintenance requirement approach. Worth doing a feature/purpose comparison between Postgres and Mysql | Pending
+DynamoDB | Serverless | Metadata DB | $11k | 0.15 | No joins, no referential integrity, no recursive travel, no RLS. | Massive scale, strong per-key performance | Pending
+S3 (+S3 Files?) | Serverless | Objects-at-rest |  | 0 |  | The prices! There's no way we can reasonably argue anything else for primary support. | Approved
+Neptune | Fully-managed | Graph DB | Unsourced | 0.3 | This would likely need to be a secondary database strictly for storing edge relationships. It would not be efficient as a primary database | Most efficient way of storing and querying the chain of intermediate results that lead to any specific result | Pending
+Data Access Broker | Fully-managed |  |  |  |  | No recommendations, must build. | Pending
+
+### sheet: MatrixSearch
+
+component evaluation/search
+Option | Type | Purpose | 3-yr TCO | FTE | Contention | Recommendation | Status
+Self Managed ElasticSearch | User-managed | Real-time search + Vector store | $38k | 1.2 | High FTE requirements. |  | Contested
+Self Managed OpenSearch | User-managed | Real-time search + Vector store | $38k | 1.2 | On EKS. High operational burden. Less performant and inferior tokenization compared to ElasticSearch. | High FTE requirements make this a hard option to choose. | Pending
+OpenSearch Serverless (NextGen) | Serverless | Real-time search + Vector store | $20k | 0.1 | Less performant and inferior tokenization compared to ElasticSearch. |  | Contested
+OpenSearch Serverless (Classic) | Serverless | Real-time search + Vector store | $45k | 0.1 | Less performant and inferior tokenization compared to ElasticSearch. |  | Pending
+AWS OpenSearch | Fully-managed | Real-time search + Vector store | $25k-40k | 0.3 | While managed by AWS, you're still on the hook for capacity planning. Less performant and inferior tokenization compared to ElasticSearch. |  | Pending
+Atlas Search + Vector | Vendor-managed | Real-time search + Vector store | Built into DB cost | 0.2 |  | If we eat the requirements around referential integrity, we get search and vector store components baked into the offering. Biggest concern is if vector dimension depth meets the needs of WS5. Decide at the data layer, not here. | Contested
+Elasticache | Fully-managed | Cache | ~$25k | 0.1 |  |  | Pending
+Redis | Fully-managed | Cache | ~$25k | 0.1 |  |  | Pending
+
+### sheet: MatrixCompute
+
+component evaluation/compute
+Option | Type | Purpose | 3-yr TCO | FTE | Contention | Recommendation | Status
+Lambda | Serverless | Core services | ~$15k | 0.25 | 15-minute max lifetime makes large-scale ingestion hard to handle.  | I can see a path where we use Lambda to make up a majority of our infra, and use ECS/EKS for long-running workloads. Recommendation depents on the final business proposal. | Approved
+EKS | Fully-managed | Core services | ~$75k | 1 | Heavy FTE investment. | Seems like this offers the most flexibility since not all usecases for business logic should be forced to fit a serverless mould. Optimally this should be suplemented with one of the two serverless options for Job-type tasks that fit well with the serverless model. **If we're expecting multi-step processing pipelines, EKS fits** | Contested
+Fargate | Serverless | Core services | ~$35k | 0.25 |  | Low barrier for entry, but less flexible than EKS. Depending on the simplicity of the proposal, could sit between Lambda and EKS as a recommendation. | Contested
+
+### sheet: MatrixML Support
+
+component evaluation/ml support
+Option | Type | Purpose | 3-yr TCO | FTE | Contention | Recommendation | Status
+Bedrock | Serverless |  | $50k to $450k | 0.1 |  |  | Pending
+⮑ light | Serverless | One curation pass at migration + embeddings + modest chat | $50k | 0.1 | Assumes curation is a one-time migration activity. If metadata quality degrades or schemas evolve, re-curation becomes necessary and this scenario no longer holds. | The floor. Enough to satisfy 'AI-assisted metadata workflows' on slide 4 as a migration accelerator plus light interactive use.
+⮑ medium | Serverless | Quarterly re-curation + active chat across ~40 users | $130k | 0.15 | The most likely real-world shape, and roughly 2.6x the light scenario. Still an assumption until WS5 confirms cadence. | PLAN AGAINST THIS as the working figure unless WS5 says otherwise. Quarterly re-curation is a reasonable default for a registry whose schemas will keep evolving under WS2.
+⮑ heavy | Serverless | Continuous agentic curation on every change + heavy analysis | $450k+ | 0.2 | Would be the largest single infrastructure line in the platform — larger than database, search, and compute combined. Needs an explicit budget decision, not a default. | Only pursue if continuous curation demonstrably improves metadata quality enough to justify it. Put a cost ceiling and alerting in place before enabling anything that re-curates on every write.
+BedRock AgentCore | Fully-managed |  | Unsourced | 0.2 |  | Supports easy MCP Server deployment and AgentCore Gateway offers an MCP Gateway solution | Pending
+BedRock embeddings | Serverless | Vector generation for semantic search | ~$1k | 0 | Almost free relative to inference. Re-embedding the full corpus after a model change is the only meaningful cost event. | Not a decision — folded into whichever inference scenario is chosen. WS5 confirms model and dimensions; common models sit well inside both OpenSearch and Elasticsearch dimension limits.
+SageMaker |  |  |  |  |  |  | Pending
+
+### sheet: MatrixOther
+
+component evaluation/other
+Option | Type | Purpose | 3-yr TCO | FTE | Contention | Recommendation | Status
+SES | Serverless | Email messaging for user notification | ~$2k | 0.02 |  | If we're aiming to notify our users in a meaningful way, SES makes this relatively easy. | Pending
+Sendgrid | Serverless | Email messaging for user notifications | ~$4k | 0.05
+SQS | Serverless | Point-to-point message queue | ~$3k | 0 |  | If we expect to handle decoupling, might not be necessary for MVP | Pending
+SNS | Serverless | Point-to-fan out | ~$1k | 0 |  | If we expect to fan out. | Pending
+EventBridge | Serverless |  | ~$4k | 0.05 |  | This combined with SQS makes for a good system | Pending
+AWS Grafana | Fully-managed | Monitoring | ~$20k | 0.1 |  |  | Pending
+AWS X-Ray | Serverless | Traceability | ~$8k | 0.1 |  |  | Approved
+API Gateway | Serverless | Front door | ~10k | 0.2 |  | Offers security, traffic management, and request validation. I'm for it. Integrates with Lambda. | Approved
+
+### sheet: Concepts
+
+Referential Integrity | In the context of relational databases, it requires that if a value of one attribute (column) of a relation (table) references a value of another attribute (either in the same or a different relation), then the referenced value must exist.
+Row-level Security (RLS) | A database security feature that restricts data access at the row level based on a user's identity, role, or execution context.
+Recursive Travel | An algorithmic method of visiting all nodes in a hierarchical data structure—like a tree or graph—by having a function call itself to process smaller sub-parts (subtrees) until it hits an endpoint.
+ACID | Atomicity, Consistency, Isolation, and Durability. It is a set of rules for database transactions that make sure data stays safe, correct, and complete, even if the computer crashes or power fails.
+WASM | WebAssembly
+Transactional Outbox | Safely solves the dual-write problem in microservices. It ensures a service updates its local database and publishes an event to a message broker (like Kafka) atomically. Instead of publishing directly, the service saves the business data and an outbox event in the same local database transaction. A separate relay process then reads the outbox table and sends the messages.

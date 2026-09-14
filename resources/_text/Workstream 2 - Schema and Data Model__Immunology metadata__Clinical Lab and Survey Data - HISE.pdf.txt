@@ -1,0 +1,848 @@
+# source: resources/Workstream 2 - Schema and Data Model/Immunology metadata/Clinical Lab and Survey Data - HISE.pdf
+# original kept: yes
+
+6/25/26, 11:56 AM                                                                    Samples - HISE
+
+
+
+
+                                                                                                                 alina.ott@alleninstitute.org
+     Sample                                                                                               AO
+                                                                                                                 Original collective longitudinal cohort study
+     KT00644
+
+
+      Sample kit GUID          Visit name          Visit details         Disease state            Days since first visit    Draw date                     Subject ID
+
+
+                                                   N/A - Flu-Series
+      KT00644                  Flu Year 2 Day 90                                                  435                       Mon Nov 30 2020               BR1002
+                                                   Timepoint Only
+
+
+
+                                                                                                               Rows per page:                  1–1 of 1
+                                                                                                                                    10
+
+
+
+     Related Files
+
+      File name
+
+
+      AIFI-2021-03-02T20:27:16.564035657Z/B052_PS1_PB00644-01_QC.fcs
+
+
+      AIFI-2021-03-02T20:27:16.564035657Z/B052_PS1_PB00644-01_QC_Passed_TTTT.png
+
+
+      AIFI-2021-03-02T20:27:16.564035657Z/B052_PS1_PB00644-01_QC_Report.txt
+
+
+      automated/SupervisedGating/2021-03-02T20:38:46.707361263Z/PS1/B052_PS1_PB00644-01_QC/B052-PS1-comp-adjusted.csv
+
+
+      automated/SupervisedGating/2021-03-02T20:38:46.707361263Z/PS1/B052_PS1_PB00644-01_QC/B052_PS1_PB00644-01_QC.wsp
+
+
+      automated/SupervisedGating/2021-03-02T20:38:46.707361263Z/PS1/B052_PS1_PB00644-01_QC/B052_PS1_PB00644-01_hierarchy.png
+
+
+      automated/SupervisedGating/2021-03-02T20:38:46.707361263Z/PS1/B052_PS1_PB00644-01_QC/B052_PS1_PB00644-01_plots.png
+
+
+      automated/SupervisedGating/2021-03-02T20:38:46.707361263Z/PS1/B052_PS1_PB00644-01_QC/gating-set/B052_PS1_PB00644-01_QC.fcs.h5
+
+
+      automated/SupervisedGating/2021-03-02T20:38:46.707361263Z/PS1/B052_PS1_PB00644-01_QC/gating-set/B052_PS1_PB00644-01_QC.fcs.pb
+
+
+      automated/SupervisedGating/2021-03-02T20:38:46.707361263Z/PS1/B052_PS1_PB00644-01_QC/gating-set/cf3eee50-2b43-4fe9-96d9-e9efb0892ff3.gs
+
+
+
+                                                                                                           Rows per page:                  1–10 of 377
+                                                                                                                               10
+
+
+
+
+     Related Metadata
+
+       Lab Results
+
+          Blood Counts
+           Filter by test name
+
+
+                        Test                                                             Value                                 Normal Range
+
+
+                        % Basophils                                                      1%
+
+
+                        % Eosinophils                                                    2.6 %
+
+
+                        % Lymphocytes                                                    39.9 %
+
+
+                        % Monocytes                                                      10.1 %
+
+
+
+https://allenimmunology.org/#/samples/83d712ca-9508-4143-a303-22531a9a5d84                                                                                             1/9
+6/25/26, 11:56 AM                                                                    Samples - HISE
+
+                           Test                                                       Value                                Normal Range
+
+
+                           % Neutrophils                                              46.4 %
+
+
+
+
+                                                                                                                            ►
+                           Absolute Basophil Count                                    39 cells/uL                     0                         202
+
+
+
+
+                                                                                                                              ►
+                           Absolute Eosinophil Count (AEC)                            101 cells/uL                    0                         400
+
+
+
+
+                                                                                                                           ►
+                           Absolute Lymphocyte Count (ALC)                            1556 cells/uL                1000                         480
+
+
+
+
+                                                                                                                               ►
+                           Absolute Monocyte Count (AMC)                              394 cells/uL                 200                          900
+
+
+
+
+                                                                                                                    ►
+                           Absolute Neutrophil Count (ANC)                            1810 cells/uL                1800                         660
+
+
+
+
+                                                                                                                                ►
+                           Hematocrit                                                 43.3 %                       39.2                         50.2
+
+
+
+
+                                                                                                                                   ►
+                           Hemoglobin                                                 15.2 g/dL                     12.1                        18.1
+
+
+
+
+                                                                                                                                    ►
+                           Mean Corpuscular Hemoglobin (MCH)                          31.6 pg                       27.5                        35.1
+
+
+
+
+                                                                                                                                           ►
+                           Mean Corpuscular Hemoglobin Concentration (MCHC)           35.1 g/dL                      32                         36
+
+
+
+
+                                                                                                                                   ►
+                           Mean Corpuscular Volume (MCV)                              90 fL                          80                         100
+
+
+
+                           Mean Platelet Volume (MPV)                                 10.2 fL
+
+
+
+
+                                                                                                                             ►
+                           Platelet Count                                             211 Thousand/uL               150                         400
+
+
+
+
+                                                                                                                               ►
+                           Red Blood Cell Count                                       4.81 Million/uL              4.18                         6.09
+
+
+
+                           Red Cell Distribution Width (RDW)                          12 %                          11.7
+                                                                                                                           ►                    14.2
+                                                                                                                    ►
+
+
+                           White Blood Cell Count (WBC)                               3.9 Thousand/uL                  4                        11.1
+
+
+
+
+          Blood Chemistries
+
+           Filter by test name
+
+
+                    Test                                                 Value                                Normal Range
+                                                                                                                ►
+
+
+
+
+                    Alanine Transaminase (ALT)                           18 U/L                          7                                52
+                                                                                                                            ►
+
+
+
+
+                    Albumin                                              4.8 g/dL                       3.5                               5.7
+                                                                                                          ►
+
+
+
+
+                    Alkaline Phosphatase                                 45 U/L                         39                                117
+                                                                                                          ►
+
+
+
+
+                    Aspartate Aminotransferase (AST)                     14 U/L                         12                                39
+                                                                                                                            ►
+
+
+
+
+                    Bilirubin, Total (T-Bili)                            0.8 mg/dL                      0.1                               1.3
+                                                                                                                      ►
+
+
+
+
+                    Blood Urea Nitrogen (BUN)                            15 mg/dL                        7                                25
+
+
+
+https://allenimmunology.org/#/samples/83d712ca-9508-4143-a303-22531a9a5d84                                                                             2/9
+6/25/26, 11:56 AM                                                                      Samples - HISE
+
+                    Test                                                   Value                                  Normal Range
+
+
+
+
+                                                                                                                             ►
+                    Calcium                                                9.4 mg/dL                        8.6                               10.3
+
+
+
+
+                                                                                                                   ►
+                    Carbon Dioxide (CO2)                                   23 mmol/L                         21                               31
+
+
+
+
+                                                                                                                                    ►
+                    Chloride (Cl)                                          104 mmol/L                       98                                108
+
+
+
+
+                                                                                                                            ►
+                    Creatinine                                             0.96 mg/dL                       0.7                               1.3
+
+
+
+                    Globin                                                 2.4 g/dL
+
+
+
+
+                                                                                                                       ►
+                    Glucose                                                100 mg/dL                        70                                199
+
+
+
+
+                                                                                                                          ►
+                    Potassium                                              4.1 mmol/L                       3.5                               5.1
+
+
+
+
+                                                                                                                        ►
+                    Protein, Total                                         7.2 g/dL                         6.4                               8.9
+
+
+
+
+                                                                                                                        ►
+                    Sodium                                                 137 mmol/L                       133                               145
+
+
+
+
+          Inflammatory Markers
+
+           Filter by test name
+
+
+                    Test                                                              Value                            Normal Range
+
+
+                    C-Reactive Protein, High-Sensitivity (HS-CRP)                     <0.3 mg/L                        < 0.3 mg/L
+
+                                                                                                                       ►
+                    SED Rate-Westergren (ESR)                                         2 mm/h                       0                                 20
+
+
+
+
+          Lipid Profile
+
+           Filter by test name
+
+
+                    Test                                        Value                                    Normal Range
+                                                                                                                                    ►
+
+
+
+
+                    Cholesterol, HDL                            57 mg/dL                           40                                   59
+                                                                                                              ►
+
+
+
+
+                    Cholesterol, LDL                            82 mg/dL                            57                                  129
+                                                                                                                       ►
+
+
+
+
+                    Cholesterol, Non-HDL                        96 mg/dL                            0                                   189
+                                                                                                          ►
+
+
+
+
+                    Cholesterol, Total                          153 mg/dL                          136                                  239
+
+
+
+                    Cholesterol/HDL Ratio                       2.7
+                                                                                                          ►
+
+
+
+
+                    Triglycerides                               67 mg/dL                           48                                   149
+
+
+
+
+          Anthropometric measures
+
+
+https://allenimmunology.org/#/samples/83d712ca-9508-4143-a303-22531a9a5d84                                                                                3/9
+6/25/26, 11:56 AM                                                                   Samples - HISE
+
+           Filter by test name
+
+
+                           Test                       Value                                          Normal Range
+
+
+                           Height                     177.8 cm
+
+
+                           Weight                     69 kg
+
+
+
+
+       Survey Data
+
+            SURVEYRESULTS (XXX)           PROMISSURVEYRESULTS (2022)         SURVEYRESULTS (2021)
+
+
+
+
+          Base Questionnaire
+
+
+
+                    Question                                                                                        Answer
+
+
+                    Name Info                                                                                       -
+
+
+                    First Name                                                                                      -
+
+
+                    Last Name                                                                                       -
+
+
+                    Middle Initial                                                                                  -
+
+
+                    Date of Birth                                                                                   -
+
+
+                    birth date                                                                                      -
+
+
+                    Month                                                                                           -
+
+
+                    Day                                                                                             -
+
+
+                    Year                                                                                            -
+
+
+                    Confirm                                                                                         -
+
+
+                    consent row                                                                                     -
+
+
+                    Date Consented                                                                                  -
+
+
+                    Consent Short Title                                                                             -
+
+
+                    Consent Version                                                                                 -
+
+
+                    Consent Form Date                                                                               -
+
+
+                    Additional Consents                                                                             -
+
+
+
+https://allenimmunology.org/#/samples/83d712ca-9508-4143-a303-22531a9a5d84                                                   4/9
+6/25/26, 11:56 AM                                                                        Samples - HISE
+
+                    Question                                                                                                           Answer
+
+
+                    BRI is committed to keeping your personal information secure. Some communication methods, such as email            -
+                    and text messaging, are less secure than others. Please only share with us the contact information you are
+                    comfortable with us using.
+
+
+                    Security Language Provided                                                                                         -
+
+
+                    Sign up to receive updates about BRI’s research and clinical trials:                                               -
+
+
+                    You may always change your mind and opt-out. We are careful not to overload your inbox and your information        -
+                    will be used for BRI-related mailings only. We do not share or sell your contact information.
+
+
+
+                                                      «    ‹     1   2   3   4   5   6     7    8   9     ›   »
+
+
+
+          Women's Health Questionnaire
+
+
+
+                    Question                                                                                                           Answer
+
+
+                    How many times have you been pregnant?                                                                             -
+
+
+                    Are you pregnant now?                                                                                              -
+
+
+                    How many live births have you had?                                                                                 -
+
+
+                    Did you breastfeed any of your children?                                                                           -
+
+
+                    For each of your previous pregnancies, please describe the details of each pregnancy in the table below. This      -
+                    includes miscarriages, abortions, tubal or ectopic pregnancies, stillbirths, and live births
+
+
+                    Have you ever had a D&C (dilation and curettage)?                                                                  -
+
+
+                    Have you ever taken medicine to treat a miscarriage                                                                -
+
+
+                    Have you ever taken medicine to remove a tubal or ectopic pregnancy?                                               -
+
+
+                    Have you ever taken medicine to end a pregnancy (abortion)?                                                        -
+
+
+                    Please describe any pregnancy-related medical problems or complications that occurred during any                   -
+                    pregnancy or delivery in the table below.
+
+
+                    Have you ever had any of the following devices inserted into your vagina to assist with delivery? (Mark all that   -
+                    apply)
+
+
+                    Other (please describe):                                                                                           -
+
+
+                    12. Have you ever been given antibiotics around the time of delivery?                                              -
+
+
+                    a. If Yes, why were you given antibiotics?                                                                         -
+
+
+                    Other (please describe)                                                                                            -
+
+
+https://allenimmunology.org/#/samples/83d712ca-9508-4143-a303-22531a9a5d84                                                                      5/9
+6/25/26, 11:56 AM                                                                         Samples - HISE
+
+                    Question                                                                                                               Answer
+
+
+                    Have you ever tried to get pregnant for more than 12 months without success?                                           -
+
+
+                    Have you ever seen a health care provider because of difficulty becoming pregnant?                                     -
+
+
+                    Have you ever taken medications or hormones, including shots, to help in getting pregnant?                             -
+
+
+                    If so, please describe any hormonal fertility medications you have used to help in getting pregnant in the table       -
+                    below.
+
+
+                    At what age did you start menstruating?                                                                                -
+
+
+
+                                                                   «    ‹   1    2   3    4    ›      »
+
+
+
+          Post-Flu
+
+
+
+                    Question                                                                                                           Answer
+
+
+                    Did you have any adverse reactions within 7 days of receiving your last influenza vaccination?                     -
+
+
+                                                                                                                                       -
+
+
+                    Post Influenza Vaccine Symptoms                                                                                    -
+
+
+                    IF YES, FEVER What was the highest temperature you had as a vaccine reaction?                                      -
+
+
+                    Did you seek professional medical care for any influenza vaccine reaction?                                         -
+
+
+                    Were you prescribed medication for an influenza vaccine reaction?                                                  -
+
+
+                    Were you hospitalized for an influenza vaccine reaction?                                                           -
+
+
+                    Were you admitted to the Intensive Care Unit (ICU) for an influenza vaccine reaction?                              -
+
+
+                    Since your last study visit, did you become ill with the influenza virus (flu)?                                    -
+
+
+                                                                                                                                       -
+
+
+                                                                                                                                       -
+
+
+                    Month                                                                                                              -
+
+
+                    Year                                                                                                               -
+
+
+                    Day                                                                                                                -
+
+
+                    Approximation                                                                                                      -
+
+
+                    Don’t know                                                                                                         -
+
+
+https://allenimmunology.org/#/samples/83d712ca-9508-4143-a303-22531a9a5d84                                                                          6/9
+6/25/26, 11:56 AM                                                                       Samples - HISE
+
+                    Question                                                                                     Answer
+
+
+                                                                                                                 -
+
+
+                    What was the duration of your symptoms…for how many days did you have the flu?               -
+
+
+                    Days                                                                                         -
+
+
+                    Approximation                                                                                -
+
+
+                                                                       «   ‹    1   2    ›      »
+
+
+
+
+          Pre-Flu
+
+
+
+                    Question                                                                                 Answer
+
+
+                    Have you ever received the influenza vaccine before in your lifetime?                    -
+
+
+                                                                                                             -
+
+
+                    In what year did you receive your last influenza vaccine?                                -
+
+
+                    Year                                                                                     -
+
+
+                    Don’t know                                                                               -
+
+
+                                                                                                             -
+
+
+                    In what month did you receive your last influenza vaccine?                               -
+
+
+                    Month                                                                                    -
+
+
+                    Don't Know                                                                               -
+
+
+                                                                                                             -
+
+
+                    By what route did you receive your last influenza vaccine, by injection or nasal mist?   -
+
+
+                    Other                                                                                    -
+
+
+                    In the past 12 months, did you become ill with the influenza virus (flu)?                -
+
+
+                    diagnosis method container                                                               -
+
+
+                    Subject received vaccine patient information leaflet before vaccine administration       -
+
+
+                    vaccine_admin_container                                                                  -
+
+
+                    Vaccine Administration Location:                                                         -
+
+
+
+
+https://allenimmunology.org/#/samples/83d712ca-9508-4143-a303-22531a9a5d84                                                7/9
+6/25/26, 11:56 AM                                                                           Samples - HISE
+
+                    Question                                                                                          Answer
+
+
+                    Vaccine Delivered to CRC                                                                          -
+
+
+                    Delivered Date:                                                                                   -
+
+
+                    Time:                                                                                             -
+
+
+
+                                                                      «     ‹   1   2   3     ›   »
+
+
+
+
+          PROMIS–29 Profile v2.1
+
+
+
+                    Question                                                                                 Answer
+
+
+                    Physical Function                                                                        -
+
+
+                    Anxiety                                                                                  -
+
+
+                    Depression                                                                               -
+
+
+                    Fatigue                                                                                  -
+
+
+                    Sleep Disturbance                                                                        -
+
+
+                    Sleep Disturbance Cont                                                                   -
+
+
+                    Ability to Participate in Social Roles and Activities                                    -
+
+
+                    Pain Interference                                                                        -
+
+
+                    Pain Intensity                                                                           -
+
+
+
+
+          Mobile Health Survey
+
+
+
+                    Question                                                                                     Answer
+
+
+                    Have you travelled outside of Washington in the last week?                                   -
+
+
+                    Have you had any changes to medications?                                                     -
+
+
+                    Please describe your recent medication changes                                               -
+
+
+                    Have you had any illnesses?                                                                  -
+
+
+                    Please describe your recent illnesses                                                        -
+
+
+                    How are you feeling today?                                                                   -
+
+
+https://allenimmunology.org/#/samples/83d712ca-9508-4143-a303-22531a9a5d84                                                     8/9
+6/25/26, 11:56 AM                                                                        Samples - HISE
+           Dietary Assessment
+
+
+
+                    Question                                                                                                                 Answer
+
+
+                    1. Do you currently take multi-vitamins? (Please report other individual vitamins in the next section.)                  -
+
+
+                    What specific brand (or equivalency) do you usually take?                                                                -
+
+
+                    How many do you take per week?                                                                                           -
+
+
+                    e.g., AARP Alphabet II Formula 643 Multivitamins and Minerals                                                            -
+
+
+                    Not counting multi-vitamins, do you take any of the following preparations?                                              -
+
+
+                    a) Vitamin A                                                                                                             -
+
+
+                    Dose per day:                                                                                                            -
+
+
+                    b) Potassium                                                                                                             -
+
+
+                    Dose per day:                                                                                                            -
+
+
+                    c) Vitamin C                                                                                                             -
+
+
+                    Dose per day:                                                                                                            -
+
+
+                    d) Vitamin B6                                                                                                            -
+
+
+                    Dose per day:                                                                                                            -
+
+
+                    e) Vitamin E                                                                                                             -
+
+
+                    Dose per day:                                                                                                            -
+
+
+                    Type:                                                                                                                    -
+
+
+                    f) Calcium (Include Calcium in Tums, etc.)                                                                               -
+
+
+                    Dose per day (elemental calcium)                                                                                         -
+
+
+                    g) Selenium                                                                                                              -
+
+
+                    Dose per day:                                                                                                            -
+
+
+
+                                                                    «   ‹    1   2   3     ›   »
+
+
+
+
+   © 2026 Allen Institute for Immunology. All Rights Reserved.                                             Privacy   Terms    Data Sharing       Documentation
+
+
+
+
+https://allenimmunology.org/#/samples/83d712ca-9508-4143-a303-22531a9a5d84                                                                                       9/9
+

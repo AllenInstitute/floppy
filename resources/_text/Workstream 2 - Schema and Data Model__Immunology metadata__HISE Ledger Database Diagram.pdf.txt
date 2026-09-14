@@ -1,0 +1,128 @@
+# source: Workstream 2 - Schema and Data Model/Immunology metadata/HISE Ledger Database Diagram.pdf
+# extracted: 2026-08-27
+
+                                                                                                                                                                                                             SLIMS integration
+
+                                                                                                                                                                                                                                       SLIMS
+
+
+
+
+                                                                                                                                                                    Cohort                                           Subject                                               Sample
+                                                                                                                                                                                                                                                                                                                                                  Specimen
+                                                                                                                                                                                                    cntn_fk_originalContent -> limsParentContentId        cntn_cf_hasBridgingControl -> bridgingControl
+                                                                                                                                                                                                   cntn_cf_externalPatientID -> partnerSubjectGuid      cntn_cf_daysSinceFirstVisit -> daysSinceFirstVisit                               cntn_cf_aifiBarcode -> specimenGuid
+                                                                                                                                                                                                      cntn_cf_ageAtEnrollment -> ageAtEnrollment            cntn_cf_hiseCollectionDateTime -> drawDate                                   cntn_fk_contentType -> specimenType
+                                                                                                                                                                                                          cntn_cf_fk_ethnicity -> ethnicity          cntn_cf_fk_diseaseStates -> diseaseStatesRecordedAtVisit                     cntn_cf_externalContainerId -> externalContainerID
+                                                                                                                                                                                                          cntn_cf_aifiBarcode -> subjectGuid              cntn_fk_originalContent -> limsParentContentID                  cntn_cf_experimentsampledescription -> experimentSampleDescription
+                                                                                                                                                              stud_name -> cohortGuid                       cntn_cf_birthYear -> birthYear                     cntn_cf_aifiBarcode -> sampleKitGuid                      cntn_cf_timeFromCollectionToIsolationStart -> timeToProcessingOnset
+                                                                                                                                                          stud_description -> description                    cntn_fk_status -> droppedOut                      cntn_cf_nonFluVisit -> visitDetails                                  cntn_cf_numberOfCells -> totalViableCellCount
+                                                                                                                                                                    customData                               cntn_cf_sex -> biologicalSex                           cntn_cf_visit -> visitName                                             cntn_fk_status -> specimenStatus
+                                                                                                                                                                                                               cntn_cf_fk_races -> race                               cntn_id -> sampleGuid                                                           customData
+                                                                                                                                                                                                             cntn_cf_fk_species -> species                    eln -> experiments, experimentComments
+                                                                                                                                                                                                                      customData                                            customData
+
+
+
+
+                                                                                                            Materialized
+                                                                                                              views
+                                                                                      A collection that is the result of a pre-computed aggregation
+
+                                                                                                                                                        Metadata ingest
+                                                                                                                                                                                                                                                                                                                                                                     SubjectView
+                                                                                       pipeline. Essentially it is a denormalized table with merged
+                                                                                                                                                                                                                                                                                             EMRData                             Subject                           (readSubjects +
+                                                                                      metadata from multiple entities. In SQL terms. Its a table with
+                                                                                                                                                                                                                                                                                                                                                                      advanced
+                                                                                      a bunch of joins but it is stored on disk, not executed on the
+                                                                                                                                                                                                                                                                                                                                                                       search)
+                                                                                                                       fly
+                          Materialized View   Collection       SLIMS                                                                                                                                                                                                                                                                                                                            FileDescriptor
+                                                                                                                                                                                                                                                                                                                                                                                               (getFileDescrip
+                                                                                                                                                                                                                                                                                                                                                                                                     tors +
+                                                                                                                                                                                                                                                                                                                                                                                                   advanced
+                                                                                                                                                                                                                                                                                                                                                                                                    search)
+                                                                                                                                                                                                                                                                                                                                                                    SampleStatus
+                                                                                                              SubjectView                               Drop file                           Ingest Receipt                   FileMetaData                   Process                         SurveyData                           Sample                            (readSamples +
+                                                                                                            (readSubjects +                                                                                                                                                                                                                                           advanced
+                                                                                                           advanced search)                                                                                                                                                                                                                                            search)
+
+
+
+
+                  SLIMS
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Advanced Search                              Advanced Search
+                                                                                                                                                                                                                                                         Scheme (data                       LabResults
+                                                                                                                                                                                                                                                          dictionary)
+
+                                                    Cohort
+                                                                                                                                                                                                                                                                                                                                                                                                                                                      GetFileDescriptors                           ReadSamples
+
+
+
+                                                                                                             SampleStatus
+                                                                                                            (readSamples +
+                                                                                                           advanced search)                                                                                                                                                                                                                           Result File/File
+                                                                                                                                                                                                                                                                                                                                                         Types
+                                                                                                                                                        Pipeline to FileDescriptor                                                                                                                    FileMetaData
+
+
+EMRDataSche
+                 EMRData                                                                                                                                                                                                                                                                                                                                                                                                                        FileDescriptor (getFileDescriptors +     SampleStatus (getFileDescriptors +
+    me                                               Subject                                                                                                                                                                                                                                                                                                                                                                                            advanced search)                        advanced search)
+
+
+                                                                                                                                                                                                                                                                                                                                                      If filetype is a                     Yes
+                                                                                                                                                            Drop file                          Ingest Receipt                     FileMetaData                  Pipeline                              FileMetaData                                 searchable result file                                            Aggregate
+                                                                                                                                                                                                                                                                                                                                                             type
+
+
+
+
+                                                                                                                                                                                                                                                                                                      FileMetaData                                               No
+                                                                                                             FileDescriptor
+LabResultsSch                                                                                                                                                                                                                                                                                             fileType
+                                                      Sample           FileMetaData                      (getFileDescriptors +
+    eme         LabResults                                                                                                                                                                                                                                                                              majorVersion                                       No op
+                                                                                                           advanced search)                                                                                                                                                                                batchId
+                                                                                                                                                                                                                                                                                                           poolId
+                                                                                                                                                                                                                                                                                                           wellId
+                                                                                                                                                                                                                                                                                                           chipId                                                                                                                                                                                    Note that
+                                                                                                                                                                                                                                                                                                           panelId                                                                                                                                                                                 sample status
+                                                                                                                                                                                                                                                                                                          adtRefId
+                                                                                                                                                                                                                                                                                                        partnerCode                                                                                                                                                                                batchIdList is
+                                                                                                                                                                                                                                                                                                          userTags                                                                                                                                                                                 updated. But
+                                                                                                                                                                                                                                                                                                        submissionBC
+                                                                                                                                                                                                                                                                                                      sampleReferences                                                                                                                                                                              this view is
+                                                                                                                                                                                                                                                                                                                                                                                                LabResults        SurveyData       Subject                                                            not file
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    dependent.
+
+
+
+
+SurveyScheme    SurveyData
+
+                                                                                       Ingest Receipt                                                                                                                                                                                                                                                                                            EMRData            Sample       FileMetaData
+
+
+
+
+                                                   Specimen
+                                                                                                                                                                                                                                                                                                                                                                                               EMRDataSche       LabResultsSch
+                                                                                                                                                                                                                                                                                                                                                                                                                                 SurveyScheme
+                                                                                                                                                                                                                                                                                                                                                                                                   me                eme
+                                                                          Process
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                 Cohort            Specimen
+
+
+
+
+                                                                                         Result File
+                                                                          Pipeline
+                                                                                         - filetype
+

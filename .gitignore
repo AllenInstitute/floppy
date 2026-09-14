@@ -1,0 +1,25 @@
+# macOS / editor cruft
+.DS_Store
+._*
+*.swp
+
+# python
+__pycache__/
+*.pyc
+.venv/
+
+# reference schema clones — cloned locally by scripts/setup.sh, not committed
+# (aind-data-schema ~106 MB, single-cell-curation ~509 MB); pinned commits live
+# in resources/schema/*.GITREF.txt
+resources/schema/aind-data-schema/
+resources/schema/aind-data-mcp/
+resources/schema/single-cell-curation/
+
+# gapdoc seed skeletons are throwaway intermediates
+*-gap-seed.json
+
+# corpus binary originals (~46 MB, churny) — humans keep these elsewhere; the
+# resources/_text/ extractions are what floppy actually reads. See README "sharing".
+resources/General/
+resources/Workstream */
+resources/Figma Boards/

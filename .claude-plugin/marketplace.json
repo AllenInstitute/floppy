@@ -1,0 +1,21 @@
+{
+  "name": "allen-bdr",
+  "owner": {
+    "name": "Aishwarya Chander",
+    "email": "aishwarya.chander@alleninstitute.org"
+  },
+  "description": "Allen Institute BioData Registry tools for Claude Code.",
+  "plugins": [
+    {
+      "name": "floppy",
+      "source": ".",
+      "description": "BDR project assistant: /floppy-ask answers project and aind-data-schema questions from the bundled corpus; /floppy-gaps writes schema gap analyses in the compact Milestone-0 format.",
+      "version": "0.2.0",
+      "author": {
+        "name": "Aishwarya Chander",
+        "email": "aishwarya.chander@alleninstitute.org"
+      },
+      "keywords": ["biodata-registry", "bdr", "aind-data-schema", "gap-analysis", "allen-institute"]
+    }
+  ]
+}

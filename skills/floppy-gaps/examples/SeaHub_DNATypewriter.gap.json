@@ -1,0 +1,547 @@
+{
+ "mode": "placeholder",
+ "meta": {
+  "dataset": "DNA Typewriter lineage recording",
+  "descriptor": "Mouse, SeaHub",
+  "source_organization": "Seattle Hub for Synthetic Biology (SeaHub)",
+  "prepared_by": "Aishwarya Chander \u00b7 Workstream 2",
+  "reference_schema": "aind-data-schema v2.9.0 (commit 18114d7b)",
+  "milestone": "Milestone 1 \u2014 Track C",
+  "status": "Draft",
+  "date": "2026-09-14",
+  "version": "v0.2"
+ },
+ "title": "SeaHub DNA Typewriter Gap Analysis",
+ "detailed_heading": "Detailed Dataset Analysis: DNA Typewriter lineage recording (Mouse, SeaHub)",
+ "intro": [
+  "This section provides a field-level breakdown for the dataset SeaHub nominated as representative of the work the registry will need to support. DNA Typewriter is a genomic recording system: a prime editor and an engineered target array are delivered to a mouse zygote by pronuclear injection, and each cell division writes an ordered insertion into a six-position register, so that a single destructive readout at E13.5 recovers the cell's division history rather than only its present state.",
+  "Two structural features drive most of the gaps. First, cardinality breaks in both directions at once \u2014 one embryo produces a bulk amplicon library, a single-cell transcriptome library, a single-cell recorder library and a ddPCR assay, while one combinatorial-indexing run carries nuclei from two embryos across twenty-five plates. Second, the biological subject is a transgenic embryo produced by injection into a donor zygote and gestated by an unrelated surrogate, a configuration that the required fields on MouseSubject cannot express at all.",
+  {
+   "label": "Placeholder note.",
+   "body": "This analysis was prepared from a preprint and a scoping conversation, not from a metadata export. Source field names below are descriptive labels for quantities the paper reports, not real keys from a SeaHub system. Classifications are verified statements about what aind-data-schema v2.9.0 does and does not contain; they are not statements about what SeaHub records, and the metrics are not comparable to the Patch-seq, Cell DIVE mIF, TEA-seq or AICS analyses, all of which were prepared from real field inventories."
+  }
+ ],
+ "sources_reviewed": [
+  "Yu Q, Kim H, Seidel S, et al. In vivo reconstruction of the cell lineage history of a developing mouse with DNA Typewriter, from zygote to late organogenesis. bioRxiv 2026.07.29.741625 (posted 2026-07-30) \u2014 Methods, Computational Methods, Data/Code availability",
+  "SeaHub scoping meeting, 2026-09 \u2014 assays, source systems, registration-scope questions",
+  "aind-data-schema v2.9.0, commit 18114d7b \u2014 core/, components/, docs/source/aind_data_schema_models/",
+  "CELLxGENE Discover schema v7.1.0, commit 1cb494af \u2014 transcriptomic cross-reference only"
+ ],
+ "sample_lead": "Sample asset:",
+ "sample_asset": [
+  "Embryo #3 (Mus musculus, C57BL/6J, E13.5, sex not determined), 1 of 10 transferred, 1 of 3 carrying detectable recorder integrations",
+  "Recorder: piggyBac-delivered PEmax-P2A-dTomato and epegRNA-circTAPE; 11 TAPE integration barcodes; ~7 PEmax copies by ddPCR",
+  "Four acquisitions from one embryo: bulk TAPE amplicon-seq (NextSeq 2000), sci-RNA-seq3, single-cell TAPE, duplex ddPCR (QX600 AutoDG)",
+  "Pooling: nuclei from embryos #2 (~24M) and #3 (~10M) co-processed across 6 RT plates -> 6 ligation plates -> 25 PCR plates at ~400,000 nuclei per plate",
+  "Derived: 1,340,794-cell dated phylogeny, 640,012-cell backbone, imputed node annotations, NextCell browser",
+  "Source: GEO GSE341627; code at github.com/seidels/dtt-mouse-analysis; intermediates on the NextCell site"
+ ],
+ "gap_summary": [
+  {
+   "gap": "Cardinality breaks in both directions within one study",
+   "layer": "Acquisition / DataDescription",
+   "detail": "One embryo yields four assay-level assets and one sci-RNA-seq3 run carries nuclei from two embryos. Acquisition.subject_id is a single required str; specimen_id may be a list but check_subject_specimen_id requires the subject ID in each entry, so it cannot carry a second animal. Pool ID, pool size, member subjects and demultiplexing method are all unrepresentable. Sixth appearance of this gap and the first dataset exhibiting both directions together."
+  },
+  {
+   "gap": "No Study or Cohort entity for the injection cohort",
+   "layer": "DataDescription",
+   "detail": "Ten embryos were transferred from one injection session, three carried integrations, one was pursued, and two indexing experiments produced the libraries. None of these groupings has a home above data_description.tags[], which is free text and unsearchable. This is also the container SeaHub asked for. Same gap as Patch-seq, mIF, Immunology cohortGuid and AICS collection_name."
+  },
+  {
+   "gap": "Modality closed enum missing amplicon-seq, bulk RNA-seq and digital PCR",
+   "layer": "DataDescription / Acquisition / Instrument / QC",
+   "detail": "Three of the four acquisitions have no modality term. The 22-value Modality enum contains SCRNASEQ but nothing for targeted amplicon sequencing, bulk transcriptomic sequencing or quantitative PCR. BARSEQ and MAPSEQ denote anatomical projection mapping, not a genomic recorder readout. Blocks modalities, data_streams, instrument.modalities and QCMetric.modality simultaneously, as it did for scATACseq and ADT in TEA-seq."
+  },
+  {
+   "gap": "Engineered recorder construct, barcode library and integration inventory have no schema home",
+   "layer": "Subject / Procedures",
+   "detail": "subject_details.genotype is a free-text string designed for inherited alleles; the recorder is delivered somatically at E0.5, mosaic, and present at variable copy number, so a single string cannot carry it. NonViralMaterial offers name, source, lot and concentration only \u2014 no construct map, cassette, backbone or designed identifier space \u2014 and nothing holds the per-animal measured state. Needs a subject-level genetic-modification record, not an extension container."
+  },
+  {
+   "gap": "date_of_birth is required and meaningless for an embryo; no developmental stage field",
+   "layer": "Subject",
+   "detail": "MouseSubject.date_of_birth is required and BEFORE-validated. An embryo harvested at E13.5 has a conception date and a harvest date but no birth date, so any value entered is a fabrication. Developmental stage \u2014 the primary temporal anchor of the experiment \u2014 has no field. CELLxGENE binds stage to MmusDv, where E13.5 is an exact term. Make date_of_birth conditional and add an ontology-bound stage field."
+  },
+  {
+   "gap": "Sex enum admits only Female and Male; the embryos were not sexed",
+   "layer": "Subject",
+   "detail": "Sex is a required enum with exactly two values and no sentinel for not-determined or not-applicable. E13.5 embryos processed whole for nuclei were never sexed, so the record cannot be completed honestly and the field cannot be left null."
+  },
+  {
+   "gap": "BreedingInfo cannot express a zygote donor plus an unrelated gestational surrogate",
+   "layer": "Subject / Procedures",
+   "detail": "BreedingInfo requires maternal_id, maternal_genotype, paternal_id and paternal_genotype and models two genetic parents. This dataset has three contributing animals: a superovulated C57BL/6J donor female, a sperm donor, and a pseudopregnant CD-1 surrogate who contributes no genetic material. The concepts share a name but not a domain. The donor and surrogate undergo procedures while producing no data asset, leaving it undecided whether they are registered subjects at all."
+  },
+  {
+   "gap": "All molecular preparation steps fall to SpecimenProcedureType.OTHER",
+   "layer": "Procedures",
+   "detail": "Harvest and flash freezing, nuclei isolation, two-step fixation (methanol then BS3), genomic DNA extraction, reverse transcription, Tn5 tagmentation and two-step indexed library preparation \u2014 every step between the animal and the sequencer. FIXATION exists but nuclei isolation does not, so one source procedure splits across one mapped concept and one catch-all. Fifth independent appearance, after Patch-seq, mIF, TEA-seq, Immunology and AICS."
+  },
+  {
+   "gap": "Three-level combinatorial index hierarchy has no representation",
+   "layer": "Acquisition",
+   "detail": "Cell identity in sci-RNA-seq3 is the composition of a reverse-transcription index, a ligation index and a PCR index across 6, 6 and 25 plates. The first index is the only record of which embryo a nucleus came from, so without a plate and well model the demultiplexing provenance lives solely in analysis code. Loading density (~400,000 nuclei/plate) drives collision and doublet rate and has no field. AICS raised the same absence for plate and well; this dataset nests it three deep."
+  },
+  {
+   "gap": "Library design and per-embryo parsing references are required to read the raw data and cannot be registered",
+   "layer": "DataDescription / Procedures",
+   "detail": "The amplicon FASTQ is uninterpretable without two per-embryo reference sets: a whitelist of 12-base integration barcodes and an insertion vocabulary of admitted edit symbols. These are simultaneously derived outputs and required inputs, which the linear source_data[] model cannot express. A file required to parse the raw data is part of the registered asset, not an annotation about it."
+  },
+  {
+   "gap": "ProcessName vocabulary omits every pipeline step, and the lineage tree has no asset shape",
+   "layer": "Processing",
+   "detail": "ProcessName has no entry for demultiplexing, read alignment (STAR against mm39, GENCODE vM37), duplicate removal, count-matrix generation or phylogenetic inference, so the entire pipeline registers as OTHER or ANALYSIS. Reference genome and annotation build have no dedicated fields. Whether the 1,340,794-cell dated tree registers as one derived asset, a family, or a database-resident object is undecided \u2014 the same question raised for Patch-seq reconstruction annotations."
+  },
+  {
+   "gap": "metadata.location is a single string; raw data sits at GEO and intermediates on a project website",
+   "layer": "DataDescription / Metadata",
+   "detail": "Raw data is deposited at GEO under GSE341627, intermediates are hosted on the NextCell site, and neither is an Allen-managed path. D11 states a file path is sufficient and D7 covers unowned data, but the single-string field cannot hold a repository accession, a project-site URL and a bucket simultaneously. Same shape as the Patch-seq multi-directory and TEA-seq CellRanger gaps, with the authoritative copy held externally."
+  },
+  {
+   "gap": "other_identifiers and institution fields cannot express five institutions and two external accessions",
+   "layer": "Metadata / DataDescription",
+   "detail": "The dataset carries a GEO accession, a bioRxiv DOI, a GitHub repository, and two IACUC protocols (#2530, #2401), with contributions from SeaHub, the Allen Institute, UW, HHMI and Fred Hutch. other_identifiers has no structure for typing identifiers by registry, and data_description.institution expects one registry-resolvable organization. The procedure-level ethics_review_id is a scalar str, forcing a choice where two protocols apply."
+  },
+  {
+   "gap": "No checksum field anywhere in the metadata core",
+   "layer": "Metadata / Platform",
+   "detail": "A grep for checksum, md5 and sha256 across src/ at commit 18114d7b returns nothing. File integrity cannot be verified from the registry alone, which matters more here because the authoritative copy is held externally at GEO and could change without the registry knowing. Belongs in the platform layer alongside the storage reference."
+  },
+  {
+   "gap": "coordinate_system is required where a sequencing run has no spatial frame",
+   "layer": "Instrument",
+   "detail": "Instrument.global_coordinate_system is required and every transform is checked against it. None of the four acquisitions has a spatial frame, so all four would be obliged to declare a fiction. Patch-seq recorded an Illumina sequencer forced to declare IMAGE_XYZ; this dataset would do the same four times over. Exempt non-spatial modalities, or add an explicit not-applicable coordinate system."
+  }
+ ],
+ "post_gap_notes": [],
+ "field_intro": "These tables document field-level mappings for the core schemas (subject, genetic modification, procedures, acquisition, processing). Source field names are descriptive labels, not keys from a SeaHub system \u2014 see the placeholder note above.",
+ "entities": [
+  {
+   "name": "Subject \u2014 transgenic embryo",
+   "fields": [
+    {
+     "source_field": "embryo_id",
+     "source_type": "str",
+     "target_field": "subject.subject_id",
+     "classification": "Mapped",
+     "cross_dataset_gap": "\u2014",
+     "notes": "Direct once a durable identifier replaces the manuscript's ordinal label. Require a persistent ID at onboarding."
+    },
+    {
+     "source_field": "strain",
+     "source_type": "str",
+     "target_field": "subject_details.strain",
+     "classification": "Mapped",
+     "cross_dataset_gap": "\u2014",
+     "notes": "C57BL/6J (JAX 000664). Required Strain entry; standard."
+    },
+    {
+     "source_field": "species",
+     "source_type": "str",
+     "target_field": "subject_details.species",
+     "classification": "Mapped",
+     "cross_dataset_gap": "\u2014",
+     "notes": "Mus musculus. Required Species value."
+    },
+    {
+     "source_field": "developmental_stage",
+     "source_type": "str (E13.5; injected E0.5)",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Developmental stage",
+     "notes": "Primary temporal anchor; determines how much history the recorder could write. Add ontology-bound stage field (MmusDv pattern)."
+    },
+    {
+     "source_field": "date_of_birth",
+     "source_type": "date",
+     "target_field": "subject_details.date_of_birth",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Developmental stage",
+     "notes": "Required, BEFORE-validated. Embryo has conception and harvest dates, no birth date. Make conditional; require an alternative temporal anchor."
+    },
+    {
+     "source_field": "sex",
+     "source_type": "enum (not determined)",
+     "target_field": "subject_details.sex",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Schema field definitions",
+     "notes": "Required enum, Female/Male only, no sentinel. Add not-determined and not-applicable values."
+    },
+    {
+     "source_field": "zygote_donor_female",
+     "source_type": "str (superovulated C57BL/6J)",
+     "target_field": "subject_details.breeding_info.maternal_id",
+     "classification": "Needs Review",
+     "cross_dataset_gap": "Engineered / non-standard subject",
+     "notes": "Genetic mother and a subject in her own right. Decide whether contributing animals are registered subjects."
+    },
+    {
+     "source_field": "surrogate_dam",
+     "source_type": "str (pseudopregnant CD-1)",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Engineered / non-standard subject",
+     "notes": "Different strain, no genetic contribution; BreedingInfo has no slot for a non-genetic contributing animal. Add surrogate reference with strain and role."
+    },
+    {
+     "source_field": "genotype",
+     "source_type": "str (piggyBac PEmax + epegRNA-circTAPE, mosaic)",
+     "target_field": "subject_details.genotype",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Engineered / non-standard subject",
+     "notes": "Free-text string for inherited alleles; cannot carry a somatically delivered, mosaic, variable-copy construct. Add a genetic-modification record."
+    },
+    {
+     "source_field": "iacuc_protocol",
+     "source_type": "list[str] (#2530, #2401)",
+     "target_field": "acquisition.ethics_review_id",
+     "classification": "Mapped",
+     "cross_dataset_gap": "Data access restrictions",
+     "notes": "Optional[List[str]] accepts both. Procedure-level field is scalar str \u2014 flag it."
+    }
+   ]
+  },
+  {
+   "name": "Genetic modification \u2014 the recorder construct",
+   "fields": [
+    {
+     "source_field": "delivery_method",
+     "source_type": "str (pronuclear injection at E0.5)",
+     "target_field": "procedures.subject_procedures[].Injection",
+     "classification": "Needs Review",
+     "cross_dataset_gap": "Procedure vocab",
+     "notes": "Injection.targeted_structure is a MouseAnatomyModel; a zygote pronucleus is not an anatomical structure in that vocabulary. Clarify target vocabulary for subcellular/embryonic injection."
+    },
+    {
+     "source_field": "construct_identity",
+     "source_type": "str (PEmax-P2A-dTomato-WPRE-bGHpA, piggyBac)",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Engineered / non-standard subject",
+     "notes": "NonViralMaterial carries name, source, lot, concentration only. No construct map, cassette, promoter, insulator or backbone. Genetic-modification record."
+    },
+    {
+     "source_field": "barcode_library_design",
+     "source_type": "str (TAPE-BC NNNNNAANNNNN; 6-unit circTAPE)",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Engineered / non-standard subject",
+     "notes": "Defines the identifier space every lineage call depends on; free text would make it unsearchable and unvalidatable. Register as a referenced design artifact."
+    },
+    {
+     "source_field": "integration_barcodes_detected",
+     "source_type": "list[str] (17/11/5 in embryos #2/#3/#6)",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Engineered / non-standard subject",
+     "notes": "Per-animal, measured not designed, and the partition key for all recorder analysis. Genetic-modification record."
+    },
+    {
+     "source_field": "transgene_copy_number",
+     "source_type": "float (~2 and ~7 PEmax copies, ddPCR)",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Engineered / non-standard subject",
+     "notes": "Explains the order-of-magnitude difference in recorder activity between embryos. Genetic-modification record with measurement method."
+    },
+    {
+     "source_field": "transgene_activation_state",
+     "source_type": "str (absent / modest / high editing)",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Engineered / non-standard subject",
+     "notes": "SeaHub raised transgene present versus activated as a distinction the registry must carry. Genetic-modification record."
+    }
+   ]
+  },
+  {
+   "name": "Procedures \u2014 animal and specimen preparation",
+   "fields": [
+    {
+     "source_field": "superovulation",
+     "source_type": "str (hCG and PMSG, intraperitoneal)",
+     "target_field": "subject_procedures[].NonSurgicalInjection",
+     "classification": "Mapped",
+     "cross_dataset_gap": "Procedure + subject model",
+     "notes": "Fits the type, but is performed on the donor female rather than the registered subject. Resolve which animal the procedure attaches to."
+    },
+    {
+     "source_field": "embryo_transfer_surgery",
+     "source_type": "str (transfer into ampulla)",
+     "target_field": "subject_procedures[].Surgery",
+     "classification": "Needs Review",
+     "cross_dataset_gap": "Procedure + subject model",
+     "notes": "Surgery is performed on the surrogate; the subject is the transferred embryo. Model the surrogate role in BreedingInfo."
+    },
+    {
+     "source_field": "harvest_and_flash_freeze",
+     "source_type": "str (PBS rinse, liquid nitrogen)",
+     "target_field": "SpecimenProcedure (type OTHER)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Procedure vocab",
+     "notes": "No entry for harvest or cryopreservation; STORAGE describes conditions, not the freezing step. Vocabulary addition."
+    },
+    {
+     "source_field": "nuclei_isolation_and_fixation",
+     "source_type": "str (methanol then BS3 crosslink)",
+     "target_field": "SpecimenProcedure",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Procedure vocab",
+     "notes": "FIXATION exists, nuclei isolation does not; one source procedure splits across two target concepts. Vocabulary addition."
+    },
+    {
+     "source_field": "gdna_extraction",
+     "source_type": "str (Qiagen AllPrep 80204)",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Procedure vocab",
+     "notes": "Produces the input to every amplicon library; recordable only as OTHER. Vocabulary addition."
+    },
+    {
+     "source_field": "library_preparation",
+     "source_type": "str (two-step indexed PCR; Tn5/Nextera N7)",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Procedure vocab",
+     "notes": "The most consequential ex-vivo step for a sequencing dataset has no type. Same absence Patch-seq recorded for SMARTer v4 and Nextera. Vocabulary addition."
+    },
+    {
+     "source_field": "protocol_reference",
+     "source_type": "str (textbook 4th ed.; methods citation)",
+     "target_field": "procedures.*.protocol_id",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Schema field definitions",
+     "notes": "ProtocolMixin expects a protocols.io DOI; a textbook chapter is legitimate provenance the field cannot express. Clarify accepted protocol identifier types."
+    }
+   ]
+  },
+  {
+   "name": "Acquisition \u2014 bulk amplicon sequencing of TAPE",
+   "fields": [
+    {
+     "source_field": "assay",
+     "source_type": "str (bulk amplicon-seq of TAPE)",
+     "target_field": "data_description.modalities",
+     "classification": "Gap",
+     "cross_dataset_gap": "Schema field definitions",
+     "notes": "No amplicon or targeted-DNA-sequencing entry. BARSEQ/MAPSEQ denote projection mapping. Modality addition or ontology binding."
+    },
+    {
+     "source_field": "sequencer",
+     "source_type": "str (Illumina NextSeq 2000)",
+     "target_field": "instrument.components[]",
+     "classification": "Needs Review",
+     "cross_dataset_gap": "Custom vs. off-the-shelf",
+     "notes": "No dedicated device class for a sequencer. Clarify which device class applies."
+    },
+    {
+     "source_field": "read_structure",
+     "source_type": "str (318/10/10 or 70/10/200; SE or PE)",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Schema field definitions",
+     "notes": "Determines whether the amplicon is recoverable from read 1 or reverse-complemented from read 2. Acquisition configuration, not a processing parameter. Add read-structure field."
+    },
+    {
+     "source_field": "gdna_input_mass",
+     "source_type": "float (5 ng)",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Schema field definitions",
+     "notes": "Bounds library complexity and therefore the interpretability of barcode counts. Add library-preparation input fields."
+    },
+    {
+     "source_field": "pcr_cycles",
+     "source_type": "int (25-28, then 6-8)",
+     "target_field": "*.additional_settings",
+     "classification": "Gap",
+     "cross_dataset_gap": "Schema field definitions",
+     "notes": "Drives duplicate rate; expressible only through an extension container, which is not a semantic match. Add library-preparation fields."
+    },
+    {
+     "source_field": "coordinate_system",
+     "source_type": "not applicable",
+     "target_field": "instrument.global_coordinate_system",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Custom vs. off-the-shelf",
+     "notes": "Required and recursively validated; a sequencing run has no spatial frame. Exempt non-spatial modalities."
+    }
+   ]
+  },
+  {
+   "name": "Acquisition \u2014 sci-RNA-seq3 with paired single-cell TAPE readout",
+   "fields": [
+    {
+     "source_field": "assay",
+     "source_type": "str (sci-RNA-seq3)",
+     "target_field": "data_description.modalities = SCRNASEQ",
+     "classification": "Mapped",
+     "cross_dataset_gap": "Schema field definitions",
+     "notes": "Applies. CELLxGENE identifies it precisely as EFO:0030028, which a closed enum cannot express. Consider ontology binding."
+    },
+    {
+     "source_field": "subject_ids",
+     "source_type": "list[str] (embryos #2 and #3 in one run)",
+     "target_field": "acquisition.subject_id",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Many-to-one subject mapping",
+     "notes": "Single required string; specimen_id list cannot carry a second animal because of the substring validator. Decompose at onboarding or add subjects[]."
+    },
+    {
+     "source_field": "rt_plate / rt_well",
+     "source_type": "str (6 plates, 96 wells)",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Plate / well layout",
+     "notes": "The first index is the only record of which embryo a nucleus came from. Container hierarchy model."
+    },
+    {
+     "source_field": "ligation_plate / pcr_plate",
+     "source_type": "str (6 plates; 23 + 2 plates)",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Plate / well layout",
+     "notes": "Cell identity is the composition of three indices across three plate levels. Container hierarchy model."
+    },
+    {
+     "source_field": "nuclei_per_plate",
+     "source_type": "int (~400,000)",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Plate / well layout",
+     "notes": "Determines collision and doublet rate, handled in the paper by a dedicated doublet-removal stage. Container hierarchy model."
+    },
+    {
+     "source_field": "suspension_type",
+     "source_type": "str (nucleus)",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Schema field definitions",
+     "notes": "Changes the expected expression profile; CELLxGENE requires it as a controlled field for this reason. Add controlled cell/nucleus field."
+    },
+    {
+     "source_field": "library_split_ratio",
+     "source_type": "str (1/3 transcriptome, 2/3 TAPE; 80:20)",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Many-to-one subject mapping",
+     "notes": "Two libraries from one cDNA pool sequenced in one run; neither one acquisition nor two independent acquisitions describes this. Resolve with the cardinality decision."
+    },
+    {
+     "source_field": "sequencer",
+     "source_type": "str (NextSeq 2000 or NovaSeq X)",
+     "target_field": "instrument.components[]",
+     "classification": "Needs Review",
+     "cross_dataset_gap": "Custom vs. off-the-shelf",
+     "notes": "One logical pool may be sequenced across two instrument models. Clarify instrument cardinality."
+    }
+   ]
+  },
+  {
+   "name": "Acquisition \u2014 droplet digital PCR",
+   "fields": [
+    {
+     "source_field": "assay",
+     "source_type": "str (duplex ddPCR, QX600 AutoDG)",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Schema field definitions",
+     "notes": "No PCR or quantification modality; registering as OTHER makes the measurement undiscoverable. Modality addition or ontology binding."
+    },
+    {
+     "source_field": "target_probe / reference_probe",
+     "source_type": "str (Cas9 FAM; GAPDH Cy5.5)",
+     "target_field": "components.reagent.* (partial)",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Schema field definitions",
+     "notes": "Fluorophore and probe classes exist for imaging and in-situ work; a qPCR probe pair with a reference assay reuses the names but not the domain. Clarify probe modelling for quantification assays."
+    },
+    {
+     "source_field": "derived_copy_number",
+     "source_type": "float ((Cas9 / GAPDH) x 2)",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Engineered / non-standard subject",
+     "notes": "Per-subject quantitative result with a stated formula; gates whether a dataset is worth registering. Genetic-modification record."
+    }
+   ]
+  },
+  {
+   "name": "Processing and derived data",
+   "fields": [
+    {
+     "source_field": "demultiplexing",
+     "source_type": "str (bcl2fastq 2.20; deML)",
+     "target_field": "processing.data_processes[].process_name",
+     "classification": "Gap",
+     "cross_dataset_gap": "Processing provenance",
+     "notes": "No entry; the step assigning reads to plates and therefore to embryos records as OTHER. ProcessName additions."
+    },
+    {
+     "source_field": "read_alignment",
+     "source_type": "str (STAR 2.6.1d, mm39, GENCODE vM37)",
+     "target_field": "processing.data_processes[].process_name",
+     "classification": "Gap",
+     "cross_dataset_gap": "Processing provenance",
+     "notes": "No alignment entry; reference genome and annotation build have no dedicated fields. ProcessName additions plus reference fields."
+    },
+    {
+     "source_field": "count_matrix_generation",
+     "source_type": "str (UMI dedup, gene count matrix)",
+     "target_field": "processing.data_processes[].process_name",
+     "classification": "Gap",
+     "cross_dataset_gap": "Processing provenance",
+     "notes": "The principal derived artifact of every transcriptomic dataset has no process name. ProcessName additions."
+    },
+    {
+     "source_field": "barcode_whitelist / insertion_vocabulary",
+     "source_type": "file (per-embryo, from tape/reference.py)",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Data discovery",
+     "notes": "Derived from the data and then required to parse it; both an output and an input, which linear source_data[] cannot express. Register as referenced reference-set assets."
+    },
+    {
+     "source_field": "lineage_tree",
+     "source_type": "file (1,340,794-cell dated phylogeny)",
+     "target_field": "data_description.data_level = derived",
+     "classification": "Needs Review",
+     "cross_dataset_gap": "Data discovery",
+     "notes": "Spans all cells of one embryo with node-level ages and imputed annotations. One asset, a family, or a database-resident object is undecided. Define registration shape for graph products."
+    },
+    {
+     "source_field": "code_repository",
+     "source_type": "url (github.com/seidels/dtt-mouse-analysis)",
+     "target_field": "processing.data_processes[].code.url",
+     "classification": "Mapped",
+     "cross_dataset_gap": "\u2014",
+     "notes": "Populated here, which is unusual against the corpus baseline where code URLs are absent. Use as-is."
+    },
+    {
+     "source_field": "raw_data_location",
+     "source_type": "str (GEO GSE341627; NextCell site)",
+     "target_field": "metadata.location",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Data discovery",
+     "notes": "Single string; raw data at a public repository, intermediates at a project site, neither Allen-managed. Asset root plus manifest; resolve external-ingest policy."
+    },
+    {
+     "source_field": "file_checksum",
+     "source_type": "not recorded",
+     "target_field": "\u2014 (platform)",
+     "classification": "Unmappable",
+     "cross_dataset_gap": "Data discovery",
+     "notes": "No checksum field exists in the metadata core. Platform-layer integrity record."
+    },
+    {
+     "source_field": "institution / investigators",
+     "source_type": "list[str] (SeaHub, Allen, UW, HHMI, Fred Hutch)",
+     "target_field": "data_description.institution, investigators",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Study / collection grouping",
+     "notes": "Fields expect one registry-resolvable institution; this dataset has five and a publication led outside the Allen Institute. Structured multi-institution provenance."
+    }
+   ]
+  }
+ ]
+}

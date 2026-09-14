@@ -1,0 +1,47 @@
+# source: resources/Workstream 2 - Schema and Data Model/Immunology metadata/Cell DIVE EXP-01367 Biomarkers to ND.xlsx
+# original kept: yes
+
+
+### sheet: Sheet1
+
+Biomarker | Clone | Fluorophore | Round Stained | UNITProt ID | Checked
+CD16a | DJ130c | AF750 |  | P08637 | True
+CD103 | 3904R | AF750 |  | P38570 | True
+EphB2 | D2X2I | AF750 |  | P29323 | True
+CD8a | C8/144B | AF750 |  | P01732 | True
+CD15 | MC480 | AF750 |  | N/A
+CD45 | 2B11 + PD7/26 | AF750 |  | P08575 | True
+CD20 | L26 | AF750 |  | P11836 | True
+IRF-4 | E8H3S | AF750 |  | Q15306 | True
+Vimentin | D21H3 | AF750 |  | P08670 | True
+Carbonic Anhydrase IX | polyclonal | AF750 |  | Q16790 | True
+FoxP3 | D2W8E | AF647 |  | Q9BZS1 | True
+SMAD4 | D3R4N | AF647 |  | Q13485 | True
+Phospho-Stat1 (Y701) | 58D6 | AF647 |  | P42224 | True
+CD3d | EP4426 | AF647 |  | P04234 | True
+HLADR | LN3 | AF647 |  | P01903 | True
+Na,K-ATPase | EP1845Y | AF647 |  | P05023 | True
+NFKB p65 | D14E12 | AF647 |  | Q04206 | True
+E-Cadherin | 240000000000 | AF647 |  | P12830 | True
+HIF-1-alpha | D1S7W | AF647 |  | Q16665 | True
+Panck | AE1/AE3 | eF570 |  | P04264,P13645, P13646,P02533,P19012,P08779,Q04695, P05783,P08727, P35908 P12035, P19013,P13647, P02538, P08729, Q01546,Q7Z794,P05787, | True
+Cleaved Gasdermin D (Asp275) | E7H9G | AF555 |  | P57764 | True
+Phospho-c-Jun (Ser73) | D47G9 | AF555 |  | P05412 | True
+MMP-9 | D6O3H | AF555 |  | P14780 | True
+Phospho-STAT3 (Y705) | D3A7 | AF555 |  | P40763 | True
+T-bet/TBX21 | E4I2K | AF555 |  | Q9JKD8 | True
+Granzyme B | D6E9W | AF555 |  | P10144 | True
+CD4 | EPR6855 | AF555 |  | P01730 | True
+YKL-40 | E2L1M | AF555 |  | P36222 | True
+Ki-67 | D2H10 | AF555 |  | P46013 | True
+COL6A1 | 3H10B1 | Coralite+ 488 |  | P12109 | True
+CD90 | D3V8A | AF488 |  | P04216 | True
+Periostin | E5F2S | AF488 |  | Q15063 | True
+CD14 | D7A2T | AF488 |  | P08571 | True
+SMA | 1A4 | AF488 |  | P62736 | True
+COL1A1 | 1E9A7 | Coralite+ 488 |  | P02452 | True
+COL3A1 | 2O1 | Coralite+ 488 |  | P02461 | True
+IDO | D5J4E | AF488 |  | P14902 | True
+ADAMDEC1 | 6C4 | AF488 |  | O15204 | True
+SOD2 | D3X8F | AF488 |  | P04179 | True
+Fibroblast Activation Protein alpha | EPR20021 | N/A |  | Q12884 | True

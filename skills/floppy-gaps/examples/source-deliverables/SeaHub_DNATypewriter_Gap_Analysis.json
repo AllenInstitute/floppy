@@ -1,0 +1,1050 @@
+{
+  "_comment": "Placeholder-mode analysis. Source of truth for the GAP LIST, recommendations, open questions and actions, and the renderer for the one-page brief ONLY: use `gapdoc.py brief`, never `all` or `build`. The full report is SeaHub_DNATypewriter_Gap_Analysis.md rendered by pandoc in the TEA-seq M0 Report layout, which gapdoc cannot emit. Running `gapdoc all` would overwrite that .docx with the ten-section house layout. Field rows are derived from a preprint's Methods and from the annotated metadata example seahub-dnatypewriter-metadata.nd.json, not from a SeaHub field export; replace with the Benchling export before treating any metric as comparable to the five real analyses.",
+  "mode": "placeholder",
+  "meta": {
+    "dataset": "DNA Typewriter mouse lineage recording (Yu, Kim, Seidel et al. 2026 preprint) — representative SeaHub dataset",
+    "source_organization": "Seattle Hub for Synthetic Biology (SeaHub) · Allen Institute · University of Washington",
+    "prepared_by": "Aishwarya Chander · Workstream 2",
+    "reference_schema": "aind-data-schema v2.9.0 (commit 18114d7b), models >=6.1.0,<7; CELLxGENE Discover v7.1.0 (commit 1cb494af) consulted for omics cross-reference",
+    "milestone": "Milestone 1 — Track C · DDM Gate: Sept 11, 2026",
+    "status": "Draft",
+    "date": "2026-09-11",
+    "version": "v0.1"
+  },
+  "purpose": "This document scopes the schema gaps implied by a representative SeaHub dataset ahead of the Milestone 1 Track C deliverable. SeaHub identified no public dataset for its current work and instead nominated the DNA Typewriter mouse lineage preprint as the closest available model of the data the registry will need to support.\n\nThe analysis is written in placeholder mode. A publication describes a data-generating process; it does not expose field names, types, or cardinalities. Every row in section 5 is therefore a hypothesis about what a SeaHub metadata record would have to carry, derived from the paper's Methods and Computational Methods sections and from the scoping conversation held with the team. Classifications are stated against the pinned schema and are reliable as statements about what the schema does and does not contain; they are not statements about what SeaHub actually records. The unknowns list in the brief names what must be supplied before the analysis can be promoted to full mode.",
+  "sources_reviewed": [
+    "Yu Q, Kim H, Seidel S, et al. In vivo reconstruction of the cell lineage history of a developing mouse with DNA Typewriter, from zygote to late organogenesis. bioRxiv 2026.07.29.741625 (posted 2026-07-30) — Methods, Computational Methods, and Data/Code availability sections",
+    "seahub-dnatypewriter-metadata.nd.json — annotated aind-format metadata example built for embryo #3 in the style of teaseq-metadata.nd.json; the attempt to populate a complete record is what surfaced G15-G18",
+    "SeaHub scoping meeting notes, 2026-09 (assays, source systems, registration-scope questions)",
+    "aind-data-schema v2.9.0, commit 18114d7b — core/, components/, docs/source/aind_data_schema_models/",
+    "references/known-gaps.md — accumulated gaps across Patch-seq, Cell DIVE mIF, TEA-seq, Immunology, AICS",
+    "references/decisions-and-open-questions.md — D1, D2, D8, D11; open items on registration granularity and external ingest",
+    "CELLxGENE Discover schema v7.1.0, commit 1cb494af — schema/7.1.0/schema.md",
+    "teaseq-metadata.nd.json (Immunology TEA-seq Example) — format and granularity reference. Note: the corpus copy does not parse (a stray closing brace at line 259 terminates the root object early) and its first specimen_procedures entry merges two procedures into one object with ten duplicated keys, silently discarding PBMC isolation under last-wins parsing."
+  ],
+  "executive_summary": "The dataset inverts the cardinality assumption in both directions at once. One embryo yields a bulk amplicon library, a single-cell transcriptome library, a single-cell recorder library, and a ddPCR copy-number assay, while one sci-RNA-seq3 combinatorial-indexing run carries nuclei from two embryos across twenty-five plates. Separately, the biological subject is a transgenic E13.5 embryo produced by pronuclear injection into a donor zygote and carried by an unrelated surrogate, a configuration that the required fields on MouseSubject cannot express.",
+  "headline": "One embryo produces four assay-level assets and one sequencing run pools two embryos, so neither direction of the asset-to-subject relationship fits a scalar Acquisition.subject_id.",
+  "gaps": [
+    {
+      "id": "G1",
+      "title": "Asset-to-subject cardinality breaks in both directions",
+      "impact": "High",
+      "recommended_action": "R1 — decide between onboarding-time decomposition and a schema-level subjects[] extension",
+      "owner": "WS2 / WS3",
+      "also_in": [
+        "Patch-seq",
+        "Cell DIVE mIF",
+        "TEA-seq",
+        "Immunology",
+        "AICS"
+      ],
+      "origin": "corpus",
+      "evidence": "known-gaps.md gap 1, 'Asset-to-biology cardinality / unit of registration', recorded in all five prior analyses; Acquisition.subject_id is a single required str in core/acquisition.py; the metadata example located the branch point precisely at genomic DNA extraction, where one specimen divides into the amplicon, ddPCR and single-cell assets with nothing recording the shared origin"
+    },
+    {
+      "id": "G2",
+      "title": "No first-class Study or Cohort entity for the injection cohort and its two indexing experiments",
+      "impact": "High",
+      "recommended_action": "R2 — Cohort entity or platform Collection; also the container SeaHub proposed for linking pilot and QC runs to a parent record",
+      "owner": "WS1 / WS2",
+      "also_in": [
+        "Patch-seq",
+        "Cell DIVE mIF",
+        "Immunology",
+        "AICS"
+      ],
+      "origin": "corpus",
+      "evidence": "known-gaps.md gap 2; ten injected embryos, three TAPE-bearing, and two separate sci-RNA-seq3 experiments have no grouping construct above data_description.tags[]"
+    },
+    {
+      "id": "G3",
+      "title": "Modality enum has no entry for targeted amplicon sequencing, bulk RNA sequencing, or digital PCR",
+      "impact": "High",
+      "recommended_action": "R3 — extend the vocabulary or bind assay identity to an ontology subtree; Q2 records the ontology commitment",
+      "owner": "WS2",
+      "also_in": [
+        "Cell DIVE mIF",
+        "TEA-seq",
+        "Immunology"
+      ],
+      "origin": "corpus",
+      "evidence": "known-gaps.md gap 12; docs/source/aind_data_schema_models/modalities.md lists SCRNASEQ, BARSEQ and MAPSEQ but no amplicon, bulk transcriptomic, ATAC, Hi-C or PCR modality"
+    },
+    {
+      "id": "G4",
+      "title": "Engineered recording construct, its barcode library, and its per-animal integration state have no home",
+      "impact": "High",
+      "recommended_action": "R4 — add a genetic-modification record carrying construct identity, delivery method, integration inventory and copy number",
+      "owner": "WS2",
+      "origin": "inferred"
+    },
+    {
+      "id": "G5",
+      "title": "MouseSubject.date_of_birth is required and meaningless for an embryo harvested at a gestational stage",
+      "impact": "High",
+      "recommended_action": "R5 — add a developmental-stage field bound to an ontology and relax the birth-date requirement",
+      "owner": "WS2",
+      "origin": "inferred"
+    },
+    {
+      "id": "G6",
+      "title": "Sex enum admits only Female and Male, and embryo sex is a derived annotation rather than a subject fact",
+      "impact": "Medium",
+      "recommended_action": "R6 — add explicit not-determined and not-applicable sentinels to Sex",
+      "owner": "WS2",
+      "origin": "inferred"
+    },
+    {
+      "id": "G7",
+      "title": "BreedingInfo cannot express a zygote donor, a sperm donor, and an unrelated gestational surrogate",
+      "impact": "Medium",
+      "recommended_action": "R7 — extend BreedingInfo with a surrogate reference and a provenance role for each contributing animal",
+      "owner": "WS2",
+      "origin": "inferred"
+    },
+    {
+      "id": "G8",
+      "title": "Every molecular preparation step falls to SpecimenProcedureType.OTHER",
+      "impact": "Medium-High",
+      "recommended_action": "R8 — add controlled vocabulary entries for nuclei isolation, genomic DNA extraction, reverse transcription, and sequencing library preparation",
+      "owner": "WS2",
+      "also_in": [
+        "Patch-seq",
+        "Cell DIVE mIF",
+        "TEA-seq",
+        "Immunology",
+        "AICS"
+      ],
+      "origin": "corpus",
+      "evidence": "known-gaps.md gap 11; specimen_procedure_types.md contains no nucleic-acid or library-preparation entries"
+    },
+    {
+      "id": "G9",
+      "title": "Three-level combinatorial index hierarchy has no representation",
+      "impact": "High",
+      "recommended_action": "R9 — model the plate and well hierarchy; Q4 asks whether a per-observation layer is in scope",
+      "owner": "WS1 / WS2",
+      "also_in": [
+        "AICS",
+        "TEA-seq"
+      ],
+      "origin": "corpus",
+      "evidence": "known-gaps.md gap 17 (plate / well / experimental design) and gap 1 (pooled demultiplexing, TEA-seq HTO case); the paper reports six reverse-transcription plates, six ligation plates and twenty-five PCR plates"
+    },
+    {
+      "id": "G10",
+      "title": "Library design and per-embryo interpretation references are required to read the raw files and are not registrable",
+      "impact": "High",
+      "recommended_action": "R10 — register design artifacts as first-class referenced objects rather than free-text parameters",
+      "owner": "WS2 / WS3",
+      "origin": "source",
+      "evidence": "SeaHub scoping meeting, library-metadata follow-up item; paper's tape/reference.py derives a per-embryo barcode whitelist and insertion vocabulary without which the amplicon FASTQ cannot be parsed; populating the metadata example showed the dependency cannot be expressed on the raw asset at all, because the source_data_when_raw validator raises if source_data is set on a RAW asset"
+    },
+    {
+      "id": "G11",
+      "title": "Derived lineage trees have no asset type and the process vocabulary omits every step in the pipeline",
+      "impact": "Medium-High",
+      "recommended_action": "R11 — extend ProcessName and define how a phylogeny and its imputed annotations are registered",
+      "owner": "WS2 / WS3",
+      "also_in": [
+        "Patch-seq",
+        "Cell DIVE mIF",
+        "Immunology",
+        "AICS"
+      ],
+      "origin": "corpus",
+      "evidence": "known-gaps.md gap 21 (source_data[] and derived lineage empty); process_names.md has no demultiplexing, read alignment, count-matrix generation or phylogenetic-inference entry"
+    },
+    {
+      "id": "G12",
+      "title": "Externally deposited and jointly owned data has no registration path",
+      "impact": "High",
+      "recommended_action": "Q5 — ownership and registration responsibility for Allen and UW co-produced datasets; R12 records the metadata that must travel regardless",
+      "owner": "WS1 / WS3",
+      "origin": "corpus",
+      "evidence": "decisions-and-open-questions.md, open ingest item 'Ingest from externally managed public locations with no internal copy' (Jess Thomas); raw data deposited at GEO GSE341627 with analysis and publication led by UW"
+    },
+    {
+      "id": "G13",
+      "title": "No checksum field anywhere in the metadata core",
+      "impact": "Medium",
+      "recommended_action": "R13 — add an integrity record at the core or platform layer",
+      "owner": "WS1 / WS2",
+      "also_in": [
+        "Patch-seq",
+        "Immunology"
+      ],
+      "origin": "corpus",
+      "evidence": "known-gaps.md gap 22; a grep for checksum, md5 and sha256 across src/ returns nothing at commit 18114d7b"
+    },
+    {
+      "id": "G14",
+      "title": "Coordinate system is required where a sequencing run has no spatial frame",
+      "impact": "Low",
+      "recommended_action": "R14 — exempt non-spatial modalities from the coordinate-system requirement",
+      "owner": "WS2",
+      "also_in": [
+        "Patch-seq",
+        "Cell DIVE mIF",
+        "AICS"
+      ],
+      "origin": "corpus",
+      "evidence": "known-gaps.md gap 29; Instrument.global_coordinate_system is required and every transform is checked against it by recursive_coord_system_check"
+    },
+    {
+      "id": "G15",
+      "title": "specimen_id substring validator conflicts with real specimen identifiers",
+      "impact": "Medium",
+      "recommended_action": "R15 — replace the substring rule with an explicit subject-specimen relationship",
+      "owner": "WS2",
+      "also_in": [
+        "TEA-seq"
+      ],
+      "origin": "corpus",
+      "evidence": "check_subject_specimen_id in core/acquisition.py requires subject_id to appear in each specimen_id; the identifier DTTembryo03-nuclei01 in the metadata example was constructed to satisfy it, exactly as TEA-seq constructed AIFI00042_PBMC01 because SLIMS barcode MS00000417 is not a substring of subject AIFI20178"
+    },
+    {
+      "id": "G16",
+      "title": "Procedures.subject_id is scalar, so a reproductive chain spanning four animals cannot be filed",
+      "impact": "Medium-High",
+      "recommended_action": "R16 — allow procedures to attach to a contributing animal other than the registered subject; Q3 asks which are registered",
+      "owner": "WS2",
+      "origin": "inferred"
+    },
+    {
+      "id": "G17",
+      "title": "No sequencer or digital PCR device class, and acquisition.instrument_id is scalar",
+      "impact": "Medium",
+      "recommended_action": "R17 — add sequencing device classes and allow an acquisition to reference more than one instrument",
+      "owner": "WS2",
+      "also_in": [
+        "TEA-seq"
+      ],
+      "origin": "corpus",
+      "evidence": "components/devices.py has no sequencer or PCR class, so NextSeq 2000, NovaSeq X and the QX600 all register as generic Device; acquisition.instrument_id is a scalar string while one library pool here was sequenced across two instrument models, the same scalar gap TEA-seq recorded for the 10x Chromium plus NovaSeq pairing"
+    },
+    {
+      "id": "G18",
+      "title": "acquisition_type is free text with no controlled vocabulary",
+      "impact": "Medium",
+      "recommended_action": "R18 — bind acquisition_type to the same vocabulary or ontology chosen for modality in R3",
+      "owner": "WS2",
+      "also_in": [
+        "Patch-seq",
+        "TEA-seq"
+      ],
+      "origin": "corpus",
+      "evidence": "acquisition.acquisition_type is an unconstrained str; 'sci-RNA-seq3' would sit alongside TEA-seq's recorded 'TEA-seq' / 'teaseq' / 'TEA-Seq' capitalisation problem, and CELLxGENE identifies this assay exactly as EFO:0030028"
+    }
+  ],
+  "terminology": [
+    {
+      "source_term": "embryo",
+      "aind_concept": "subject.subject_id with MouseSubject details",
+      "caveat": "The embryo is the organism for lineage purposes but has no birth date, no recorded sex, and a genome modified after fertilisation rather than inherited.",
+      "notes": "Drives G5, G6, G7"
+    },
+    {
+      "source_term": "TAPE integration barcode",
+      "aind_concept": "— (no analog)",
+      "caveat": "A 12-base tag marking one genomic insertion of the recorder. It is neither a subject identifier nor a specimen identifier; it partitions the genome of a single animal into independently recording units.",
+      "notes": "Drives G4, G10"
+    },
+    {
+      "source_term": "monomer array site",
+      "aind_concept": "— (no analog)",
+      "caveat": "An ordered six-position register whose contents encode elapsed division history. The unit of measurement is a position within a synthetic construct, not an anatomical or instrumental coordinate.",
+      "notes": "Related to G4"
+    },
+    {
+      "source_term": "sci-RNA-seq3 plate index",
+      "aind_concept": "— (no analog)",
+      "caveat": "Cell identity is reconstructed from the combination of reverse-transcription, ligation and PCR indices. No level of the schema holds a plate or well.",
+      "notes": "Drives G9"
+    },
+    {
+      "source_term": "insertion vocabulary",
+      "aind_concept": "— (no analog)",
+      "caveat": "A per-embryo set of admitted edit symbols derived from the data itself and then used to parse it. It is simultaneously a derived artifact and an input to interpretation.",
+      "notes": "Drives G10"
+    },
+    {
+      "source_term": "surrogate dam",
+      "aind_concept": "components.subjects.BreedingInfo.maternal_id",
+      "caveat": "The concepts share a name but not a domain. The CD-1 surrogate gestates the embryo and contributes no genetic material, while maternal_id is defined as a genetic parent.",
+      "notes": "Drives G7"
+    },
+    {
+      "source_term": "lineage tree",
+      "aind_concept": "data_description.data_level = derived",
+      "caveat": "The tree is the scientific product and the object other groups will reuse, but it is a single graph spanning approximately 1.34 million cells rather than a per-subject or per-acquisition artifact.",
+      "notes": "Drives G11"
+    }
+  ],
+  "entities": [
+    {
+      "name": "Subject — transgenic embryo",
+      "description": "The source system tracks a transgenic C57BL/6J embryo generated by pronuclear injection at E0.5 and harvested at E13.5. The schema models a mouse subject as a born animal with a birth date, a recorded sex, a strain, and two genetic parents. Neither the gestational timing nor the post-fertilisation genome modification has a place in that model, and the required fields are the ones that fail.",
+      "fields": [
+        {
+          "source_field": "embryo_id",
+          "source_type": "str (e.g. 'embryo #3', 1 of 10 transferred)",
+          "target_field": "subject.subject_id",
+          "classification": "Mapped",
+          "notes": "Direct correspondence once a durable identifier replaces the manuscript's ordinal label.",
+          "recommendation": "Use as-is; require a persistent identifier at onboarding."
+        },
+        {
+          "source_field": "strain",
+          "source_type": "str ('C57BL/6J', JAX 000664)",
+          "target_field": "subject_details.strain",
+          "classification": "Mapped",
+          "notes": "Strain is a required Strain.ONE_OF and C57BL/6J is a standard entry.",
+          "recommendation": "Use as-is."
+        },
+        {
+          "source_field": "species",
+          "source_type": "str ('Mus musculus')",
+          "target_field": "subject_details.species",
+          "classification": "Mapped",
+          "notes": "Required Species.ONE_OF.",
+          "recommendation": "Use as-is."
+        },
+        {
+          "source_field": "developmental_stage",
+          "source_type": "str ('E13.5'; injection at E0.5)",
+          "target_field": "— (no analog)",
+          "classification": "Gap",
+          "notes": "No gestational or developmental-stage field exists. The stage is the primary temporal anchor of the entire experiment and determines what the recorder had time to write.",
+          "recommendation": "R5"
+        },
+        {
+          "source_field": "date_of_birth",
+          "source_type": "not applicable (embryo not carried to term)",
+          "target_field": "subject_details.date_of_birth",
+          "classification": "Conflict",
+          "notes": "The field is required and typed as a date with BEFORE time validation. An embryo harvested at E13.5 has a conception date and a harvest date but no birth date, so any value entered is a fabrication.",
+          "recommendation": "R5"
+        },
+        {
+          "source_field": "sex",
+          "source_type": "not determined (embryos not sexed)",
+          "target_field": "subject_details.sex",
+          "classification": "Conflict",
+          "notes": "Sex is a required enum admitting only Female and Male. There is no sentinel for not determined, so a record for an unsexed embryo cannot be completed honestly.",
+          "recommendation": "R6"
+        },
+        {
+          "source_field": "zygote_donor_female",
+          "source_type": "str (superovulated C57BL/6J female)",
+          "target_field": "subject_details.breeding_info.maternal_id",
+          "classification": "Needs Review",
+          "notes": "The donor female is the genetic mother and a subject in her own right, having undergone hormonal superovulation. Whether she is registered as a subject or referenced only as breeding provenance is a team decision.",
+          "recommendation": "R7 · Q3"
+        },
+        {
+          "source_field": "surrogate_dam",
+          "source_type": "str (pseudopregnant CD-1 female, Charles River 022)",
+          "target_field": "— (no analog)",
+          "classification": "Gap",
+          "notes": "The gestational surrogate is a different strain from the embryo and contributes no genetic material. BreedingInfo has no slot for a non-genetic contributing animal.",
+          "recommendation": "R7"
+        },
+        {
+          "source_field": "genotype",
+          "source_type": "str (piggyBac-delivered PEmax and epegRNA-circTAPE, mosaic)",
+          "target_field": "subject_details.genotype",
+          "classification": "Conflict",
+          "notes": "genotype is a free-text string designed for inherited alleles. The recorder is delivered somatically, present at variable copy number, and mosaic across the embryo, so a single string cannot carry it.",
+          "recommendation": "R4"
+        },
+        {
+          "source_field": "iacuc_protocol",
+          "source_type": "list[str] ('#2530', '#2401')",
+          "target_field": "acquisition.ethics_review_id",
+          "classification": "Mapped",
+          "notes": "Acquisition.ethics_review_id is Optional[List[str]] and accepts both protocol numbers. Procedure-level fields take a single string, so a procedure governed by two protocols needs a choice.",
+          "recommendation": "Use as-is at acquisition level; flag the procedure-level scalar."
+        }
+      ]
+    },
+    {
+      "name": "Genetic modification — the recorder construct",
+      "description": "The source system tracks an engineered recording system delivered as piggyBac transposon mRNA plus a plasmid library carrying a prime editor, an epegRNA, a degenerate insertion sequence, and a barcoded six-unit target array. The schema models injected material as either a viral preparation or a generic reagent, neither of which carries construct architecture, library diversity, or the resulting per-animal integration inventory. This is the entity with the least schema surface and the most scientific weight.",
+      "fields": [
+        {
+          "source_field": "delivery_method",
+          "source_type": "str ('pronuclear injection at E0.5, piggyBac transposition')",
+          "target_field": "procedures.subject_procedures[].Injection",
+          "classification": "Needs Review",
+          "notes": "Injection exists but its targeted_structure is a MouseAnatomyModel and its dynamics describe volume, duration and current. A pronuclear injection targets a subcellular structure in a zygote, which the anatomy vocabulary does not cover.",
+          "recommendation": "R4 · Q3"
+        },
+        {
+          "source_field": "construct_identity",
+          "source_type": "str ('PEmax-P2A-dTomato-WPRE-bGHpA in piggyBac vector')",
+          "target_field": "— (no analog)",
+          "classification": "Gap",
+          "notes": "NonViralMaterial inherits from Reagent and carries name, source, lot and concentration. There is no field for a construct map, cassette composition, insulators, promoter, or vector backbone.",
+          "recommendation": "R4"
+        },
+        {
+          "source_field": "barcode_library_design",
+          "source_type": "str (TAPE barcode NNNNNAANNNNN; insertion NNNGGA; 6-unit circTAPE)",
+          "target_field": "— (no analog)",
+          "classification": "Gap",
+          "notes": "The degenerate positions define the identifier space that every downstream lineage call depends on. Recording it as a free-text note would make it unsearchable and unvalidatable.",
+          "recommendation": "R4 · R10"
+        },
+        {
+          "source_field": "integration_barcodes_detected",
+          "source_type": "list[str] (17, 11 and 5 distinct TAPE-BC sequences in embryos #2, #3 and #6)",
+          "target_field": "— (no analog)",
+          "classification": "Gap",
+          "notes": "The integration inventory is per-animal, measured rather than designed, and is the partition key for all recorder analysis. It is closer to a per-subject measurement than to metadata about a reagent.",
+          "recommendation": "R4"
+        },
+        {
+          "source_field": "transgene_copy_number",
+          "source_type": "float (PEmax approximately 2 copies in embryo #2, 7 in embryo #3, by ddPCR)",
+          "target_field": "— (no analog)",
+          "classification": "Gap",
+          "notes": "Copy number explains the order-of-magnitude difference in recorder activity between embryos and therefore determines dataset usability. No subject-level measurement field exists.",
+          "recommendation": "R4"
+        },
+        {
+          "source_field": "transgene_activation_state",
+          "source_type": "bool / str (editing detected: absent, modest, high)",
+          "target_field": "— (no analog)",
+          "classification": "Gap",
+          "notes": "SeaHub raised transgene present versus transgene activated as a distinction the registry must carry. The schema has no representation of either.",
+          "recommendation": "R4"
+        }
+      ]
+    },
+    {
+      "name": "Procedures — animal and specimen preparation",
+      "description": "The source system tracks a chain that runs from hormonal superovulation through zygote collection, pronuclear injection, embryo transfer surgery, harvest and flash freezing, to nuclei isolation, two-step fixation, and genomic DNA extraction. The schema separates in-vivo subject procedures from ex-vivo specimen procedures, and the animal side maps reasonably well. The molecular side falls almost entirely to the OTHER fallback.",
+      "fields": [
+        {
+          "source_field": "superovulation",
+          "source_type": "str (hCG and PMSG, intraperitoneal)",
+          "target_field": "procedures.subject_procedures[].NonSurgicalInjection",
+          "classification": "Mapped",
+          "notes": "An intraperitoneal hormone injection fits NonSurgicalInjection, though it is performed on the donor female rather than on the registered subject.",
+          "recommendation": "R7 — resolve which animal the procedure attaches to."
+        },
+        {
+          "source_field": "embryo_transfer_surgery",
+          "source_type": "str (transfer into ampulla of pseudopregnant female)",
+          "target_field": "procedures.subject_procedures[].Surgery",
+          "classification": "Needs Review",
+          "notes": "Surgery requires an ethics_review_id and describes procedures performed on a subject. Here the surgery is performed on the surrogate and the subject is the transferred embryo.",
+          "recommendation": "R7"
+        },
+        {
+          "source_field": "harvest_and_flash_freeze",
+          "source_type": "str (PBS rinse, liquid nitrogen)",
+          "target_field": "procedures.specimen_procedures[].SpecimenProcedure (type OTHER)",
+          "classification": "Gap",
+          "notes": "No SpecimenProcedureType entry covers harvest or cryopreservation. STORAGE exists but describes conditions rather than the freezing step.",
+          "recommendation": "R8"
+        },
+        {
+          "source_field": "nuclei_isolation_and_fixation",
+          "source_type": "str (sci-RNA-seq3 protocol; methanol then BS3 crosslinking)",
+          "target_field": "procedures.specimen_procedures[].SpecimenProcedure",
+          "classification": "Conflict",
+          "notes": "FIXATION exists as a type, but nuclei isolation does not, and the two-step protocol is one procedure in the source and two unrelated concepts in the target.",
+          "recommendation": "R8"
+        },
+        {
+          "source_field": "gdna_extraction",
+          "source_type": "str (Qiagen AllPrep DNA/RNA, 80204)",
+          "target_field": "— (no analog)",
+          "classification": "Gap",
+          "notes": "Nucleic-acid extraction has no vocabulary entry, so the step that produces the input to every amplicon library is unrecordable except as OTHER.",
+          "recommendation": "R8"
+        },
+        {
+          "source_field": "library_preparation",
+          "source_type": "str (two-step indexed PCR; Tn5 tagmentation with Nextera N7)",
+          "target_field": "— (no analog)",
+          "classification": "Gap",
+          "notes": "Library preparation is the single most consequential ex-vivo step for a sequencing dataset and has no type. Patch-seq recorded the same absence for SMARTer v4 and Nextera preparation.",
+          "recommendation": "R8"
+        },
+        {
+          "source_field": "protocol_reference",
+          "source_type": "str (Manipulating the Mouse Embryo, 4th ed.; prior sci-RNA-seq3 publication)",
+          "target_field": "procedures.*.protocol_id",
+          "classification": "Conflict",
+          "notes": "ProtocolMixin expects a protocols.io DOI. A textbook chapter and a methods citation are legitimate protocol provenance that the field cannot express.",
+          "recommendation": "Q3"
+        },
+        {
+          "source_field": "performed_on",
+          "source_type": "str (donor female; surrogate; embryo)",
+          "target_field": "procedures.subject_id",
+          "classification": "Conflict",
+          "notes": "Single string for the whole document. Superovulation and transfer surgery act on animals other than the registered subject and cannot be filed.",
+          "recommendation": "R16"
+        }
+      ]
+    },
+    {
+      "name": "Acquisition — bulk amplicon sequencing of TAPE",
+      "description": "The source system tracks one amplicon library per TAPE-bearing embryo, generated from five nanograms of genomic DNA by two-step PCR and sequenced on a NextSeq 2000. Read structure differs between embryos, with two sequenced single-end and one paired-end, which changes downstream parsing. The schema has no modality under which to register this acquisition at all.",
+      "fields": [
+        {
+          "source_field": "assay",
+          "source_type": "str ('bulk amplicon-seq of TAPE / epegRNA-TAPE')",
+          "target_field": "data_description.modalities",
+          "classification": "Gap",
+          "notes": "The Modality enum has no amplicon or targeted-DNA-sequencing entry. BARSEQ and MAPSEQ exist but denote anatomical projection mapping, not a genomic recorder readout.",
+          "recommendation": "R3"
+        },
+        {
+          "source_field": "sequencer",
+          "source_type": "str ('Illumina NextSeq 2000')",
+          "target_field": "instrument.components[].Scanner or Device",
+          "classification": "Needs Review",
+          "notes": "A sequencer has no dedicated device class. Which existing class it should be registered under is a schema question, not a data question.",
+          "recommendation": "Q3"
+        },
+        {
+          "source_field": "read_structure",
+          "source_type": "str ('318/10/10' or '70/10/200'; single- or paired-end)",
+          "target_field": "— (no analog)",
+          "classification": "Gap",
+          "notes": "Read structure determines whether the amplicon is recoverable from read one or must be reverse complemented from read two. It is acquisition configuration, not a processing parameter.",
+          "recommendation": "R3 · R10"
+        },
+        {
+          "source_field": "gdna_input_mass",
+          "source_type": "float (5 ng)",
+          "target_field": "— (no analog)",
+          "classification": "Gap",
+          "notes": "Input mass bounds the complexity of the resulting library and therefore the interpretability of barcode counts.",
+          "recommendation": "R10"
+        },
+        {
+          "source_field": "pcr_cycles",
+          "source_type": "int (25–28 first round, 6–8 second round)",
+          "target_field": "acquisition.data_streams[].*.additional_settings",
+          "classification": "Gap",
+          "notes": "Cycle count drives duplicate rate and is only expressible through an extension container. Per the corpus principle, a parameters dictionary is an extension container and not a semantic match.",
+          "recommendation": "R8 · R10"
+        },
+        {
+          "source_field": "coordinate_system",
+          "source_type": "not applicable",
+          "target_field": "instrument.global_coordinate_system",
+          "classification": "Conflict",
+          "notes": "The field is required on Instrument and validated recursively against every transform, yet a sequencing run has no spatial frame.",
+          "recommendation": "R14"
+        },
+        {
+          "source_field": "sequencer_device_class",
+          "source_type": "str (NextSeq 2000; QX600)",
+          "target_field": "instrument.components[].Device",
+          "classification": "Gap",
+          "notes": "No sequencer or PCR device class exists, so both register as generic Device and read structure, chemistry and flow cell type have no home.",
+          "recommendation": "R17"
+        }
+      ]
+    },
+    {
+      "name": "Acquisition — sci-RNA-seq3 with paired single-cell TAPE readout",
+      "description": "The source system tracks a three-level combinatorial indexing run in which nuclei from two embryos are distributed across six reverse-transcription plates, pooled, redistributed across six ligation plates, pooled again, and finally distributed across twenty-five PCR plates at approximately four hundred thousand nuclei per plate. The complementary DNA is then split, with one third continuing as transcriptome library and two thirds amplified specifically for the recorder array, and the two pools are sequenced together at a fixed ratio. Every structural feature of this design is invisible to the schema.",
+      "fields": [
+        {
+          "source_field": "assay",
+          "source_type": "str ('sci-RNA-seq3')",
+          "target_field": "data_description.modalities = SCRNASEQ",
+          "classification": "Mapped",
+          "notes": "SCRNASEQ exists and applies. CELLxGENE identifies this assay precisely as EFO:0030028, which the closed enum cannot express.",
+          "recommendation": "R3"
+        },
+        {
+          "source_field": "subject_ids",
+          "source_type": "list[str] (nuclei from embryo #2 and embryo #3 in one run)",
+          "target_field": "acquisition.subject_id",
+          "classification": "Conflict",
+          "notes": "The field is a single required string. Specimen_id may be a list but check_subject_specimen_id requires the subject identifier to appear in each entry, so it cannot carry a second animal.",
+          "recommendation": "R1"
+        },
+        {
+          "source_field": "rt_plate / rt_well",
+          "source_type": "str (6 plates, 96 wells, first of three indices)",
+          "target_field": "— (no analog)",
+          "classification": "Gap",
+          "notes": "The first index is the only record of which embryo a nucleus came from. Without a plate and well model, demultiplexing provenance lives solely in analysis code.",
+          "recommendation": "R9"
+        },
+        {
+          "source_field": "ligation_plate / pcr_plate",
+          "source_type": "str (6 ligation plates; 23 plus 2 PCR plates)",
+          "target_field": "— (no analog)",
+          "classification": "Gap",
+          "notes": "Cell identity is the composition of three indices across three plate levels. The AICS analysis raised the same absence for plate and well; this dataset nests it three deep.",
+          "recommendation": "R9 · Q4"
+        },
+        {
+          "source_field": "nuclei_per_plate",
+          "source_type": "int (approximately 400,000 target)",
+          "target_field": "— (no analog)",
+          "classification": "Gap",
+          "notes": "Loading density determines collision and doublet rate, which the paper handles with a dedicated doublet-removal stage.",
+          "recommendation": "R9"
+        },
+        {
+          "source_field": "suspension_type",
+          "source_type": "str ('nucleus')",
+          "target_field": "— (no analog)",
+          "classification": "Gap",
+          "notes": "Whether the assayed particle was a cell or a nucleus changes the expected expression profile. CELLxGENE requires this as a controlled field for exactly this reason.",
+          "recommendation": "R3"
+        },
+        {
+          "source_field": "library_split_ratio",
+          "source_type": "str ('one third transcriptome, two thirds TAPE; sequenced 80:20')",
+          "target_field": "— (no analog)",
+          "classification": "Gap",
+          "notes": "Two libraries derive from one complementary DNA pool and are sequenced in one run. Neither a single acquisition nor two independent acquisitions describes this correctly.",
+          "recommendation": "R1 · R10"
+        },
+        {
+          "source_field": "sequencer",
+          "source_type": "str ('NextSeq 2000' or 'NovaSeq X', custom primers)",
+          "target_field": "instrument.components[]",
+          "classification": "Needs Review",
+          "notes": "One logical library pool may be sequenced across two instrument models, so instrument identity is not one-to-one with the acquisition.",
+          "recommendation": "Q3"
+        },
+        {
+          "source_field": "specimen_id",
+          "source_type": "str (nuclei preparation identifier)",
+          "target_field": "acquisition.specimen_id",
+          "classification": "Conflict",
+          "notes": "check_subject_specimen_id requires subject_id to appear in the specimen id. The example identifier was constructed to satisfy the rule; a real Benchling or freezer barcode would not.",
+          "recommendation": "R15"
+        },
+        {
+          "source_field": "acquisition_type",
+          "source_type": "str ('sci-RNA-seq3')",
+          "target_field": "acquisition.acquisition_type",
+          "classification": "Gap",
+          "notes": "Unconstrained free text. Capitalisation variants would fragment search, the failure TEA-seq recorded for its own assay name.",
+          "recommendation": "R18"
+        },
+        {
+          "source_field": "instrument_id",
+          "source_type": "str (two sequencer models for one pool)",
+          "target_field": "acquisition.instrument_id",
+          "classification": "Conflict",
+          "notes": "Scalar. Null in the example because ExternalDataStream is used to avoid the requirement, which suppresses instrument metadata that is available.",
+          "recommendation": "R17"
+        }
+      ]
+    },
+    {
+      "name": "Acquisition — droplet digital PCR",
+      "description": "The source system tracks a duplex ddPCR assay that quantifies prime-editor copy number against a GAPDH reference, reported as a ratio scaled by two. This is a measurement about the subject rather than a dataset about the biology, and it is the assay that decided which embryo the study pursued. The schema offers no modality and no measurement container for it.",
+      "fields": [
+        {
+          "source_field": "assay",
+          "source_type": "str ('duplex ddPCR, QX600 AutoDG')",
+          "target_field": "— (no analog)",
+          "classification": "Gap",
+          "notes": "No PCR or quantification modality exists. Registering the run as OTHER would make the copy-number measurement undiscoverable.",
+          "recommendation": "R3"
+        },
+        {
+          "source_field": "target_probe / reference_probe",
+          "source_type": "str (Cas9 FAM; GAPDH Cy5.5, BioRad dMmuCNS559838272)",
+          "target_field": "components.reagent.* (partial)",
+          "classification": "Conflict",
+          "notes": "Fluorophore and probe classes exist for imaging and in-situ work. A quantitative PCR probe pair with a reference assay is a different construct that happens to reuse fluorophore names.",
+          "recommendation": "R4 · Q3"
+        },
+        {
+          "source_field": "derived_copy_number",
+          "source_type": "float ((Cas9 / GAPDH) × 2)",
+          "target_field": "— (no analog)",
+          "classification": "Gap",
+          "notes": "A per-subject quantitative result with a stated formula has no home outside a notes field, and it gates whether a dataset is worth registering at all.",
+          "recommendation": "R4"
+        }
+      ]
+    },
+    {
+      "name": "Processing and derived data",
+      "description": "The source system tracks a pipeline that runs from base calls through demultiplexing, trimming, alignment, deduplication and count-matrix generation, then through recorder-specific parsing, denoising, tree building and ancestral-state imputation, ending in a dated phylogeny of approximately 1.34 million cells and an interactive browser. Code is versioned publicly and raw data is deposited externally. The schema's processing model accommodates the shape of this pipeline but names almost none of its steps.",
+      "fields": [
+        {
+          "source_field": "demultiplexing",
+          "source_type": "str ('bcl2fastq 2.20; deML maximum-likelihood demultiplexer')",
+          "target_field": "processing.data_processes[].process_name",
+          "classification": "Gap",
+          "notes": "ProcessName has no demultiplexing entry, so the step that assigns reads to plates and therefore to embryos is recorded as OTHER.",
+          "recommendation": "R11"
+        },
+        {
+          "source_field": "read_alignment",
+          "source_type": "str ('STAR 2.6.1d, mm39, GENCODE vM37')",
+          "target_field": "processing.data_processes[].process_name",
+          "classification": "Gap",
+          "notes": "No alignment entry exists. Reference genome and annotation build are load-bearing for reuse and have no dedicated fields.",
+          "recommendation": "R11"
+        },
+        {
+          "source_field": "count_matrix_generation",
+          "source_type": "str (UMI deduplication and gene count matrix)",
+          "target_field": "processing.data_processes[].process_name",
+          "classification": "Gap",
+          "notes": "The principal derived artifact of every transcriptomic dataset in the registry has no process name.",
+          "recommendation": "R11"
+        },
+        {
+          "source_field": "barcode_whitelist / insertion_vocabulary",
+          "source_type": "file (per-embryo reference sets from tape/reference.py)",
+          "target_field": "— (no analog)",
+          "classification": "Gap",
+          "notes": "These are derived from the data and then required to parse it, and for one embryo the sets are reused across the bulk and single-cell datasets. They are both an output and an input, which the linear source_data model does not express.",
+          "recommendation": "R10"
+        },
+        {
+          "source_field": "lineage_tree",
+          "source_type": "file (dated phylogeny, 1,340,794 cells; 640,012-cell backbone)",
+          "target_field": "data_description.data_level = derived",
+          "classification": "Needs Review",
+          "notes": "The tree spans all cells of one embryo and carries node-level ages and imputed annotations. Whether it registers as one derived asset, a family of assets, or a database-resident object is undecided.",
+          "recommendation": "R11 · Q4"
+        },
+        {
+          "source_field": "code_repository",
+          "source_type": "url ('github.com/seidels/dtt-mouse-analysis')",
+          "target_field": "processing.data_processes[].code.url",
+          "classification": "Mapped",
+          "notes": "The field exists and is populated here, which is unusual against the corpus baseline where code URLs are absent.",
+          "recommendation": "Use as-is."
+        },
+        {
+          "source_field": "raw_data_location",
+          "source_type": "str ('GEO GSE341627'; NextCell website for intermediates)",
+          "target_field": "metadata.location",
+          "classification": "Conflict",
+          "notes": "Location is a single string. Raw data sits at a public repository, intermediates at a project website, and neither is an Allen-managed path.",
+          "recommendation": "R12 · Q5"
+        },
+        {
+          "source_field": "file_checksum",
+          "source_type": "not recorded",
+          "target_field": "— (platform)",
+          "classification": "Unmappable",
+          "notes": "No checksum field exists in the metadata core. Integrity belongs to the platform layer, but nothing currently records it.",
+          "recommendation": "R13"
+        },
+        {
+          "source_field": "institution / investigators",
+          "source_type": "list[str] (SeaHub, Allen Institute, University of Washington, HHMI, Fred Hutch)",
+          "target_field": "data_description.institution, investigators",
+          "classification": "Conflict",
+          "notes": "The fields expect one registry-resolvable institution. This dataset has five contributing institutions and a publication led outside the Allen Institute.",
+          "recommendation": "R12 · Q5"
+        }
+      ]
+    }
+  ],
+  "cross_cutting": [
+    {
+      "heading": "Cardinality in both directions",
+      "body": "Prior analyses found one asset referencing many subjects, as in the pooled TEA-seq library, or one subject producing many assets, as in Patch-seq. This dataset does both simultaneously and within a single study.\n\nConsequence. One embryo yields a bulk amplicon library, a transcriptome library, a recorder library and a ddPCR result, while one indexing run carries nuclei from two embryos across twenty-five plates. Decomposition at onboarding resolves the second case only by discarding the plate hierarchy that makes demultiplexing auditable.\n\nRequired decision. The two paths named in the corpus remain the two paths here: enforce one subject per acquisition and decompose at onboarding, or extend the schema with a subjects[] relationship for multiplexed and pooled assays. This dataset raises the cost of the first option because the pooling is three levels deep."
+    },
+    {
+      "heading": "The registration-scope question this dataset answers",
+      "body": "SeaHub asked for guidance on which datasets belong in the registry, noting that much current work is technology development and that some datasets are discarded when an experiment fails.\n\nMethod note. This study is a worked example of why the answer cannot be 'only the successful ones'. Ten embryos were transferred, three carried detectable recorder integrations, and one was pursued. The ddPCR copy-number assay and the bulk amplicon screen are the records that explain why seven embryos produced nothing and why one produced everything.\n\nConsequence. Under a policy that registers only the datasets that yielded results, the evidence supporting the selection is unregistered, and the published dataset becomes unreproducible in the sense decision D8 already disclaims. Registering the screen at study level, with the negative results attached, costs little and preserves the selection logic."
+    },
+    {
+      "heading": "Design artifacts as first-class objects",
+      "body": "Three artifacts in this dataset are neither raw data nor conventional metadata: the synthesised oligonucleotide library design, the per-embryo integration-barcode whitelist, and the per-embryo insertion vocabulary.\n\nInterpretive principle. A file that must be present to parse the raw data is part of the registered asset, not an annotation about it. The amplicon FASTQ is uninterpretable without the whitelist, and the whitelist is itself derived from that FASTQ.\n\nScope boundary. This generalises past this dataset. SeaHub's high-throughput library screening has the same property, where barcode count tables are meaningless without the library membership list, and the meeting recorded it as an open requirement for the registry team."
+    },
+    {
+      "heading": "Ontology binding versus closed enumeration",
+      "body": "Four gaps in this analysis are vocabulary gaps: modality, specimen procedure type, process name, and sex sentinels. Each currently requires a schema release to extend.\n\nReconciliation note. The CELLxGENE cross-check at v7.1.0 found that the same problem is solved by binding a field to an ontology subtree rather than to a closed enumeration, with assay identity validated as a descendant of an Experimental Factor Ontology term and developmental stage as a descendant of a species-specific stage ontology. Under that pattern sci-RNA-seq3 and E13.5 both have exact terms today, with no schema change.\n\nScope boundary. The pattern is borrowable; the specific fields are not. A CELLxGENE annotation is a per-cell column and this schema has no per-observation layer, so each borrowing needs a stated home. The commitment to an external ontology release cadence is a governance decision recorded as Q2, not a recommendation made here."
+    },
+    {
+      "heading": "Version boundary",
+      "body": "All classifications are stated against aind-data-schema v2.9.0 at commit 18114d7b, with the models dependency pinned at greater than or equal to 6.1.0 and less than 7. The CELLxGENE cross-reference is v7.1.0 at commit 1cb494af.\n\nMethod note. Where a gap recurs from an earlier analysis, the earlier finding may have been made against a different version. Patch-seq was analysed against v2.7.2 and the Immunology, mIF and TEA-seq analyses against an unpinned latest. Each recurrence recorded here was re-verified against the pinned commit rather than carried forward on the strength of the earlier document."
+    },
+    {
+      "heading": "Note on layers",
+      "body": "Three findings in this analysis belong to the registry platform rather than to the portable schema: file integrity, the location of externally deposited copies, and the grouping of assets into a study.\n\nNote on layers. Classifying them as platform concerns is not a deferral. It states that a schema change would be the wrong instrument, and it moves the decision to Workstream 1 where the Organization, Space and lifecycle model already exists."
+    }
+  ],
+  "recommendations": [
+    {
+      "id": "R1",
+      "addresses": "G1",
+      "layer": "Schema or Platform",
+      "description": "Resolve the asset-to-subject relationship for pooled and multi-assay designs. Option (a) extend Acquisition with a subjects[] relationship and a pool descriptor carrying pool identity, member subjects and demultiplexing method, which keeps the record faithful and travels with exported metadata but changes a core cardinality that five analyses now depend on. Option (b) enforce one subject per acquisition and decompose pooled runs at onboarding, which ships without a schema change but relocates demultiplexing provenance into Workstream 3 tooling where it is not searchable. This dataset pools two subjects across three index levels, so option (b) must also answer where the plate hierarchy in R9 lives.",
+      "workstream": "WS2 / WS3",
+      "origin": "corpus"
+    },
+    {
+      "id": "R2",
+      "addresses": "G2",
+      "layer": "Schema or Platform",
+      "description": "Introduce a grouping construct above the data asset. Option (a) a first-class Study or Cohort entity that assets reference, which is portable, searchable and would let the ten-embryo injection cohort carry its own metadata. Option (b) a formalised platform Collection with stable identifiers, which is faster to deliver and reuses existing plumbing but does not travel with exported metadata. Either option also supplies the parent record SeaHub asked for, under which pilot runs, plasmid confirmations and barcode-distribution checks can be linked rather than registered individually.",
+      "workstream": "WS1 / WS2",
+      "origin": "corpus"
+    },
+    {
+      "id": "R3",
+      "addresses": "G3",
+      "layer": "Schema or Schema governance",
+      "description": "Give assay identity room to grow. Option (a) add Modality entries for targeted amplicon sequencing, bulk transcriptomic sequencing, chromatin accessibility, chromatin conformation and quantitative PCR, which is a small change that leaves the next assay blocked again. Option (b) adopt the pattern of binding assay identity to an ontology subtree, as CELLxGENE binds assay to descendants of the Experimental Factor Ontology assay terms, under which sci-RNA-seq3 resolves to EFO:0030028 with no schema release. Either option should also add a controlled suspension field distinguishing cell from nucleus, which changes the expected expression profile and is currently unrecorded.",
+      "workstream": "WS2",
+      "origin": "corpus",
+      "borrowed_from": "CELLxGENE Discover v7.1.0 — obs['assay_ontology_term_id'] and obs['suspension_type']"
+    },
+    {
+      "id": "R4",
+      "addresses": "G4",
+      "layer": "Schema",
+      "description": "Add a genetic-modification record attached to the subject, distinct from the inherited-allele model that genotype serves. It should carry construct identity and architecture, delivery method and timing, the designed identifier space of any barcode library, the measured integration inventory per animal, copy number with its measurement method, and an activation state. Option (a) model it as a subject-level Modification entity referenced by procedures, which keeps measured per-animal state next to the animal. Option (b) extend NonViralMaterial with construct and library fields and record integration state as a quality-control metric, which requires no new entity but splits one concept across two files.",
+      "workstream": "WS2",
+      "origin": "inferred"
+    },
+    {
+      "id": "R5",
+      "addresses": "G5",
+      "layer": "Schema",
+      "description": "Add a developmental-stage field to MouseSubject and make date_of_birth conditional rather than required. Bind the stage to a species-appropriate ontology, following the pattern CELLxGENE uses where mouse stages are descendants of the Mouse Developmental Stages ontology life-cycle term, so that E13.5 is an exact validated value rather than a string in a notes field. Relaxing date_of_birth requires a rule for which alternative temporal anchor is mandatory when a birth date does not exist, and the natural candidates are conception date and harvest date.",
+      "workstream": "WS2",
+      "origin": "inferred",
+      "borrowed_from": "CELLxGENE Discover v7.1.0 — obs['development_stage_ontology_term_id'], MmusDv"
+    },
+    {
+      "id": "R6",
+      "addresses": "G6",
+      "layer": "Schema",
+      "description": "Extend the Sex enum with explicit sentinels for not determined and not applicable, keeping them distinguishable from each other and from a missing value. CELLxGENE's convention of separate reserved values for unknown and not-applicable is the precedent worth copying, because an embryo that was never sexed and an assay for which sex is meaningless are different records. The field is currently required, so the alternative of leaving it null is not available.",
+      "workstream": "WS2",
+      "origin": "inferred"
+    },
+    {
+      "id": "R7",
+      "addresses": "G7",
+      "layer": "Schema",
+      "description": "Extend BreedingInfo to describe reproductive provenance as a set of roles rather than a maternal and paternal pair. At minimum it needs a gestational-surrogate reference with its own strain, and a role label distinguishing genetic contribution from gestation. Option (a) add an optional surrogate_id and surrogate_strain to BreedingInfo, which is minimal and covers this case. Option (b) generalise to a list of contributing animals with typed roles, which also covers in-vitro fertilisation, embryo donation and chimeric designs that the accelerators are likely to bring next.",
+      "workstream": "WS2",
+      "origin": "inferred"
+    },
+    {
+      "id": "R8",
+      "addresses": "G8",
+      "layer": "Schema",
+      "description": "Add SpecimenProcedureType entries for nuclei isolation, genomic DNA extraction, reverse transcription, sequencing library preparation, and tissue cryopreservation. These need controlled vocabulary additions, not free-text workarounds, in order for molecular preparation to be searchable across datasets. The same absence was recorded for Patch-seq, TEA-seq, mIF, Immunology and AICS, which makes this the fifth independent appearance and the strongest available case for a vocabulary release rather than per-dataset OTHER.",
+      "workstream": "WS2",
+      "origin": "corpus"
+    },
+    {
+      "id": "R9",
+      "addresses": "G9",
+      "layer": "Schema",
+      "description": "Model the container hierarchy that combinatorial and plate-based assays depend on. It must nest, because cell identity here is the composition of a reverse-transcription well, a ligation well and a polymerase chain reaction plate, and it must carry loading density. Option (a) a generic Container entity with a parent reference and a well coordinate, which covers plates, wells, lanes and flow cells and answers the AICS plate-and-well gap at the same time. Option (b) an assay-specific indexing block on Acquisition, which is faster but leaves the AICS case unaddressed and does not compose.",
+      "workstream": "WS1 / WS2",
+      "origin": "corpus"
+    },
+    {
+      "id": "R10",
+      "addresses": "G10",
+      "layer": "Schema or WS3 onboarding",
+      "description": "Register design and interpretation artifacts as referenced objects with identifiers, not as parameters inside an extension container. This covers the oligonucleotide library design and its membership list, the per-embryo integration-barcode whitelist, the insertion vocabulary, and the read structure needed to parse the amplicon. Option (a) a referenced Design or Reference-Set asset that raw assets point to, which makes the dependency explicit and reusable across the bulk and single-cell datasets that share it here. Option (b) require these files inside the asset and describe them in the file manifest, which needs no new entity but makes the shared dependency invisible.",
+      "workstream": "WS2 / WS3",
+      "origin": "source"
+    },
+    {
+      "id": "R11",
+      "addresses": "G11",
+      "layer": "Schema",
+      "description": "Extend ProcessName with entries for demultiplexing, read alignment, duplicate removal, count-matrix generation and phylogenetic inference, and add fields for reference genome and annotation build. Then decide how a tree-shaped derived product registers: option (a) as a single derived asset with the tree as its primary file, which is simple and matches the way the authors distribute it, or option (b) as a database-resident object the registry references, which suits node-level query but reopens the unresolved question of database-resident data recorded for Patch-seq and mIF.",
+      "workstream": "WS2 / WS3",
+      "origin": "corpus"
+    },
+    {
+      "id": "R12",
+      "addresses": "G12",
+      "layer": "Platform",
+      "description": "Define the metadata that must be captured for data the institute uses but does not own or hold. At minimum: the external repository accession, the holding institution, the contributing institutions, the publication, and enough of the collection method for an institute researcher to judge fitness for reuse. This is the practical action the meeting identified, where collaborative analyses imported into Code Ocean are tagged so the record aligns with the registry's metadata model. Registration responsibility itself is Q5 and is not settled here.",
+      "workstream": "WS1 / WS3",
+      "origin": "corpus"
+    },
+    {
+      "id": "R13",
+      "addresses": "G13",
+      "layer": "Schema or Platform",
+      "description": "Record file integrity as an algorithm and value pair. Option (a) in the portable schema alongside the file manifest, which lets integrity travel with exported metadata. Option (b) in the platform layer next to the storage reference, which keeps a volatile operational value out of a versioned scientific record. The choice interacts with the location and manifest decision, so it should be taken with it rather than separately.",
+      "workstream": "WS1 / WS2",
+      "origin": "corpus"
+    },
+    {
+      "id": "R14",
+      "addresses": "G14",
+      "layer": "Schema",
+      "description": "Exempt non-spatial modalities from the coordinate-system requirement, or introduce an explicit not-applicable coordinate system that the recursive validator accepts. A sequencing run has no spatial frame, and the current requirement forces every sequencing-based dataset in the registry to declare a fiction. Patch-seq recorded an Illumina instrument obliged to declare an image coordinate frame; this dataset would do the same four times over.",
+      "workstream": "WS2",
+      "origin": "corpus"
+    },
+    {
+      "id": "R15",
+      "addresses": "G15",
+      "layer": "Schema",
+      "description": "Replace the specimen_id substring rule with an explicit subject-specimen relationship. The current validator encodes an identifier convention as a structural constraint, which forces every source system whose barcodes predate the rule to mint synthetic identifiers. Option (a) a foreign-key style reference validated for existence rather than for string containment, which is correct and requires a migration for assets that relied on the convention. Option (b) retain the rule but permit a declared alias, which is cheaper and leaves two identifier spaces to reconcile.",
+      "workstream": "WS2",
+      "origin": "corpus"
+    },
+    {
+      "id": "R16",
+      "addresses": "G16",
+      "layer": "Schema",
+      "description": "Allow a procedure to record the animal it was performed on when that animal is not the registered subject. Superovulation is performed on the donor female and transfer surgery on the surrogate, yet Procedures.subject_id is a single string, so neither procedure can be filed against the embryo whose data is being registered. Option (a) add a performed_on reference at the procedure level, which keeps one Procedures document per asset and is a small change. Option (b) register contributing animals as subjects in their own right and link them, which is more faithful and multiplies the record count for every embryo produced.",
+      "workstream": "WS2",
+      "origin": "inferred"
+    },
+    {
+      "id": "R17",
+      "addresses": "G17",
+      "layer": "Schema",
+      "description": "Add device classes for sequencers and quantification instruments, and allow an acquisition to reference more than one instrument. A generic Device carries no read structure, chemistry, flow cell type or run configuration, so the parameters that determine whether reads are parseable survive only as prose. The scalar instrument_id additionally forces the ExternalDataStream workaround, which both this dataset and TEA-seq adopted to avoid the requirement while modalities were unresolved — a workaround that suppresses instrument metadata that is in fact available.",
+      "workstream": "WS2",
+      "origin": "corpus"
+    },
+    {
+      "id": "R18",
+      "addresses": "G18",
+      "layer": "Schema or Schema governance",
+      "description": "Constrain acquisition_type to the same vocabulary chosen for modality under R3, rather than leaving it free text. Two datasets have now recorded the same failure mode, where capitalisation variants of one assay name would prevent search. If R3 adopts ontology binding, acquisition_type should resolve to the same term, so that assay identity is stated once.",
+      "workstream": "WS2",
+      "origin": "corpus"
+    }
+  ],
+  "open_questions": [
+    {
+      "id": "Q1",
+      "question": "Is the unit of registration for this dataset the study, the embryo, or the sequencing library? Decision D1 names the data asset and D2 equates one raw asset with one acquisition, but a run pooling two embryos and a cell type splitting into two libraries from one complementary DNA pool satisfy neither cleanly.",
+      "blocking": true,
+      "owner": "WS2 · Sep 11"
+    },
+    {
+      "id": "Q2",
+      "question": "Will the schema commit to external ontology releases for assay identity and developmental stage, accepting their versioning cadence, or continue to govern closed enums with a schema release per addition? R3 and R5 both depend on this and it is a governance decision rather than a modelling one.",
+      "blocking": true,
+      "owner": "WS2 · Sep 11"
+    },
+    {
+      "id": "Q3",
+      "question": "Which animals in a reproductive chain are registered as subjects? The hormonally treated zygote donor, the sperm donor and the surrogate all undergo procedures and none of them produces a data asset.",
+      "blocking": false,
+      "owner": "WS2 · Sep"
+    },
+    {
+      "id": "Q4",
+      "question": "Does the registry acknowledge any level below the data asset? A per-cell, per-well or per-node layer is implied by the plate hierarchy in R9 and the tree in R11, and its absence is the reason both recommendations have to offer a platform option.",
+      "blocking": true,
+      "owner": "WS1 / WS2 · Sep 11"
+    },
+    {
+      "id": "Q5",
+      "question": "Who registers a dataset produced jointly by the Allen Institute and an external collaborator, published externally, and deposited in a public repository? The case is concrete here, with Allen injections, University of Washington analysis and publication, and raw data at GEO.",
+      "blocking": true,
+      "owner": "WS1 / WS3 · Sep 11"
+    }
+  ],
+  "unknowns": [
+    {
+      "item": "Actual field names, types and cardinalities in SeaHub's Benchling configuration",
+      "why": "No metadata export or field list was available. Every source-field label in section 5 is a descriptive name for a quantity the paper reports, not a real key, which is why this analysis is in placeholder mode",
+      "ask": "Kenny, who configured the Benchling instance, via Aishwarya Chander"
+    },
+    {
+      "item": "Whether Benchling, Code Ocean or Google Sheets is the intended system of record for analysis-level metadata",
+      "why": "The three are used together, with experiments in Benchling, code and compute in Code Ocean, and analysis tracking in Google Sheets linking to Drive summaries",
+      "ask": "SeaHub computational staff, via Aishwarya Chander"
+    },
+    {
+      "item": "Which SeaHub dataset will be the actual Milestone 1 Track C subject",
+      "why": "This preprint was nominated as a representative example because no public dataset exists for the team's current work; it is not necessarily the dataset that will be mapped",
+      "ask": "Jess Thomas (jess.thomas@alleninstitute.org)"
+    },
+    {
+      "item": "Whether registry scope includes vendor-prepared sequencing and the metadata expected from vendors",
+      "why": "The team reported using external providers for library preparation and long-read sequencing; the paper's vendors are synthesis suppliers, so the two cases may differ",
+      "ask": "Jess Thomas (jess.thomas@alleninstitute.org)"
+    },
+    {
+      "item": "Whether the NextCell browser and its intermediate files are in registry scope",
+      "why": "Decision D8 states the registry is an inventory system rather than an archival reference system, and the browser is a hosted derived product rather than a file set",
+      "ask": "WS1, via Jess Thomas (jess.thomas@alleninstitute.org)"
+    }
+  ],
+  "actions": [
+    {
+      "text": "Obtain the Benchling field export and a metadata example from a live SeaHub experiment, then promote this analysis from placeholder to full mode (all unknowns)",
+      "owner": "Aishwarya Chander / Kenny",
+      "by": "Before Sep 11 gate",
+      "blocking": true
+    },
+    {
+      "text": "Decide the unit of registration for pooled and multi-assay sequencing designs, and whether decomposition happens at onboarding (Q1, R1)",
+      "owner": "WS2 + WS3",
+      "by": "Sep 11 gate",
+      "blocking": true
+    },
+    {
+      "text": "Decide whether assay identity and developmental stage bind to external ontologies or stay closed enums (Q2, R3, R5)",
+      "owner": "WS2",
+      "by": "Sep 11 gate",
+      "blocking": true
+    },
+    {
+      "text": "Decide whether any level below the data asset exists in the registry model (Q4, R9, R11)",
+      "owner": "WS1 + WS2",
+      "by": "Sep 11 gate",
+      "blocking": true
+    },
+    {
+      "text": "Decide registration responsibility for Allen and UW co-produced, externally deposited datasets (Q5, R12)",
+      "owner": "WS1 + WS3",
+      "by": "Sep 11 gate",
+      "blocking": true
+    },
+    {
+      "text": "Fix the two structural defects in the corpus TEA-seq metadata example — a stray closing brace that terminates the root object and a missing separator that silently discards PBMC isolation",
+      "owner": "WS2 / Aishwarya Chander",
+      "by": "M2",
+      "blocking": false
+    },
+    {
+      "text": "Open a genetic-modification modelling thread covering construct identity, barcode library design, integration inventory, copy number and activation state (R4)",
+      "owner": "WS2",
+      "by": "M2",
+      "blocking": false
+    },
+    {
+      "text": "Add the molecular-preparation and pipeline vocabulary entries, now on their fifth independent appearance across datasets (R8, R11)",
+      "owner": "WS2",
+      "by": "M2",
+      "blocking": false
+    },
+    {
+      "text": "Define registry guidance for pilot, confirmatory and negative-result datasets, using the ten-embryo screen as the worked case",
+      "owner": "Registry team",
+      "by": "M2",
+      "blocking": false
+    }
+  ],
+  "method_note": "Placeholder mode. This analysis was prepared from a preprint and a scoping conversation rather than from a metadata export, so section 5 states what a compliant record would have to carry and not what SeaHub currently records. Classifications are verified statements about aind-data-schema v2.9.0 at commit 18114d7b: each Gap was confirmed absent by reading the relevant module or generated vocabulary table, and each Conflict by reading the field definition and its validators. No claim is made that any field is populated in any existing SeaHub record. Metrics in section 9 are counts over the hypothesised field table and are not comparable to the Patch-seq, Cell DIVE mIF, TEA-seq, Immunology or AICS analyses, all of which were prepared from real field inventories. The CELLxGENE cross-check at v7.1.0 was run because the dataset is transcriptomic; it returned usable patterns for assay identity, suspension type and developmental stage, and nothing for instruments, procedures, coordinate systems, provenance or integrity, which the schema declares out of scope by design. An annotated metadata example (seahub-dnatypewriter-metadata.nd.json) was then built for embryo #3 in the style of the TEA-seq example, because attempting to populate a complete record tests the schema in a way that reading it does not. That exercise produced G15 through G18 and sharpened G1, G6 and G10; each was verified against the pinned commit before being recorded. The TEA-seq example used as the format reference does not itself parse, and its first specimen procedure merges two procedures into one object, so neither defect was reproduced here."
+}

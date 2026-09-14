@@ -1,0 +1,523 @@
+{
+ "mode": "full",
+ "meta": {
+  "dataset": "AICS Primary-Image Metadata",
+  "descriptor": "Cell lines, Cell Science",
+  "source_organization": "Allen Institute for Cell Science (AICS)",
+  "prepared_by": "Aishwarya Chander \u00b7 Workstream 2",
+  "reference_schema": "aind-data-schema v2.9.0 (commit 18114d7b)",
+  "milestone": "Milestone 0 \u2014 Track C",
+  "status": "Draft",
+  "date": "2026-08-25",
+  "version": "v0.1"
+ },
+ "title": "Cell Science (AICS) Gap Analysis",
+ "detailed_heading": "Detailed Dataset Analysis: AICS Primary-Image Metadata (Cell lines, Cell Science)",
+ "intro": [
+  "This section provides a field-level breakdown for the Allen Institute for Cell Science (AICS) primary-image metadata dataset. The source is a discovery-oriented Parquet view \u2014 one row per retained primary-image file, 186 top-level fields and four nested objects containing 49 physical child fields \u2014 drawn from a 33,184-row REMBI-categorized slim view of AICS candidate schema 0.6.0.",
+  "The central structural difference is the unit of registration: one AICS row is one image file, while one aind data asset represents an acquisition-level collection produced by a single acquisition. Mapping each file row to a separate asset would duplicate acquisition, instrument, specimen and processing metadata and could invent artificial sessions. Compounding this, AICS is cell-line-centric \u2014 cell line, parental line, clone, tagged structure and culture state are the primary biological identity \u2014 whereas aind Subject detail types describe live animals and humans, so acquisition.subject_id and specimen_id cannot be populated without a governed cell-line profile.",
+  {
+   "label": "Classification note.",
+   "body": "The standalone AICS analysis classified 186 fields on a six-way scale (Direct / Partial / Extension container / No first-class analog / Platform or manifest / Derived-search-only) suited to a quantitative crosswalk. For continuity with the rest of this report, the tables below are re-expressed on the five-way scheme: Direct becomes Mapped, a semantic or cardinality mismatch becomes Conflict, an ambiguous destination becomes Needs Review, an extension-container-only or absent construct becomes Gap, and platform/manifest or search-only fields become Unmappable. Per the house interpretive principle, a field retained only in a flexible parameters or notes dictionary is an extension container, not a true semantic match, and is classified Gap. The full six-way crosswalk and all 186 fields remain in the companion workbook, AICS_AIND_Data_Schema_Field_Crosswalk.xlsx."
+  }
+ ],
+ "sources_reviewed": [
+  "AICS slim REMBI-categorized primary-image Parquet view (aics_bff_primary_images_slim_rembi_categorized.parquet) \u2014 33,184 rows, 186 top-level fields, four nested objects",
+  "AICS_AIND_Data_Schema_Field_Crosswalk.xlsx \u2014 companion workbook with top-level, nested-child and AIND-required-field matrices",
+  "AICS candidate schema 0.6.0",
+  "aind-data-schema v2.9.0 (final release), pinned at https://github.com/AllenNeuralDynamics/aind-data-schema/tree/v2.9.0"
+ ],
+ "sample_lead": "Source view:",
+ "sample_asset": [
+  "One row per retained primary-image file; 186 top-level fields; four nested objects (49 physical child fields)",
+  "Mapping evidence: 11 Direct, 75 Partial, 48 extension-container, 23 no first-class analog, 10 platform/manifest, 19 derived/search-only",
+  "Modality: in-vitro light microscopy of tagged human iPSC-derived cell lines",
+  "Storage: AWS / Vast \u2014 per-file paths; an asset root must be derived by a governed aggregation rule",
+  "Scope boundary: the slim primary-image view, not the full 282-field governed AICS class model; conclusions apply to onboarding this view"
+ ],
+ "gap_summary": [
+  {
+   "gap": "Asset boundary: one AICS row is one image file; one aind asset is an acquisition-level collection",
+   "layer": "Metadata / DataDescription",
+   "detail": "Identity, location and every repeated field depend on the aggregation rule. Aggregating file rows into an acquisition asset requires a deterministic key led by acquisition_group_id, timing, instrument and biological context, plus a companion file manifest. Do not create one acquisition per file by default."
+  },
+  {
+   "gap": "Biological identity: cell lines and clones have no first-class Subject analog",
+   "layer": "Subject",
+   "detail": "AICS models cell lines, clones and lineage; aind v2.9.0 models animal/human Subjects and derived specimen IDs. Required subject_id/specimen_id cannot be populated without a governed cell-line/specimen profile. Treating a cell-line identifier as subject_id would be syntactically convenient but semantically misleading."
+  },
+  {
+   "gap": "Acquisition timing is required and timezone-aware; AICS dates are heterogeneous and often date-only",
+   "layer": "Acquisition",
+   "detail": "Acquisition and DataStream objects may fail validation or misstate events. Migration must parse values into number-plus-unit and timezone-aware datetimes, retain raw text for provenance, and reject fabricated timezone or end-time values."
+  },
+  {
+   "gap": "Instrument/config referential integrity requires named devices and a coordinate system",
+   "layer": "Instrument / Acquisition",
+   "detail": "A complete Instrument plus DataStream needs named cameras, detectors, lasers, triggers and a coordinate system. Objective facts alone (magnification, exposure) cannot construct them; DataStream.active_devices requires names matching Instrument components that the view does not supply."
+  },
+  {
+   "gap": "Plate, well, layout, colony and experimental-condition metadata have no first-class model",
+   "layer": "Procedure / Acquisition",
+   "detail": "Core experimental design would become untyped protocol_parameters or be lost. A typed plate/well/layout profile is needed and referenced from the acquisition/specimen package. Same absence SeaHub raised for its three-level combinatorial index hierarchy."
+  },
+  {
+   "gap": "Generic image-file metadata exceeds aind's acquisition-level image model",
+   "layer": "DataDescription / Platform",
+   "detail": "Physical format, TCZYX shape, axis order, byte size and previews have no generic aind core field. A governed file-and-image manifest or an imaging extension is needed beneath the acquisition asset; storage/cache lifecycle fields belong in the registry platform, not portable scientific JSON."
+  },
+  {
+   "gap": "Culture, preparation, treatments, concentrations and timepoints exceed Reagent and SpecimenProcedure vocabularies",
+   "layer": "Procedures",
+   "detail": "aind Reagent lacks role, concentration, volume, group and treatment timing. Flexible parameters preserve values but not interoperable semantics; seeding, replate, differentiation, fixation, media, passage and treatment events should be normalized into ordered SpecimenProcedure or Manipulation records with typed profile fields."
+  },
+  {
+   "gap": "Processing fields lack the code URLs, experimenters, timestamps, ordering and dependency graph for reproducible DataProcess records",
+   "layer": "Processing",
+   "detail": "Derived-data provenance is only partly constructible. Flat analysis/segmentation/output fields must expand into ordered DataProcess records with process type, stage, Code URL/version/commit, parameters, experimenters, timestamps, inputs, outputs and a dependency graph."
+  },
+  {
+   "gap": "AICS QC flags can become QCMetric records, but require normalization",
+   "layer": "QualityControl",
+   "detail": "Modality, evaluation stage, typed metric value, grouping tags and status history must be defined for AICS QC flags. Registry workflow state must be kept separate from scientific QC status; a default_grouping policy must be defined for generated metrics."
+  },
+  {
+   "gap": "Required administrative metadata is absent or ambiguous",
+   "layer": "DataDescription",
+   "detail": "Institution, funding source, investigator identity and creation semantics are not present in the supplied view, so DataDescription cannot be validated from it alone. These must be supplied from authoritative dataset-level sources, with v2.9.0 pinned for the migration."
+  }
+ ],
+ "post_gap_notes": [
+  {
+   "label": "Required-field readiness.",
+   "body": "Forty-two high-value aind required or conditionally-required checks were evaluated for the in-vitro imaging pathway: twenty-eight are high-severity gaps, nine medium, and five low-severity or directly available. This is a readiness assessment of the information needed to construct valid, scientifically meaningful aind objects, not a population percentage. Metadata and Instrument are Partial; DataDescription and Subject/specimen are Low; Procedures, Acquisition/DataStream, Processing and QualityControl are Partial. Principal blockers include data_description.institution, funding_source, acquisition.subject_id/specimen_id, Channel.detector device identity and trigger, instrument.global_coordinate_system, and DataProcess.code.url."
+  }
+ ],
+ "field_intro": "These tables show representative field-level mappings by metadata domain; the complete 186-field and 49-child crosswalk, with severities and source URLs, is in the companion workbook. Classifications follow the five-way scheme defined in the classification note above.",
+ "entities": [
+  {
+   "name": "Study and dataset",
+   "fields": [
+    {
+     "source_field": "dataset_name",
+     "source_type": "string",
+     "target_field": "data_description.project_name",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Study / collection grouping",
+     "notes": "Closest project-level concept; confirm one AICS dataset equals one aind project."
+    },
+    {
+     "source_field": "dataset_id",
+     "source_type": "string",
+     "target_field": "metadata.other_identifiers[]",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Schema field definitions",
+     "notes": "Preserve as an external identifier; DataDescription has no project-identifier field."
+    },
+    {
+     "source_field": "collection_name",
+     "source_type": "string",
+     "target_field": "data_description.tags[]",
+     "classification": "Gap",
+     "cross_dataset_gap": "Study / collection grouping",
+     "notes": "No collection object in v2.9.0; tags are lossy."
+    },
+    {
+     "source_field": "study_title",
+     "source_type": "string",
+     "target_field": "project_name or data_summary",
+     "classification": "Needs Review",
+     "cross_dataset_gap": "Study / collection grouping",
+     "notes": "Select one canonical project_name and retain the fuller title in data_summary when different."
+    },
+    {
+     "source_field": "study_type",
+     "source_type": "string",
+     "target_field": "data_description.tags[]",
+     "classification": "Gap",
+     "cross_dataset_gap": "Study / collection grouping",
+     "notes": "No typed study object or study-type field exists."
+    },
+    {
+     "source_field": "acquisition_group_id",
+     "source_type": "string",
+     "target_field": "data_description.name / acquisition identity (derived)",
+     "classification": "Needs Review",
+     "cross_dataset_gap": "Data discovery",
+     "notes": "Best candidate for grouping file rows into an acquisition asset, but aind identity is time-based."
+    }
+   ]
+  },
+  {
+   "name": "Biological source",
+   "fields": [
+    {
+     "source_field": "organism",
+     "source_type": "string",
+     "target_field": "subject.subject_details.species",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Cell-line identity",
+     "notes": "Species maps to NCBI Taxonomy, but AICS cell lines are not aind Subject instances."
+    },
+    {
+     "source_field": "cell_line",
+     "source_type": "string",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Cell-line identity",
+     "notes": "v2.9.0 has animal/human subject details but no cell-line/clone lineage object."
+    },
+    {
+     "source_field": "parental_cell_line",
+     "source_type": "string",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Cell-line identity",
+     "notes": "No lineage object; parental line cannot be typed."
+    },
+    {
+     "source_field": "clone",
+     "source_type": "string",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Cell-line identity",
+     "notes": "No clone object in the Subject model."
+    },
+    {
+     "source_field": "biological_entity",
+     "source_type": "string",
+     "target_field": "subject/specimen profile",
+     "classification": "Needs Review",
+     "cross_dataset_gap": "Cell-line identity",
+     "notes": "Use to select a cell-line/specimen profile; no matching aind subject subtype exists."
+    },
+    {
+     "source_field": "cell_line_annotation",
+     "source_type": "string",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Cell-line identity",
+     "notes": "No cell-line/clone lineage object to carry the annotation."
+    }
+   ]
+  },
+  {
+   "name": "Specimen conditions, culture and treatments",
+   "fields": [
+    {
+     "source_field": "sample_state",
+     "source_type": "string",
+     "target_field": "specimen_procedures[].protocol_parameters",
+     "classification": "Gap",
+     "cross_dataset_gap": "Procedure vocab",
+     "notes": "Retained in flexible parameters only; semantics, units and vocabulary are not first-class."
+    },
+    {
+     "source_field": "culture_media",
+     "source_type": "string",
+     "target_field": "specimen_procedures[].protocol_parameters",
+     "classification": "Gap",
+     "cross_dataset_gap": "Procedure vocab",
+     "notes": "Extension container only; no typed reagent/role model."
+    },
+    {
+     "source_field": "passage",
+     "source_type": "int",
+     "target_field": "specimen_procedures[].protocol_parameters",
+     "classification": "Gap",
+     "cross_dataset_gap": "Procedure vocab",
+     "notes": "Extension container only."
+    },
+    {
+     "source_field": "fixation_date",
+     "source_type": "date",
+     "target_field": "specimen_procedures[].protocol_parameters",
+     "classification": "Gap",
+     "cross_dataset_gap": "Procedure vocab",
+     "notes": "Extension container only; also a timezone/typing concern."
+    },
+    {
+     "source_field": "protocol",
+     "source_type": "string",
+     "target_field": "specimen_procedures[].protocol_id",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Schema field definitions",
+     "notes": "ProtocolMixin expects a protocols.io DOI; AICS protocol references need normalization."
+    },
+    {
+     "source_field": "reagents",
+     "source_type": "object[]",
+     "target_field": "specimen_procedures[].protocol_parameters",
+     "classification": "Gap",
+     "cross_dataset_gap": "Procedure vocab",
+     "notes": "aind Reagent lacks role, concentration, volume, group and treatment timing."
+    }
+   ]
+  },
+  {
+   "name": "Experimental design and plate layout",
+   "fields": [
+    {
+     "source_field": "plate_barcode",
+     "source_type": "string",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Plate / well layout",
+     "notes": "No plate/well model; identity and layout would be untyped or lost."
+    },
+    {
+     "source_field": "plate_format",
+     "source_type": "string",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Plate / well layout",
+     "notes": "No plate model to carry format/model."
+    },
+    {
+     "source_field": "well",
+     "source_type": "string",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Plate / well layout",
+     "notes": "No well identity construct."
+    },
+    {
+     "source_field": "condition",
+     "source_type": "string",
+     "target_field": "data_description.tags[] or protocol_parameters",
+     "classification": "Gap",
+     "cross_dataset_gap": "Plate / well layout",
+     "notes": "No typed experimental-condition construct."
+    },
+    {
+     "source_field": "experimental_condition",
+     "source_type": "string",
+     "target_field": "data_description.tags[] or protocol_parameters",
+     "classification": "Gap",
+     "cross_dataset_gap": "Plate / well layout",
+     "notes": "No typed experimental-condition construct."
+    },
+    {
+     "source_field": "colony_position",
+     "source_type": "string",
+     "target_field": "\u2014 (no analog)",
+     "classification": "Gap",
+     "cross_dataset_gap": "Plate / well layout",
+     "notes": "No plate/well/layout model to anchor colony position."
+    }
+   ]
+  },
+  {
+   "name": "Instrument and acquisition",
+   "fields": [
+    {
+     "source_field": "instrument_id",
+     "source_type": "string",
+     "target_field": "instrument.instrument_id; acquisition.instrument_id",
+     "classification": "Mapped",
+     "cross_dataset_gap": "\u2014",
+     "notes": "Cross-file instrument identifier; values must agree."
+    },
+    {
+     "source_field": "objective_magnification",
+     "source_type": "float",
+     "target_field": "instrument.components[Objective].magnification",
+     "classification": "Mapped",
+     "cross_dataset_gap": "\u2014",
+     "notes": "Numeric value maps directly."
+    },
+    {
+     "source_field": "exposure_time_ms",
+     "source_type": "float",
+     "target_field": "...channels[].detector.exposure_time",
+     "classification": "Mapped",
+     "cross_dataset_gap": "Schema field definitions",
+     "notes": "Convert milliseconds to a value plus exposure_time_unit."
+    },
+    {
+     "source_field": "channels",
+     "source_type": "object[]",
+     "target_field": "ImagingConfig.channels[]",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Custom vs. off-the-shelf",
+     "notes": "Names and excitation map well, but required detector device identity/trigger and full filters are absent."
+    },
+    {
+     "source_field": "imaging_start_time",
+     "source_type": "datetime",
+     "target_field": "acquisition.acquisition_start_time or Image.image_start_time",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Schema field definitions",
+     "notes": "Granularity and timezone require normalization."
+    },
+    {
+     "source_field": "duration_minutes",
+     "source_type": "float",
+     "target_field": "derived acquisition/data_stream end time",
+     "classification": "Needs Review",
+     "cross_dataset_gap": "Schema field definitions",
+     "notes": "End time derivable only when a trustworthy start time is present."
+    }
+   ]
+  },
+  {
+   "name": "Image data and file asset",
+   "fields": [
+    {
+     "source_field": "file_name",
+     "source_type": "string",
+     "target_field": "ImagingConfig.images[].file_name or metadata.name",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Data discovery",
+     "notes": "metadata.name identifies the whole asset; image file_name exists only in selected image classes."
+    },
+    {
+     "source_field": "file_path",
+     "source_type": "string",
+     "target_field": "metadata.location or images[].file_name",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Data discovery",
+     "notes": "One aind location describes an asset root, while AICS stores one path per file row."
+    },
+    {
+     "source_field": "file_type",
+     "source_type": "string",
+     "target_field": "data_description.modalities[] plus file-manifest extension",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Schema field definitions",
+     "notes": "Physical format and scientific modality are different concepts."
+    },
+    {
+     "source_field": "axis_order",
+     "source_type": "string",
+     "target_field": "images[] / transform / file-manifest extension",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Data discovery",
+     "notes": "aind imaging objects capture some geometry but not a generic TCZYX file-header model."
+    },
+    {
+     "source_field": "raw_image_shape_tczyx",
+     "source_type": "int[]",
+     "target_field": "images[] / transform / file-manifest extension",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Data discovery",
+     "notes": "No generic TCZYX file-header model."
+    },
+    {
+     "source_field": "file_size_bytes",
+     "source_type": "int",
+     "target_field": "file manifest / registry platform",
+     "classification": "Unmappable",
+     "cross_dataset_gap": "Data discovery",
+     "notes": "Per-file discovery or storage metadata without a generic aind core field."
+    }
+   ]
+  },
+  {
+   "name": "Processing and derived outputs",
+   "fields": [
+    {
+     "source_field": "analysis_activities",
+     "source_type": "string[]",
+     "target_field": "processing.data_processes[].process_type/name",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Processing provenance",
+     "notes": "May expand one AICS list into multiple ordered DataProcess records."
+    },
+    {
+     "source_field": "content_generation_algorithm",
+     "source_type": "string",
+     "target_field": "processing.data_processes[].code.name/version",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Processing provenance",
+     "notes": "Algorithm name alone does not satisfy Code.url or reproducibility requirements."
+    },
+    {
+     "source_field": "processing_date",
+     "source_type": "date",
+     "target_field": "processing.data_processes[].start_date_time",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Processing provenance",
+     "notes": "A date alone lacks timezone, end time, process identity and responsible experimenter."
+    },
+    {
+     "source_field": "input_file",
+     "source_type": "string",
+     "target_field": "data_processes[].code.input_data or dependency_graph",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Processing provenance",
+     "notes": "Normalize to asset names and explicit processing dependencies."
+    },
+    {
+     "source_field": "outputs",
+     "source_type": "object",
+     "target_field": "data_processes[].output_parameters/output_path",
+     "classification": "Gap",
+     "cross_dataset_gap": "Processing provenance",
+     "notes": "Retained, but requires normalization into DataProcess, Code and output lineage."
+    },
+    {
+     "source_field": "segmentation_pixel_voxel_size",
+     "source_type": "float",
+     "target_field": "data_processes[].output_parameters",
+     "classification": "Gap",
+     "cross_dataset_gap": "Processing provenance",
+     "notes": "Extension container only; normalize into DataProcess/output lineage."
+    }
+   ]
+  },
+  {
+   "name": "Governance, provenance and quality",
+   "fields": [
+    {
+     "source_field": "metadata_record_id",
+     "source_type": "string",
+     "target_field": "metadata.other_identifiers[]",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Schema field definitions",
+     "notes": "Secondary identifier; it identifies a file row, not necessarily the acquisition asset."
+    },
+    {
+     "source_field": "uploaded_by",
+     "source_type": "string",
+     "target_field": "registry policy / data_summary or restrictions",
+     "classification": "Needs Review",
+     "cross_dataset_gap": "Data access restrictions",
+     "notes": "Route portable scientific meaning separately from platform governance."
+    },
+    {
+     "source_field": "qc_status",
+     "source_type": "string",
+     "target_field": "quality_control.status",
+     "classification": "Mapped",
+     "cross_dataset_gap": "\u2014",
+     "notes": "Normalize AICS status labels to the aind status representation."
+    },
+    {
+     "source_field": "source_qc_flag",
+     "source_type": "string",
+     "target_field": "quality_control.metrics[].status_history/value",
+     "classification": "Conflict",
+     "cross_dataset_gap": "Schema field definitions",
+     "notes": "Create a named QCMetric with modality, stage and status provenance."
+    },
+    {
+     "source_field": "metadata_qc_note",
+     "source_type": "string",
+     "target_field": "quality_control.notes",
+     "classification": "Mapped",
+     "cross_dataset_gap": "\u2014",
+     "notes": "Maps directly as a quality-control note."
+    },
+    {
+     "source_field": "cold_store_candidate",
+     "source_type": "bool",
+     "target_field": "file manifest / registry platform",
+     "classification": "Unmappable",
+     "cross_dataset_gap": "\u2014",
+     "notes": "Per-file storage lifecycle; no generic aind core field."
+    }
+   ]
+  }
+ ]
+}

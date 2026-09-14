@@ -1,0 +1,55 @@
+{
+ "_comment": "Abridged compact-format example (SeaHub DNA Typewriter, 2 of 7 entities). Shows the voice and the exact shape the renderer expects. Doubles as the gapdoc self-check: `python3 scripts/gapdoc.py build assets/example.json -o /tmp/example.docx` must exit 0.",
+ "mode": "placeholder",
+ "meta": {
+  "dataset": "DNA Typewriter lineage recording",
+  "descriptor": "Mouse, SeaHub",
+  "source_organization": "Seattle Hub for Synthetic Biology (SeaHub)",
+  "prepared_by": "Workstream 2",
+  "reference_schema": "aind-data-schema v2.9.0 (commit 18114d7b)",
+  "milestone": "Milestone 1 — Track C",
+  "status": "Draft",
+  "date": "2026-09-14",
+  "version": "v0.2"
+ },
+ "intro": [
+  "This section provides a field-level breakdown for the dataset SeaHub nominated as representative of the work the registry will need to support. DNA Typewriter is a genomic recording system: a prime editor and an engineered target array are delivered to a mouse zygote by pronuclear injection, and each cell division writes an ordered insertion into a six-position register, so that a single destructive readout at E13.5 recovers the cell's division history rather than only its present state.",
+  {"label": "Placeholder note.", "body": "This analysis was prepared from a preprint and a scoping conversation, not from a metadata export. Source field names below are descriptive labels for quantities the paper reports, not real keys from a SeaHub system. Classifications are verified statements about what aind-data-schema v2.9.0 does and does not contain."}
+ ],
+ "sources_reviewed": [
+  "Yu Q, Kim H, Seidel S, et al. In vivo reconstruction of the cell lineage history of a developing mouse with DNA Typewriter. bioRxiv 2026.07.29.741625",
+  "aind-data-schema v2.9.0, commit 18114d7b",
+  "CELLxGENE Discover schema v7.1.0, commit 1cb494af — transcriptomic cross-reference only"
+ ],
+ "sample_asset": [
+  "Embryo #3 (Mus musculus, C57BL/6J, E13.5, sex not determined), 1 of 10 transferred",
+  "Recorder: piggyBac-delivered PEmax-P2A-dTomato and epegRNA-circTAPE; 11 TAPE integration barcodes",
+  "Source: GEO GSE341627; code at github.com/seidels/dtt-mouse-analysis"
+ ],
+ "gap_summary": [
+  {"gap": "Cardinality breaks in both directions within one study", "layer": "Acquisition / DataDescription", "detail": "One embryo yields four assay-level assets and one sci-RNA-seq3 run carries nuclei from two embryos. Acquisition.subject_id is a single required str. Sixth appearance of this gap and the first dataset exhibiting both directions together."},
+  {"gap": "date_of_birth is required and meaningless for an embryo; no developmental stage field", "layer": "Subject", "detail": "MouseSubject.date_of_birth is required and BEFORE-validated, but an embryo harvested at E13.5 has no birth date. Developmental stage — the primary temporal anchor — has no field. Make date_of_birth conditional and add an ontology-bound stage field."},
+  {"gap": "Engineered recorder construct and integration inventory have no schema home", "layer": "Subject / Procedures", "detail": "subject_details.genotype is free text for inherited alleles; the recorder is somatic, mosaic and variable-copy. NonViralMaterial offers name/source/lot/concentration only. Needs a subject-level genetic-modification record, not an extension container."}
+ ],
+ "field_intro": "These tables document field-level mappings for the core schemas. Source field names are descriptive labels, not keys from a SeaHub system — see the placeholder note above.",
+ "entities": [
+  {
+   "name": "Subject — transgenic embryo",
+   "fields": [
+    {"source_field": "embryo_id", "source_type": "str", "target_field": "subject.subject_id", "classification": "Mapped", "cross_dataset_gap": "—", "notes": "Direct once a durable identifier replaces the manuscript's ordinal label."},
+    {"source_field": "developmental_stage", "source_type": "str (E13.5)", "target_field": "— (no analog)", "classification": "Gap", "cross_dataset_gap": "Developmental stage", "notes": "Primary temporal anchor; determines how much history the recorder could write. Add ontology-bound stage field (MmusDv pattern)."},
+    {"source_field": "date_of_birth", "source_type": "date", "target_field": "subject_details.date_of_birth", "classification": "Conflict", "cross_dataset_gap": "Developmental stage", "notes": "Required, BEFORE-validated. Embryo has conception and harvest dates, no birth date. Make conditional."},
+    {"source_field": "genotype", "source_type": "str (piggyBac PEmax, mosaic)", "target_field": "subject_details.genotype", "classification": "Conflict", "cross_dataset_gap": "Engineered subject identity", "notes": "Free-text string for inherited alleles; cannot carry a somatically delivered, mosaic, variable-copy construct. Add a genetic-modification record."}
+   ]
+  },
+  {
+   "name": "Acquisition — sci-RNA-seq3 with paired single-cell TAPE readout",
+   "fields": [
+    {"source_field": "assay", "source_type": "str (sci-RNA-seq3)", "target_field": "data_description.modalities = SCRNASEQ", "classification": "Mapped", "cross_dataset_gap": "Schema field definitions", "notes": "Applies. CELLxGENE identifies it precisely as EFO:0030028, which a closed enum cannot express."},
+    {"source_field": "subject_ids", "source_type": "list[str] (two embryos)", "target_field": "acquisition.subject_id", "classification": "Conflict", "cross_dataset_gap": "Many-to-one subject mapping", "notes": "Single required string; specimen_id list cannot carry a second animal because of the substring validator. Decompose at onboarding or add subjects[]."},
+    {"source_field": "rt_plate / rt_well", "source_type": "str (6 plates, 96 wells)", "target_field": "— (no analog)", "classification": "Gap", "cross_dataset_gap": "Plate / well layout", "notes": "The first index is the only record of which embryo a nucleus came from. Container hierarchy model."}
+   ]
+  }
+ ],
+ "post_gap_notes": []
+}

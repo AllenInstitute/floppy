@@ -1,0 +1,537 @@
+# source: resources/Workstream 2 - Schema and Data Model/AICS_AIND_Data_Schema_Gap_Analysis.docx
+# original kept: yes
+
+**Gap Analysis**
+
+**AICS Primary-Image Metadata Schema vs. AIND Data Schema v2.9.0**
+
+Comparison of the AICS REMBI-categorized slim primary-image metadata
+view against the canonical AIND v2.9.0 JSON schema, with architectural
+findings, field mappings, readiness gaps, and migration recommendations.
+
+**Status:** Draft for scientific and engineering review
+
+**Prepared:** August 25, 2026
+
+**Reference schema:** aind-data-schema v2.9.0 (final release) -
+https://github.com/AllenNeuralDynamics/aind-data-schema/tree/v2.9.0
+
+**Source schema:** AICS candidate schema 0.6.0; 33,184-row, 186-field
+slim REMBI-categorized primary-image Parquet view
+
+**Companion evidence:** Complete top-level, nested-child, and
+AIND-required-field matrices are provided in the accompanying Excel
+workbook.
+
+**Contents**
+============
+
+-   1\. Purpose and Scope
+
+-   2\. Executive Summary of Key Gaps
+
+-   3\. Terminology Reconciliation
+
+-   4\. High-Level and Architectural Differences
+
+-   5\. Field-Level Mapping by Metadata Domain
+
+-   6\. AIND Required-Field Readiness
+
+-   7\. Cross-Cutting Concerns
+
+-   8\. Proposed Adjustments and Migration Recommendations
+
+-   9\. Open Questions
+
+-   10\. Sources and Method
+
+**1. Purpose and Scope**
+========================
+
+This document compares the supplied AICS primary-image metadata schema
+with aind-data-schema v2.9.0. The source is a discovery-oriented Parquet
+view: one row per retained primary-image file, with 186 top-level fields
+and four nested objects containing 49 physical child fields. The
+reference is a hierarchical set of JSON models centered on a data asset
+produced by one acquisition.
+
+**Scope boundary.** The analysis evaluates schema semantics, structure,
+requiredness, type/cardinality, controlled vocabularies, and feasible
+transformations. It does not claim that a mapping is populated for every
+row. Existing AICS validation evidence establishes the view\'s shape and
+internal consistency; AIND readiness is assessed separately.
+
+**Version boundary.** The reference is pinned to v2.9.0, the final
+aind-data-schema release. Future evolution occurs in the biodata-schema
+repository, so migration decisions should not be based on an unpinned
+\'latest\' URL.
+
+**Interpretive principle.** A field is considered direct only when its
+scientific meaning and destination are materially aligned. A flexible
+notes or parameters dictionary is classified as an extension container,
+not a true semantic match.
+
+**2. Executive Summary of Key Gaps**
+====================================
+
+The schemas overlap on imaging concepts, but they were designed around
+different units of registration and different scientific domains. Eleven
+of 186 top-level AICS fields have a direct destination; 75 are partial,
+48 require flexible extension containers, 23 have no first-class analog,
+10 belong in a file-manifest or platform layer, and 19 are search-only
+derivatives that should be regenerated rather than migrated.
+
+  **\#**   **Gap**                                                                                                                                          **Impact**
+  -------- ------------------------------------------------------------------------------------------------------------------------------------------------ ------------------------------------------------------------------------------------------
+  **1**    Asset boundary: one AICS row is one image file; one AIND data asset represents an acquisition-level collection.                                  High - identity, location, and every repeated field depend on the aggregation rule.
+  **2**    Biological identity: AICS models cell lines, clones, and lineage; AIND v2.9.0 models animal/human Subjects and derived specimen IDs.             High - required subject\_id/specimen\_id cannot be populated without a governed profile.
+  **3**    AIND acquisition timing is required and timezone-aware; AICS dates are heterogeneous and often date-only.                                        High - acquisition and DataStream objects may fail validation or misstate events.
+  **4**    Instrument/config referential integrity requires named cameras, detectors, lasers, triggers, and coordinate systems.                             High - objective facts alone cannot construct a complete Instrument plus DataStream.
+  **5**    Plate, well, layout, colony, and experimental-condition metadata have no first-class AIND model.                                                 High - core experimental design would become untyped parameters or be lost.
+  **6**    Generic image file metadata (format, TCZYX shape, axis order, byte size, previews) exceeds AIND\'s acquisition-level image model.                High - a governed file manifest or imaging extension is needed.
+  **7**    Culture, preparation, treatments, concentrations, and timepoints exceed the AIND Reagent and SpecimenProcedure vocabularies.                     Medium/High - flexible parameters preserve values but not interoperable semantics.
+  **8**    Processing fields lack the code URLs, experimenters, timestamps, ordering, and dependency graph required for reproducible DataProcess records.   High - derived-data provenance is only partly constructible.
+  **9**    AICS QC flags can become QCMetric records, but modality, stage, metric value, grouping, and status history require normalization.                Medium - quality signals are present but not directly valid AIND QC.
+  **10**   Required administrative metadata - institution, funding, investigators, creation semantics - is not present or is ambiguous.                     High - DataDescription cannot be validated from the supplied view alone.
+
+**Mapping evidence summary**
+----------------------------
+
+  **Classification**          **Top-level fields**   **Interpretation**
+  --------------------------- ---------------------- ------------------------------------------------------------------------------
+  **Direct**                  11                     Meaning aligns; normalization or unit encoding may still be needed.
+  **Partial**                 75                     A destination exists, but granularity, meaning, or required context differs.
+  **Extension container**     48                     Value can be retained in parameters/notes without first-class semantics.
+  **No first-class analog**   23                     AIND v2.9.0 lacks the scientific construct.
+  **Platform or manifest**    10                     Belongs with file inventory, storage, preview, or lifecycle services.
+  **Derived/search-only**     19                     Regenerate from canonical nested values; do not migrate independently.
+
+**3. Terminology Reconciliation**
+=================================
+
+The two schemas reuse common terms at different levels. The following
+vocabulary is used throughout this analysis.
+
+  **AICS term**                      **Closest AIND concept**                                 **Caveat**
+  ---------------------------------- -------------------------------------------------------- -----------------------------------------------------------------------------------------------
+  **Asset / Parquet row**            Image file within an AIND data asset                     AICS row identity is finer-grained than AIND asset identity.
+  **Acquisition group**              Acquisition + DataDescription.name                       Best aggregation key, but AIND identity is centered on acquisition time and subject/specimen.
+  **Dataset / collection / study**   DataDescription.project\_name, name, tags                No identified Study or Collection object in v2.9.0.
+  **Cell line**                      Subject/specimen profile (no direct object)              A cell line is not an animal/human Subject and cannot safely be substituted for one.
+  **Plate / well / layout**          SpecimenProcedure.protocol\_parameters                   Possible storage location only; not a typed experimental-design model.
+  **Channel description**            ImagingConfig.channels\[\].Channel                       AIND also requires a detector configuration and named devices.
+  **Reagent / treatment**            Reagent + SpecimenProcedure or Manipulation              AIND Reagent lacks role, concentration, volume, group, and treatment timing.
+  **Output**                         Processing.DataProcess output\_path/output\_parameters   Viewer and download URLs remain platform/file-manifest metadata.
+  **Search bridge**                  Search index derived from canonical metadata             Not portable scientific metadata; regenerate after migration.
+
+**4. High-Level and Architectural Differences**
+===============================================
+
+**4.1 Unit of registration and asset boundary**
+-----------------------------------------------
+
+The largest structural difference is not a field-name mismatch. The AICS
+view registers each primary image file independently, while AIND
+describes one acquisition episode and its data asset as a collection.
+Mapping each file row to a separate AIND asset would duplicate
+acquisition, instrument, specimen, treatment, and processing metadata
+and could invent artificial sessions. Aggregating rows requires a
+deterministic rule and a companion file manifest.
+
+  **Dimension**      **AICS source**                               **AIND v2.9.0**                               **Consequence**
+  ------------------ --------------------------------------------- --------------------------------------------- --------------------------------------------
+  **Unit**           One primary-image file row                    One acquisition-level data asset              Define aggregation/decomposition.
+  **Identity**       metadata\_record\_id, source IDs, file path   metadata.name + acquisition time/subject      Preserve row IDs as secondary identifiers.
+  **Location**       Per-file path                                 Single asset root location                    Derive root; retain relative file paths.
+  **Multiplicity**   Many rows may share acquisition\_group\_id    One Acquisition with streams/configs/images   Group before validation.
+  **Derived data**   Nested outputs plus file roles                Processing/DataProcess and source\_data       Build explicit lineage graph.
+
+**4.2 Biological identity and specimen semantics**
+--------------------------------------------------
+
+AICS is cell-line-centric: cell line, parental line, clone, tagged
+structure, genes/proteins, reagents, and culture state are central. AIND
+v2.9.0 requires acquisition.subject\_id and, for in-vitro modalities,
+specimen\_id, but its Subject detail types are animal/human-oriented and
+its specimen model is primarily expressed through procedure identifiers.
+Treating a cell-line identifier as subject\_id would be syntactically
+convenient but semantically misleading.
+
+**Required decision.** Define a versioned AICS cell-line/specimen
+profile with stable IDs, relationships to organism/donor where known,
+clone lineage, derivation provenance, and an explicit policy for
+populating AIND subject\_id and specimen\_id.
+
+**4.3 Entity and hierarchy comparison**
+---------------------------------------
+
+  **Concern**               **AICS**                                        **AIND v2.9.0**                                  **Assessment**
+  ------------------------- ----------------------------------------------- ------------------------------------------------ ------------------------------------------------------
+  **Dataset grouping**      dataset\_name, dataset\_id, collection, study   DataDescription project/name/tags                Partial; identifiers and study semantics are weaker.
+  **Experimental layout**   plate, well, colony, condition                  No first-class model                             Schema/profile gap.
+  **Instrument**            System + objective scalars                      Instrument components + named devices            Partial; device inventory is incomplete.
+  **Acquisition**           Repeated per-file settings                      Acquisition -\> DataStreams -\> configurations   Requires grouping and normalization.
+  **Image header**          Axis, shape, sizes, voxel dimensions            Selected Image classes and transforms            Partial; no generic TCZYX manifest.
+  **Processing**            Flat fields + nested outputs                    Ordered DataProcess records + Code               Partial; reproducibility fields missing.
+  **Quality**               Status, flags, notes                            QCMetric objects + grouping/status               Constructible with normalization.
+
+**4.4 Extensibility and governance**
+------------------------------------
+
+AIND\'s typed objects and registries give shared fields strong
+semantics, while several escape hatches - protocol\_parameters,
+output\_parameters, code.parameters, additional\_settings, and notes -
+can retain project-specific values. Those containers are useful for
+migration, but relying on them for 48 top-level AICS fields would
+produce technically valid yet weakly interoperable metadata. Stable,
+widely used AICS constructs should be promoted into a governed profile
+or proposed as schema additions rather than left indefinitely as
+anonymous key/value data.
+
+**5. Field-Level Mapping by Metadata Domain**
+=============================================
+
+Representative mappings are shown below. The complete workbook contains
+all 186 top-level fields, all 49 physical nested child fields,
+classifications, severities, recommendations, and source URLs.
+
+**5.1 Study and dataset**
+-------------------------
+
+  **AICS field**               **AIND target**                                           **Status**   **Notes**
+  ---------------------------- --------------------------------------------------------- ------------ --------------------------------------------------------------------------------------------------------
+  **dataset\_name**            data\_description.project\_name                           Partial      Closest project-level concept; confirm one AICS dataset equals one AIND project.
+  **dataset\_id**              metadata.other\_identifiers\[\]                           Partial      Preserve as an external identifier; AIND DataDescription has no project identifier field.
+  **collection\_name**         data\_description.tags\[\]                                Partial      AIND has no identified collection object; tags are lossy.
+  **study\_title**             data\_description.project\_name or data\_summary          Partial      Select one canonical project\_name and retain the fuller title in data\_summary when different.
+  **study\_type**              data\_description.tags\[\]                                Partial      No typed study object or study-type field exists.
+  **acquisition\_group\_id**   data\_description.name / acquisition identity (derived)   Partial      Best candidate for grouping file rows into an AIND acquisition asset, but AIND identity is time-based.
+
+**5.2 Biological source**
+-------------------------
+
+  **AICS field**               **AIND target**                                                              **Status**              **Notes**
+  ---------------------------- ---------------------------------------------------------------------------- ----------------------- ---------------------------------------------------------------------------------------
+  **organism**                 subject.subject\_details.species                                             Partial                 Species can map to NCBI Taxonomy, but AICS cell lines are not AIND Subject instances.
+  **cell\_line**               Cell-line/specimen extension; limited Subject/SpecimenProcedure parameters   No first-class analog   AIND v2.9.0 has animal/human subject details but no cell-line/clone lineage object.
+  **parental\_cell\_line**     Cell-line/specimen extension; limited Subject/SpecimenProcedure parameters   No first-class analog   AIND v2.9.0 has animal/human subject details but no cell-line/clone lineage object.
+  **clone**                    Cell-line/specimen extension; limited Subject/SpecimenProcedure parameters   No first-class analog   AIND v2.9.0 has animal/human subject details but no cell-line/clone lineage object.
+  **biological\_entity**       subject/specimen profile                                                     Partial                 Use to select a cell-line/specimen profile; no matching AIND subject subtype exists.
+  **cell\_line\_annotation**   Cell-line/specimen extension; limited Subject/SpecimenProcedure parameters   No first-class analog   AIND v2.9.0 has animal/human subject details but no cell-line/clone lineage object.
+
+**5.3 Specimen conditions, culture, and treatments**
+----------------------------------------------------
+
+  **AICS field**       **AIND target**                                                               **Status**            **Notes**
+  -------------------- ----------------------------------------------------------------------------- --------------------- ---------------------------------------------------------------------------------------------------
+  **sample\_state**    procedures.specimen\_procedures\[\].protocol\_parameters/procedure\_details   Extension container   Can be retained in flexible parameters, but semantics, units, and vocabulary are not first-class.
+  **culture\_media**   procedures.specimen\_procedures\[\].protocol\_parameters/procedure\_details   Extension container   Can be retained in flexible parameters, but semantics, units, and vocabulary are not first-class.
+  **passage**          procedures.specimen\_procedures\[\].protocol\_parameters/procedure\_details   Extension container   Can be retained in flexible parameters, but semantics, units, and vocabulary are not first-class.
+  **fixation\_date**   procedures.specimen\_procedures\[\].protocol\_parameters/procedure\_details   Extension container   Can be retained in flexible parameters, but semantics, units, and vocabulary are not first-class.
+  **protocol**         procedures.specimen\_procedures\[\].protocol\_parameters/procedure\_details   Extension container   Can be retained in flexible parameters, but semantics, units, and vocabulary are not first-class.
+  **reagents**         procedures.specimen\_procedures\[\].protocol\_parameters/procedure\_details   Extension container   Can be retained in flexible parameters, but semantics, units, and vocabulary are not first-class.
+
+**5.4 Experimental design and plate layout**
+--------------------------------------------
+
+  **AICS field**                **AIND target**                                                                         **Status**              **Notes**
+  ----------------------------- --------------------------------------------------------------------------------------- ----------------------- -----------------------------------------------------------------------
+  **plate\_barcode**            No first-class AIND plate/well model; possible SpecimenProcedure.protocol\_parameters   No first-class analog   Plate/well identity and experimental layout would be untyped or lost.
+  **plate\_format**             No first-class AIND plate/well model; possible SpecimenProcedure.protocol\_parameters   No first-class analog   Plate/well identity and experimental layout would be untyped or lost.
+  **well**                      No first-class AIND plate/well model; possible SpecimenProcedure.protocol\_parameters   No first-class analog   Plate/well identity and experimental layout would be untyped or lost.
+  **condition**                 data\_description.tags\[\] or SpecimenProcedure.protocol\_parameters                    Extension container     No typed experimental-condition or plate-layout construct.
+  **experimental\_condition**   data\_description.tags\[\] or SpecimenProcedure.protocol\_parameters                    Extension container     No typed experimental-condition or plate-layout construct.
+  **colony\_position**          No first-class AIND plate/well model; possible SpecimenProcedure.protocol\_parameters   No first-class analog   Plate/well identity and experimental layout would be untyped or lost.
+
+**5.5 Instrument and acquisition**
+----------------------------------
+
+  **AICS field**                 **AIND target**                                                                                      **Status**   **Notes**
+  ------------------------------ ---------------------------------------------------------------------------------------------------- ------------ -------------------------------------------------------------------------------------------------------------------
+  **instrument\_id**             instrument.instrument\_id; acquisition.instrument\_id                                                Direct       Use as the cross-file instrument identifier; values must agree.
+  **objective\_magnification**   instrument.components\[Objective\].magnification                                                     Direct       Numeric value maps directly.
+  **exposure\_time\_ms**         acquisition.data\_streams\[\].configurations\[ImagingConfig\].channels\[\].detector.exposure\_time   Direct       Convert milliseconds to an AIND value plus exposure\_time\_unit.
+  **channels**                   ImagingConfig.channels\[\]                                                                           Partial      Channel names and excitation map well, but required detector device identity/trigger and full filters are absent.
+  **imaging\_start\_time**       acquisition.acquisition\_start\_time or Image.image\_start\_time                                     Partial      Granularity and timezone require normalization.
+  **duration\_minutes**          derive acquisition/data\_stream end time                                                             Partial      Can derive an end time only when a trustworthy start time is present.
+
+**5.6 Image data and file asset**
+---------------------------------
+
+  **AICS field**                 **AIND target**                                                        **Status**             **Notes**
+  ------------------------------ ---------------------------------------------------------------------- ---------------------- --------------------------------------------------------------------------------------------------------
+  **file\_name**                 ImagingConfig.images\[\].file\_name or metadata.name                   Partial                AIND metadata.name identifies the whole asset; image file\_name exists only in selected image classes.
+  **file\_path**                 metadata.location or ImagingConfig.images\[\].file\_name               Partial                One AIND location describes an asset root, while AICS stores one path per file row.
+  **file\_type**                 data\_description.modalities\[\] plus file-manifest extension          Partial                Physical format and scientific modality are different concepts.
+  **axis\_order**                ImagingConfig.images\[\] / image transform / file-manifest extension   Partial                AIND imaging objects capture some geometry but not a generic TCZYX file-header model.
+  **raw\_image\_shape\_tczyx**   ImagingConfig.images\[\] / image transform / file-manifest extension   Partial                AIND imaging objects capture some geometry but not a generic TCZYX file-header model.
+  **file\_size\_bytes**          File manifest / registry platform                                      Platform or manifest   Useful per-file discovery or storage metadata without a generic AIND core field.
+
+**5.7 Processing and derived outputs**
+--------------------------------------
+
+  **AICS field**                         **AIND target**                                                                  **Status**            **Notes**
+  -------------------------------------- -------------------------------------------------------------------------------- --------------------- -----------------------------------------------------------------------------------------
+  **analysis\_activities**               processing.data\_processes\[\].process\_type/name                                Partial               May expand one AICS list into multiple ordered DataProcess records.
+  **content\_generation\_algorithm**     processing.data\_processes\[\].code.name/version                                 Partial               Algorithm name alone does not satisfy AIND Code.url or reproducibility requirements.
+  **processing\_date**                   processing.data\_processes\[\].start\_date\_time                                 Partial               A date alone lacks timezone, end time, process identity, and responsible experimenter.
+  **input\_file**                        processing.data\_processes\[\].code.input\_data or dependency\_graph             Partial               Normalize to asset names and explicit processing dependencies.
+  **outputs**                            processing.data\_processes\[\].output\_parameters/output\_path/code.parameters   Extension container   Can be retained, but requires normalization into DataProcess, Code, and output lineage.
+  **segmentation\_pixel\_voxel\_size**   processing.data\_processes\[\].output\_parameters/output\_path/code.parameters   Extension container   Can be retained, but requires normalization into DataProcess, Code, and output lineage.
+
+**5.8 Governance, provenance, and quality**
+-------------------------------------------
+
+  **AICS field**               **AIND target**                                                     **Status**             **Notes**
+  ---------------------------- ------------------------------------------------------------------- ---------------------- -----------------------------------------------------------------------------------------------------------
+  **metadata\_record\_id**     metadata.other\_identifiers\[\]                                     Partial                Preserve as a secondary identifier; it identifies a file row, not necessarily the AIND acquisition asset.
+  **uploaded\_by**             Registry policy / data\_description.data\_summary or restrictions   Partial                Route portable scientific meaning separately from platform governance.
+  **qc\_status**               quality\_control.status                                             Direct                 Normalize AICS status labels to the AIND status representation.
+  **source\_qc\_flag**         quality\_control.metrics\[\].status\_history/value                  Partial                Create a named QCMetric with modality, stage, and status provenance.
+  **metadata\_qc\_note**       quality\_control.notes                                              Direct                 Maps directly as a quality-control note.
+  **cold\_store\_candidate**   File manifest / registry platform                                   Platform or manifest   Useful per-file discovery or storage metadata without a generic AIND core field.
+
+**6. AIND Required-Field Readiness**
+====================================
+
+Forty-two high-value AIND required or conditionally required checks were
+evaluated for the intended in-vitro imaging pathway. Twenty-eight are
+high-severity gaps, nine are medium-severity gaps, and five are
+low-severity or directly available. This is not a population percentage;
+it is a readiness assessment of the information needed to construct
+valid, scientifically meaningful AIND objects.
+
+  **Core object**              **Current readiness**   **Principal blocker**
+  ---------------------------- ----------------------- ---------------------------------------------------------------------------------------------------
+  **Metadata**                 Partial                 Asset name and root location require acquisition-level aggregation.
+  **DataDescription**          Low                     Institution, funding, investigator identity, creation semantics, and modality mapping.
+  **Subject/specimen**         Low                     No compatible cell-line Subject profile or stable specimen-ID policy.
+  **Procedures**               Partial                 Culture/treatment details fit only flexible parameters; boundaries and actors are incomplete.
+  **Instrument**               Partial                 Objective facts exist; device inventory, modification date, and coordinate system are incomplete.
+  **Acquisition/DataStream**   Partial                 Timing, timezone, active-device names, detector trigger, and stream construction.
+  **Processing**               Partial                 Code URL/version, experimenters, timestamps, stage, and dependency graph.
+  **QualityControl**           Partial                 Metric normalization, modality/stage, values, grouping, and status history.
+
+**Selected validation blockers**
+--------------------------------
+
+  **AIND field**                              **Closest AICS evidence**            **Coverage**               **Gap**
+  ------------------------------------------- ------------------------------------ -------------------------- --------------------------------------------------------------------------------------------
+  **data\_description.institution**           None                                 Missing                    No collecting institution field in the supplied view.
+  **data\_description.funding\_source**       None                                 Missing                    No funder/grant metadata.
+  **acquisition.subject\_id**                 cell\_line / parental\_cell\_line    Semantic mismatch          A cell line is not an AIND live Subject instance.
+  **acquisition.specimen\_id**                None; could be derived               Missing                    Stable specimen identity and derivation rules must be defined.
+  **acquisition.acquisition\_end\_time**      duration\_minutes                    Derivable only sometimes   Requires reliable start time plus duration; otherwise absent.
+  **DataStream.active\_devices**              instrument\_name; objective\_model   Partial                    AIND requires names matching Instrument components; camera/light-source names are missing.
+  **instrument.modification\_date**           None                                 Missing                    No hardware configuration effective/modification date.
+  **instrument.global\_coordinate\_system**   camera\_alignment\_matrix            Insufficient               A matrix alone does not define origins, axes, and device coordinate systems.
+  **Channel.detector**                        exposure\_time\_ms; binning          Missing identity           DetectorConfig requires a device\_name and trigger\_type not supplied in the view.
+  **DataProcess.code.url**                    content\_generation\_algorithm       Missing                    Algorithm name is insufficient for reproducibility.
+  **quality\_control.default\_grouping**      None                                 Missing                    Grouping policy must be defined for generated metrics.
+
+**7. Cross-Cutting Concerns**
+=============================
+
+**7.1 Time, units, and typed values**
+-------------------------------------
+
+AIND expects timezone-aware datetimes and explicit units in many
+device/configuration models. The AICS view contains a mixture of
+strings, dates, numeric values with units encoded in field names, and
+raw source text. Migration should parse values into number-plus-unit
+pairs, retain raw text for provenance, and reject fabricated timezone or
+end-time values.
+
+**7.2 Controlled vocabularies and persistent identifiers**
+----------------------------------------------------------
+
+AIND uses registries for modalities, species, organizations, people,
+reagents, and units. AICS vocabularies are project-oriented and include
+cell-line/catalog provenance. A governed crosswalk is required; values
+that do not map should remain explicit extensions rather than being
+forced into an approximately named registry entry.
+
+**7.3 Search and presentation fields**
+--------------------------------------
+
+Nineteen top-level AICS fields are flattened search bridges derived from
+nested cell-line, channel, reagent, or output metadata. They should not
+be copied into portable AIND JSON. The registry should index the
+canonical nested values and regenerate equivalent search fields.
+Likewise, REMBI category prefixes are presentation labels, not
+scientific metadata keys.
+
+**7.4 Source-view limitations**
+-------------------------------
+
+The supplied Parquet is a slim primary-image view, not the entire
+282-field governed AICS class model. It omits 12 fields that are empty
+across the selected primary-image rows and excludes non-primary assets
+by design. Conclusions about AIND coverage therefore apply to onboarding
+this view; they should not be generalized to every AICS asset class
+without repeating the comparison against the canonical 198-field and
+full class schemas.
+
+**7.5 Data-population evidence**
+--------------------------------
+
+The AICS companion validation reports 33,184 rows, 186 top-level fields,
+five row groups, full category annotation, preserved values/types, and
+no all-empty retained fields. The broader quality baseline reports
+98.75% required-field completion under AICS rules. Neither result
+guarantees AIND validity because AIND introduces different required
+fields, hierarchies, and controlled vocabularies.
+
+**8. Proposed Adjustments and Migration Recommendations**
+=========================================================
+
+Recommendations are ordered by dependency. They distinguish changes to
+onboarding logic, a governed AICS-to-AIND profile, the registry
+platform/file-manifest layer, and potential future schema proposals.
+
+**R1 - Define the AIND asset boundary and aggregation contract**
+----------------------------------------------------------------
+
+Group AICS file rows into acquisition-level assets using a governed key
+led by acquisition\_group\_id, acquisition timing, instrument, and
+biological/plate context. Preserve metadata\_record\_id, file\_name,
+relative path, size, and source IDs in a companion file manifest. Do not
+create one AIND acquisition per file by default.
+
+**R2 - Create a cell-line/specimen identity profile**
+-----------------------------------------------------
+
+Define stable specimen IDs and a cell-line identity object or governed
+extension carrying organism, cell line, parental line, clone, tagged
+structure, genes/proteins, catalog reference, and derivation provenance.
+Document precisely how AIND subject\_id and specimen\_id are populated
+without implying a live animal/human Subject.
+
+**R3 - Model plate, well, and experimental design explicitly**
+--------------------------------------------------------------
+
+Add a typed registry/profile layer for plate barcode, format, model,
+layout, well, well group, colony/position, condition, and batch.
+Reference it from the acquisition/specimen package. Avoid burying core
+design variables indefinitely in untyped protocol\_parameters.
+
+**R4 - Build an AICS microscopy Instrument/Acquisition profile**
+----------------------------------------------------------------
+
+Specify the minimum Microscope, Objective, Camera/Detector, Laser/LED,
+DataStream, ImagingConfig, Channel, Image, and coordinate-system
+representation. Require stable device names, detector trigger,
+acquisition start/end with timezone, modality mappings, and unit
+normalization.
+
+**R5 - Add a governed file and image manifest**
+-----------------------------------------------
+
+Retain physical format, byte size, source file IDs, previews, TCZYX
+shape, axis order, pixel/voxel spacing, scene/FOV/position, and per-file
+role beneath the acquisition asset. Keep storage/cache lifecycle fields
+in the Registry platform, not portable scientific JSON.
+
+**R6 - Normalize culture, specimen preparation, and treatment events**
+----------------------------------------------------------------------
+
+Transform seeding, replate, differentiation, fixation, culture media,
+passage, reagents, concentrations, volumes, treatment groups, and timing
+into ordered SpecimenProcedure or Manipulation events. Add typed profile
+fields for concepts not represented by AIND Reagent/SpecimenProcedure.
+
+**R7 - Construct reproducible Processing and lineage records**
+--------------------------------------------------------------
+
+Expand flat analysis/segmentation/output fields into ordered DataProcess
+records with process type, stage, Code URL/version/commit, parameters,
+experimenters, timestamps, inputs, outputs, and dependency graph.
+Preserve source wording when normalized mapping is uncertain.
+
+**R8 - Normalize QC into QCMetric objects**
+-------------------------------------------
+
+Define metric names, modality, evaluation stage, typed values, status
+history, grouping tags, and references for AICS QC flags. Keep registry
+workflow state separate from scientific QC status.
+
+**R9 - Separate portable metadata from index/platform concerns**
+----------------------------------------------------------------
+
+Regenerate search bridges from canonical nested values. Keep thumbnail,
+cache/cold-storage state, upload audit, local lifecycle, and UI category
+labels in the registry/file-manifest layer. Maintain an explicit
+crosswalk so no source field silently disappears.
+
+**R10 - Supply missing administrative and version-governance metadata**
+-----------------------------------------------------------------------
+
+Add institution, funding, investigators with persistent identifiers,
+creation-time semantics, project mapping, license/restrictions, and
+modality mapping from authoritative dataset-level sources. Pin v2.9.0
+for this migration and establish a separate decision for transition to
+biodata-schema.
+
+**9. Open Questions**
+=====================
+
+-   What is the authoritative AIND data-asset boundary:
+    acquisition\_group\_id, plate/well/session, or each physical image
+    file?
+
+-   What stable identifier represents a cell-line-derived specimen, and
+    how is it related to organism, donor, parental line, and clone?
+
+-   Should plate/well/experimental design live in an AICS profile, the
+    Registry relational layer, or a proposed future schema extension?
+
+-   Which legacy acquisitions may use ExternalDataStream because device
+    details are unavailable, and what minimum evidence is still
+    required?
+
+-   Are generic AIND parameters acceptable as a transitional store, or
+    must key AICS fields be typed before onboarding?
+
+-   Which timestamp source is authoritative for acquisition start/end,
+    processing, and specimen events, and what timezone policy applies?
+
+-   Should the production target remain aind-data-schema v2.9.0 or move
+    directly to the successor biodata-schema after this baseline
+    comparison?
+
+-   Who owns and approves controlled-vocabulary mappings, extension
+    keys, validation exceptions, and future migration upgrades?
+
+**10. Sources and Method**
+==========================
+
+The comparison used the supplied AICS Parquet artifact and its governed
+companion files, the supplied Immunology gap analysis as the reporting
+template, and the official tagged AIND v2.9.0 source schemas. The
+crosswalk was constructed field by field and checked against root
+required fields plus the required nested objects used for in-vitro
+imaging.
+
+-   AICS source:
+    aics\_bff\_primary\_images\_slim\_rembi\_categorized.parquet and
+    repository companion schema/validation files.
+
+-   AIND documentation:
+    https://aind-data-schema.readthedocs.io/en/latest/
+
+-   Pinned AIND source and generated JSON schemas:
+    https://github.com/AllenNeuralDynamics/aind-data-schema/tree/v2.9.0
+
+-   AIND v2.9.0 release notice:
+    https://github.com/AllenNeuralDynamics/aind-data-schema/releases/tag/v2.9.0
+
+-   Reference format: Immunology\_BioData\_Registry\_Gap\_Analysis.docx,
+    supplied August 25, 2026.
+
+**Method note.** \'Direct\' does not mean the entire AIND object is
+valid; it means the individual field has a defensible destination.
+\'Extension container\' indicates retention in a flexible dictionary or
+notes field and is intentionally not counted as semantic conformance.
+Required-field readiness is assessed conditionally for core objects that
+would be emitted in an AICS in-vitro imaging package.

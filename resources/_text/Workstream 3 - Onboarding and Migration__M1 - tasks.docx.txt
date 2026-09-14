@@ -1,0 +1,108 @@
+# source: Workstream 3 - Onboarding and Migration/M1 - tasks.docx
+# extracted: 2026-08-27
+
+Workstream 3 -- Milestone 1 -- Tasks
+
+1)  Pick a workstream owner:
+
+> The rotation:
+
+1.  Ray
+
+2.  **Tim**
+
+3.  Doug
+
+4.  Jessica
+
+2\) Align on the architecture requirements for ingest and
+pre-registration
+
+> Questions:
+>
+> **Tim:**
+>
+> Can metadata in the registry be updated/deleted?
+
+-   Does the registry support point-in-time reads? For example, git
+    allows you to reference the state of the repo at a given commit; do
+    our users need to be able to reference the state of the registry at
+    the point they published based on its content?
+
+-   Jess: if yes, do these updates need to propagate back to the
+    "source" registries (e.g. an accelerator may already have a system
+    in place for tracking metadata, if metadata is edited in BDR, so we
+    need to support also making that change to the original system?)
+
+    -   Ray: Ideally yes, as this would be a nice user experience, but
+        also potentially a tall order for a v1\... I have a similar
+        question in reverse, i.e., if someone makes an update in an
+        accelerator-specific registry, should we provide some mechanism
+        to propagate those updates to BDR? Or is the expectation that
+        scientists/curators/agents make those updates directly?
+
+> What is the scope of the agentic involvement in ingest?
+
+-   It might be scoped to the mapping of external context into our
+    canonical model with the goal of producing artifacts that would
+    support subsequent ingest of data. For example, an agent could
+    assist in producing a schema that defines the shape of data we will
+    accept from a given submitter, along with a transformation from that
+    shape into the canonical model shape. Ingest would then be a second
+    workflow that would apply those derived schema for validation, then
+    the derived transformations for loading into the persistence layer.
+
+-   It might be scoped to accomplish both mapping and ingest in one
+    workflow. That is, every time a submitter presents data it goes
+    through an agentic process that cures it and, if successful, loads
+    it into the persistence layer.
+
+    -   Ray: my sense is that this is what we're after
+
+> I've heard the term 'data hopper' a number of times; what's meant by
+> that?
+
+-   Ray: I understand that to be a staging area of sorts, where a user
+    could submit "messy" data that may not fully adhere to the schema.
+    The Registry would still surface that data but make it clear that's
+    in some kind of provisional tier. Then, an agent would "clean up"
+    the data, i.e., highlight where the data needs to be updated to be
+    schema-compliant and require human intervention before final ingest
+    to the Registry-proper.
+
+    -   Note that the red boxes on the left of [this
+        diagram](https://www.figma.com/board/Ui0H2lNusiPg3mjDoleORH/BDR--Use-Cases?node-id=662-621&t=DjHV74DatEoBiP4N-4)
+        ("staging") capture this idea pretty well
+
+> Will a submission to the registry have a single ID?
+
+-   Data will come in many forms, but it will always be expressible as
+    an instance of the canonical model. My mental model of this is an
+    'Observation'. Does the registry track things at the Observation
+    level? Or only at its constituent entities level?
+
+Ray: In addition to humans submitting data to BDR, we will presumably
+have automated ETL processes submitting data, e.g., from lab systems
+like PowerApps. How will pre-ingest validation flow work in these cases
+where a human may or may not be in the loop? How will end users handle
+required corrections to incoming data?
+
+-   Ray: In Brain Science, we're doing two things to mediate this: 1)
+    ensuring that a contract is established with the lab team's
+    interface before ingest so that data is submitted in a (largely)
+    predictable shape, and 2) building an ingest service upstream of the
+    Registry that handles validation before ingest. I don't know that we
+    need to repeat that pattern here, but worth considering in case it
+    affects architecture requirements.
+
+Jess: We have some datasets published to public locations, like the AWS
+Open Data bucket s3://allencell. Will we need/want/plan to support
+ingest from these externally managed locations? Noting that we do not
+generally also have a copy of this published data in our internal
+systems.
+
+Jess: I may have missed this from M0 discussions, but will the
+architecture support propagating metadata through nested relationships
+in the schema? For example, is some metadata are applied to a "Plate",
+does that also become available at the "Well" level (where a Plate
+contains multiple Wells)?
