@@ -2,6 +2,8 @@
 
 BioData Registry project assistant. Two commands, one shared corpus.
 
+<img src="floppy.png" alt="floppy" width="200">
+
 | Command | Does |
 |---|---|
 | `/floppy-ask` | Answers questions about the BDR project and the aind-data-schema, from the bundled corpus. Cites its source. Says when something is open rather than inventing a resolution. |
