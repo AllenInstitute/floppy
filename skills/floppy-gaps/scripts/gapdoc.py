@@ -32,7 +32,6 @@ from pathlib import Path
 CLASSES = ["Mapped", "Gap", "Conflict", "Unmappable", "Needs Review"]
 FIELD_HEADERS = ["Source Field", "Type", "Target (aind)", "Classification",
                  "Cross-Dataset Gap", "Notes & Recommendation"]
-ESCALATION = "Jess Thomas (jess.thomas@alleninstitute.org)"
 
 PLACEHOLDER_BANNER = (
     "Placeholder note.",
@@ -134,9 +133,6 @@ def validate(doc):
                 if not str(f.get(k, "")).strip():
                     problems.append(f"a field in {e.get('name','?')!r} is missing {k!r}")
 
-    for u in doc.get("unknowns", []):
-        if not str(u.get("ask", "")).strip():
-            problems.append(f"unknown {u.get('item')!r} names nobody to ask; default {ESCALATION}")
     return problems
 
 
@@ -145,7 +141,6 @@ def validate(doc):
 def build(doc, out):
     from docx import Document
     from docx.shared import Pt, Inches, RGBColor
-    from docx.enum.text import WD_ALIGN_PARAGRAPH
 
     d = Document()
     for s in d.sections:
