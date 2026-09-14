@@ -45,6 +45,39 @@ else — `/floppy-ask` runs on the bundled text with no extra setup.
 **Updating.** `/plugin update floppy`, then re-run `bash scripts/setup.sh` if the
 pinned schema commits changed.
 
+## Using it in Cowork and claude.ai chat
+
+**Claude Desktop — Cowork.** Cowork uses whatever is installed in the **Code
+tab**; there's no separate install in Cowork. So install once in Code and it's
+there in Cowork:
+
+```
+/plugin marketplace add AllenInstitute/floppy
+/plugin install floppy@allen-bdr
+bash scripts/setup.sh
+```
+
+Then switch to the Cowork tab — `/floppy-ask` and `/floppy-gaps` are available.
+(Install scope matters: choose **User** to have it in every session, **Project**
+to share it with a repo via `.claude/settings.json`.) Run `/reload-plugins` if a
+command doesn't appear right after install.
+
+**claude.ai web chat.** The plugin/marketplace flow is a Claude Code / Desktop
+feature and is **not** available in the plain web chat. Two ways to get the
+behavior there:
+
+- *Per-user (manual).* Make a Claude **Project**, open its settings, and paste
+  the body of a `SKILL.md` (e.g. `skills/floppy-ask/SKILL.md`, minus the
+  frontmatter) into the Project's custom instructions. Every chat in that
+  Project then follows it. This is a static copy — it won't track skill updates,
+  and it can't run `gapdoc.py`, so `/floppy-gaps`'s docx build isn't available
+  this way.
+- *Org-wide (admin).* On Team/Enterprise plans an admin can distribute the
+  plugin from **Settings → Directory → Plugins** (GitHub marketplace entry, or a
+  `.plugin` upload). Build the upload artifact with `bash scripts/package.sh`,
+  which writes `floppy.plugin`. This flow is still rolling out and its exact
+  requirements can change — check the in-app admin screen for the current steps.
+
 ## Layout
 
 ```
